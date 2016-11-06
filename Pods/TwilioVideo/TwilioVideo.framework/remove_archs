@@ -1,0 +1,21 @@
+cd "$(dirname "$0")"
+
+FRAMEWORK_PATH="$(basename "$(pwd)")"
+FRAMEWORK_BIN="${FRAMEWORK_PATH%.framework}"
+ALL_ARCHS=$(lipo -info "${FRAMEWORK_BIN}" | rev | cut -d: -f1 | rev)
+
+for ARCH in ${ALL_ARCHS}; do
+  if ! [[ "${VALID_ARCHS}" == *"${ARCH}"* ]]; then
+    echo "Removing ${ARCH}..."
+    lipo -remove "${ARCH}" -output "${FRAMEWORK_BIN}" "${FRAMEWORK_BIN}"
+  fi
+done
+
+if [ -d BCSymbolMaps ]; then
+  if [ "${ACTION}" == "install" ]; then
+    mv BCSymbolMaps/*.bcsymbolmap "${CONFIGURATION_BUILD_DIR}"
+  fi
+  rm -rf BCSymbolMaps
+fi
+
+rm remove_archs || true

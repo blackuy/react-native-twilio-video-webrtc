@@ -52,12 +52,7 @@ class App extends Component {
         <TwilioVideo
           ref="twilioVideo" 
           onRoomDidConnect={(data)=> {
-            console.log(`Room `, data) 
-            participants = data["participantsNames"]
-            this.setState({currentState: STATES.CONNECTED})
-            if(participants.length > 0){
-              this.setState({currentState: STATES.WAITING_PARTICIPANT})
-            }
+            // ... participants = data["participantsNames"]
           }} 
           onRoomParticipantDidConnect={(data)=> {
             //... i.e. participant = data["participantName"]

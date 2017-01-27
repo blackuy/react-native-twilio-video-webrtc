@@ -7,10 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		20D3AB19A6E98EAE49EA7D8F /* Pods_TWReactNativeTwilioVideoWebrtc.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EFF85F064E07449842D1F3D3 /* Pods_TWReactNativeTwilioVideoWebrtc.framework */; };
 		3D458EC11DCE592E0044D480 /* TWRemotePreviewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D458EBC1DCE592E0044D480 /* TWRemotePreviewManager.m */; };
 		3D458EC21DCE592E0044D480 /* TWVideoModule.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D458EBE1DCE592E0044D480 /* TWVideoModule.m */; };
 		3D458EC31DCE592E0044D480 /* TWVideoPreviewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D458EC01DCE592E0044D480 /* TWVideoPreviewManager.m */; };
+		E851584F1E3ACF4C00D9B0C6 /* ALView+PureLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = E85158471E3ACF4C00D9B0C6 /* ALView+PureLayout.m */; };
+		E85158501E3ACF4C00D9B0C6 /* NSArray+PureLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = E85158491E3ACF4C00D9B0C6 /* NSArray+PureLayout.m */; };
+		E85158511E3ACF4C00D9B0C6 /* NSLayoutConstraint+PureLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = E851584B1E3ACF4C00D9B0C6 /* NSLayoutConstraint+PureLayout.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -27,16 +29,21 @@
 
 /* Begin PBXFileReference section */
 		134814201AA4EA6300B7C361 /* libTWReactNativeTwilioVideoWebrtc.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libTWReactNativeTwilioVideoWebrtc.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		1EDA0EA95B26012E8C2E38E5 /* Pods-TWReactNativeTwilioVideoWebrtc.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TWReactNativeTwilioVideoWebrtc.release.xcconfig"; path = "../Pods/Target Support Files/Pods-TWReactNativeTwilioVideoWebrtc/Pods-TWReactNativeTwilioVideoWebrtc.release.xcconfig"; sourceTree = "<group>"; };
 		3D458EBB1DCE592E0044D480 /* TWRemotePreviewManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TWRemotePreviewManager.h; sourceTree = "<group>"; };
 		3D458EBC1DCE592E0044D480 /* TWRemotePreviewManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TWRemotePreviewManager.m; sourceTree = "<group>"; };
 		3D458EBD1DCE592E0044D480 /* TWVideoModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TWVideoModule.h; sourceTree = "<group>"; };
 		3D458EBE1DCE592E0044D480 /* TWVideoModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TWVideoModule.m; sourceTree = "<group>"; };
 		3D458EBF1DCE592E0044D480 /* TWVideoPreviewManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TWVideoPreviewManager.h; sourceTree = "<group>"; };
 		3D458EC01DCE592E0044D480 /* TWVideoPreviewManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TWVideoPreviewManager.m; sourceTree = "<group>"; };
-		3D458F4E1DCEA8740044D480 /* TWTwilioVideoReactNative.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = TWTwilioVideoReactNative.framework; path = "../../../../../../../../Library/Developer/Xcode/DerivedData/stranger-giuoybbbsfhgndeokggygaitbxml/Build/Products/Debug-iphoneos/TWTwilioVideoReactNative/TWTwilioVideoReactNative.framework"; sourceTree = "<group>"; };
-		44EDC8FC6628047164F4D610 /* Pods-TWReactNativeTwilioVideoWebrtc.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TWReactNativeTwilioVideoWebrtc.debug.xcconfig"; path = "../Pods/Target Support Files/Pods-TWReactNativeTwilioVideoWebrtc/Pods-TWReactNativeTwilioVideoWebrtc.debug.xcconfig"; sourceTree = "<group>"; };
-		EFF85F064E07449842D1F3D3 /* Pods_TWReactNativeTwilioVideoWebrtc.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TWReactNativeTwilioVideoWebrtc.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		E85158461E3ACF4C00D9B0C6 /* ALView+PureLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "ALView+PureLayout.h"; sourceTree = "<group>"; };
+		E85158471E3ACF4C00D9B0C6 /* ALView+PureLayout.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "ALView+PureLayout.m"; sourceTree = "<group>"; };
+		E85158481E3ACF4C00D9B0C6 /* NSArray+PureLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSArray+PureLayout.h"; sourceTree = "<group>"; };
+		E85158491E3ACF4C00D9B0C6 /* NSArray+PureLayout.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSArray+PureLayout.m"; sourceTree = "<group>"; };
+		E851584A1E3ACF4C00D9B0C6 /* NSLayoutConstraint+PureLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSLayoutConstraint+PureLayout.h"; sourceTree = "<group>"; };
+		E851584B1E3ACF4C00D9B0C6 /* NSLayoutConstraint+PureLayout.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSLayoutConstraint+PureLayout.m"; sourceTree = "<group>"; };
+		E851584C1E3ACF4C00D9B0C6 /* PureLayout+Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "PureLayout+Internal.h"; sourceTree = "<group>"; };
+		E851584D1E3ACF4C00D9B0C6 /* PureLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PureLayout.h; sourceTree = "<group>"; };
+		E851584E1E3ACF4C00D9B0C6 /* PureLayoutDefines.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PureLayoutDefines.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -44,7 +51,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				20D3AB19A6E98EAE49EA7D8F /* Pods_TWReactNativeTwilioVideoWebrtc.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -59,18 +65,10 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		3D458F4B1DCEA85A0044D480 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				3D458F4E1DCEA8740044D480 /* TWTwilioVideoReactNative.framework */,
-				EFF85F064E07449842D1F3D3 /* Pods_TWReactNativeTwilioVideoWebrtc.framework */,
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
 		58B511D21A9E6C8500147676 = {
 			isa = PBXGroup;
 			children = (
+				E85158451E3ACF4C00D9B0C6 /* PureLayout */,
 				3D458EBB1DCE592E0044D480 /* TWRemotePreviewManager.h */,
 				3D458EBC1DCE592E0044D480 /* TWRemotePreviewManager.m */,
 				3D458EBD1DCE592E0044D480 /* TWVideoModule.h */,
@@ -78,18 +76,23 @@
 				3D458EBF1DCE592E0044D480 /* TWVideoPreviewManager.h */,
 				3D458EC01DCE592E0044D480 /* TWVideoPreviewManager.m */,
 				134814211AA4EA7D00B7C361 /* Products */,
-				3D458F4B1DCEA85A0044D480 /* Frameworks */,
-				C2F70E6250543755725CD259 /* Pods */,
 			);
 			sourceTree = "<group>";
 		};
-		C2F70E6250543755725CD259 /* Pods */ = {
+		E85158451E3ACF4C00D9B0C6 /* PureLayout */ = {
 			isa = PBXGroup;
 			children = (
-				44EDC8FC6628047164F4D610 /* Pods-TWReactNativeTwilioVideoWebrtc.debug.xcconfig */,
-				1EDA0EA95B26012E8C2E38E5 /* Pods-TWReactNativeTwilioVideoWebrtc.release.xcconfig */,
+				E85158461E3ACF4C00D9B0C6 /* ALView+PureLayout.h */,
+				E85158471E3ACF4C00D9B0C6 /* ALView+PureLayout.m */,
+				E85158481E3ACF4C00D9B0C6 /* NSArray+PureLayout.h */,
+				E85158491E3ACF4C00D9B0C6 /* NSArray+PureLayout.m */,
+				E851584A1E3ACF4C00D9B0C6 /* NSLayoutConstraint+PureLayout.h */,
+				E851584B1E3ACF4C00D9B0C6 /* NSLayoutConstraint+PureLayout.m */,
+				E851584C1E3ACF4C00D9B0C6 /* PureLayout+Internal.h */,
+				E851584D1E3ACF4C00D9B0C6 /* PureLayout.h */,
+				E851584E1E3ACF4C00D9B0C6 /* PureLayoutDefines.h */,
 			);
-			name = Pods;
+			path = PureLayout;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -99,11 +102,9 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 58B511EF1A9E6C8500147676 /* Build configuration list for PBXNativeTarget "TWReactNativeTwilioVideoWebrtc" */;
 			buildPhases = (
-				C81453FB1E7E323C999EDF79 /* [CP] Check Pods Manifest.lock */,
 				58B511D71A9E6C8500147676 /* Sources */,
 				58B511D81A9E6C8500147676 /* Frameworks */,
 				58B511D91A9E6C8500147676 /* CopyFiles */,
-				CEC014CD79460389D4FD0CA1 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -145,39 +146,6 @@
 		};
 /* End PBXProject section */
 
-/* Begin PBXShellScriptBuildPhase section */
-		C81453FB1E7E323C999EDF79 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
-			showEnvVarsInLog = 0;
-		};
-		CEC014CD79460389D4FD0CA1 /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[CP] Copy Pods Resources";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/../Pods/Target Support Files/Pods-TWReactNativeTwilioVideoWebrtc/Pods-TWReactNativeTwilioVideoWebrtc-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-/* End PBXShellScriptBuildPhase section */
-
 /* Begin PBXSourcesBuildPhase section */
 		58B511D71A9E6C8500147676 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -186,6 +154,9 @@
 				3D458EC21DCE592E0044D480 /* TWVideoModule.m in Sources */,
 				3D458EC31DCE592E0044D480 /* TWVideoPreviewManager.m in Sources */,
 				3D458EC11DCE592E0044D480 /* TWRemotePreviewManager.m in Sources */,
+				E851584F1E3ACF4C00D9B0C6 /* ALView+PureLayout.m in Sources */,
+				E85158501E3ACF4C00D9B0C6 /* NSArray+PureLayout.m in Sources */,
+				E85158511E3ACF4C00D9B0C6 /* NSLayoutConstraint+PureLayout.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -268,8 +239,11 @@
 		};
 		58B511F01A9E6C8500147676 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 44EDC8FC6628047164F4D610 /* Pods-TWReactNativeTwilioVideoWebrtc.debug.xcconfig */;
 			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
@@ -285,8 +259,11 @@
 		};
 		58B511F11A9E6C8500147676 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 1EDA0EA95B26012E8C2E38E5 /* Pods-TWReactNativeTwilioVideoWebrtc.release.xcconfig */;
 			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,

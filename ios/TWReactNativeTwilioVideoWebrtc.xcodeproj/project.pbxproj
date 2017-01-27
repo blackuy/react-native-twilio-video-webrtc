@@ -13,7 +13,6 @@
 		E851584F1E3ACF4C00D9B0C6 /* ALView+PureLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = E85158471E3ACF4C00D9B0C6 /* ALView+PureLayout.m */; };
 		E85158501E3ACF4C00D9B0C6 /* NSArray+PureLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = E85158491E3ACF4C00D9B0C6 /* NSArray+PureLayout.m */; };
 		E85158511E3ACF4C00D9B0C6 /* NSLayoutConstraint+PureLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = E851584B1E3ACF4C00D9B0C6 /* NSLayoutConstraint+PureLayout.m */; };
-		E85158531E3ACF5B00D9B0C6 /* TwilioVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E85158521E3ACF5B00D9B0C6 /* TwilioVideo.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -45,7 +44,6 @@
 		E851584C1E3ACF4C00D9B0C6 /* PureLayout+Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "PureLayout+Internal.h"; sourceTree = "<group>"; };
 		E851584D1E3ACF4C00D9B0C6 /* PureLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PureLayout.h; sourceTree = "<group>"; };
 		E851584E1E3ACF4C00D9B0C6 /* PureLayoutDefines.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PureLayoutDefines.h; sourceTree = "<group>"; };
-		E85158521E3ACF5B00D9B0C6 /* TwilioVideo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = TwilioVideo.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -53,7 +51,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E85158531E3ACF5B00D9B0C6 /* TwilioVideo.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -71,7 +68,6 @@
 		58B511D21A9E6C8500147676 = {
 			isa = PBXGroup;
 			children = (
-				E85158521E3ACF5B00D9B0C6 /* TwilioVideo.framework */,
 				E85158451E3ACF4C00D9B0C6 /* PureLayout */,
 				3D458EBB1DCE592E0044D480 /* TWRemotePreviewManager.h */,
 				3D458EBC1DCE592E0044D480 /* TWRemotePreviewManager.m */,

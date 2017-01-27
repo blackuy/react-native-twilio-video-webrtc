@@ -9,7 +9,7 @@
 
 @import TwilioVideo;
 #import "TWVideoPreviewManager.h"
-#import <PureLayout/PureLayout.h>
+#import "PureLayout/PureLayout.h"
 #import "TWVideoModule.h"
 
 

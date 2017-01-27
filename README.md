@@ -9,7 +9,7 @@ yarn add https://github.com/eduedix/react-native-twilio-video-webrtc
 react-native link react-native-twilio-video-webrtc
 ```
 
-open project in Xcode. Click Project in the left pane and go to the tab `General`. Then add Embedded Framework. Click `Add another` and go to `node_modules/react-native-twilio-video-webrtc`. Select TwilioVideo.framework
+Open project in Xcode. Click Project in the left pane and go to the tab `General`. Then add Embedded Framework. Click `Add another` and go to `node_modules/react-native-twilio-video-webrtc`. Select TwilioVideo.framework. Select `Copy items if needed`.
 
 # Usage
 

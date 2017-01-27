@@ -1,6 +1,16 @@
 # react-native-twilio-video-webrtc
 Twilio Video (WebRTC) iOS Wrapper for React Native
 
+# Installation
+Go to your project directory and run these in your terminal:
+
+```
+yarn add https://github.com/eduedix/react-native-twilio-video-webrtc
+react-native link react-native-twilio-video-webrtc
+```
+
+open project in Xcode. Click Project in the left pane and go to the tab `General`. Then add Embedded Framework. Click `Add another` and go to `node_modules/react-native-twilio-video-webrtc`. Select TwilioVideo.framework
+
 # Usage
 
 Note: This is a illustrative example. Not intended to be workable.

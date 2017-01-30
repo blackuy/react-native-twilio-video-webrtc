@@ -2,6 +2,9 @@
 Twilio Video (WebRTC) iOS Wrapper for React Native
 
 # Installation
+If react-native >= 0.40.0: install react-native-twilio-video-webrtc@1.1.*
+If react-native < 0.40.0: install react-native-twilio-video-webrtc@1.0.*
+
 Go to your project directory and run these in your terminal:
 
 ```

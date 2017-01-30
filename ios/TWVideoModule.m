@@ -1,11 +1,3 @@
-//
-//  TWVideoModule.m
-//  stranger
-//
-//  Created by Gaston Morixe on 11/4/16.
-//  Copyright © 2016 Facebook. All rights reserved.
-//
-
 #import "TWVideoModule.h"
 
 static NSString* roomDidConnect               = @"roomDidConnect";
@@ -337,41 +329,6 @@ RCT_EXPORT_METHOD(disconnect) {
     builder.minFrameRate = TVIVideoConstraintsFrameRateNone;
     builder.maxFrameRate = TVIVideoConstraintsFrameRateNone;
   }];
-  
-  //          Video constraints provide a mechanism to capture a video track using a preferred frame size and/or frame rate.
-  
-  //          Here, we set the captured frame size to 960x540. Check TWCCameraCapturer.h for other valid video constraints values.
-  
-  //          960x540 video will fill modern iPhone screens. However, older 32-bit devices (A5, A6 based) will have trouble capturing, and encoding video at HD quality. For these devices we constrain the capturer to produce 480x360 video at 15fps.
-  
-  //         if (Platform.isLowPerformanceDevice) {
-  //             return TWCVideoConstraints.init(block: { (constraints) in
-  //                 constraints.maxSize = TWCVideoConstraintsSize480x360
-  //                 constraints.minSize = TWCVideoConstraintsSize480x360
-  //                 constraints.maxFrameRate = 15
-  //                 constraints.minFrameRate = 15
-  //             })
-  //         } else {
-  //             return TWCVideoConstraints.init(block: { (constraints) in
-  //                 constraints.maxSize = TWCVideoConstraintsSize960x540
-  //                 constraints.minSize = TWCVideoConstraintsSize960x540
-  //                 constraints.maxFrameRate = TWCVideoFrameRateConstraintsNone
-  //                 constraints.minFrameRate = TWCVideoFrameRateConstraintsNone
-  //             })
-  //         }
-  //     }
 }
 
 @end
-
-
-
-// func createCapturer() {
-//         self.camera = TWCCameraCapturer(delegate: self, source: .FrontCamera)
-//         let videoCaptureConstraints = self.videoCaptureConstraints()
-//         let videoTrack = TWCLocalVideoTrack(capturer: self.camera!, constraints: videoCaptureConstraints)
-//         if self.localMedia!.addTrack(videoTrack) == false {
-//             print("Error: Failed to create a video track using the local camera.")
-//         }
-//     }
-

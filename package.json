@@ -1,12 +1,12 @@
 {
   "name": "react-native-twilio-video-webrtc",
   "keywords": "react-native",  
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Twilio Video (WebRTC) iOS Wrapper for React Native",
   "main": "index.js",
   "license": "MIT",
   "author": "Gaston Morixe <gaston@black.uy> (https://github.com/gaston23)",
-  "contributors": ["eduedix (https://github.com/eduedix)"],
+  "contributors": ["Erdem Basegmez <eduedix@gmail.com> (https://github.com/eduedix)"],
   "repository": {
     "type": "git",
     "url": "git@github.com:gaston23/react-native-twilio-video-webrtc.git"

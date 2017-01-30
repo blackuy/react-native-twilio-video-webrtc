@@ -1,18 +1,9 @@
-//
-//  TWVideoManager.m
-//  stranger
-//
-//  Created by Gaston Morixe on 11/4/16.
-//  Copyright © 2016 Facebook. All rights reserved.
-//
-#import "UIView+React.h"
+#import <React/UIView+React.h>
 
 @import TwilioVideo;
 #import "TWRemotePreviewManager.h"
 #import "PureLayout/PureLayout.h"
 #import "TWVideoModule.h"
-
-
 
 @interface TWRemotePreviewManager()
 
@@ -21,9 +12,6 @@
 @implementation TWRemotePreviewManager
 
 RCT_EXPORT_MODULE()
-
-//RCT_EXPORT_VIEW_PROPERTY(onConnect, RCTBubblingEventBlock)
-
 
 -(void)dealloc{
 
@@ -56,11 +44,3 @@ RCT_EXPORT_MODULE()
 }
 
 @end
-
-
-//RCT_EXPORT_VIEW_PROPERTY(pitchEnabled, BOOL)
-
-//RCT_CUSTOM_VIEW_PROPERTY(region, MKCoordinateRegion, RCTMap)
-//{
-//  [view setRegion:json ? [RCTConvert MKCoordinateRegion:json] : defaultView.region animated:YES];
-//}

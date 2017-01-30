@@ -1,20 +1,12 @@
-//
-//  TWVideoModule.h
-//  stranger
-//
-//  Created by Gaston Morixe on 11/4/16.
-//  Copyright © 2016 Facebook. All rights reserved.
-//
-
 #import <Foundation/Foundation.h>
 
 @import TwilioVideo;
 
-#import "RCTBridgeModule.h"
-#import "RCTConvert.h"
+#import <React/RCTBridgeModule.h>
+#import <React/RCTConvert.h>
 
-#import "RCTEventDispatcher.h"
-#import "RCTEventEmitter.h"
+#import <React/RCTEventDispatcher.h>
+#import <React/RCTEventEmitter.h>
 
 @interface TWVideoModule : RCTEventEmitter <RCTBridgeModule>
 

@@ -23,7 +23,7 @@ export default class TwilioVideo extends Component {
     this.startCall = this.startCall.bind(this)
     this.endCall = this.endCall.bind(this)
 
-    this._eventEmitter = new NativeEventEmitter(TWVideoModule)    
+    this._eventEmitter = new NativeEventEmitter(TWVideoModule)
   }
 
 
@@ -32,6 +32,22 @@ export default class TwilioVideo extends Component {
 
   flipCamera(){
     TWVideoModule.flipCamera()
+  }
+
+  detachVideoTrack() {
+    TWVideoModule.detachVideoTrack()
+  }
+
+  detachAudioTrack() {
+    TWVideoModule.detachAudioTrack()
+  }
+
+  attachVideoTrack() {
+    TWVideoModule.attachVideoTrack()
+  }
+
+  attachAudioTrack() {
+    TWVideoModule.attachAudioTrack()
   }
 
   startCall({roomName, accessToken}) {

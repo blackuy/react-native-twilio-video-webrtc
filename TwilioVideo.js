@@ -129,11 +129,12 @@ export default class TwilioVideo extends Component {
   }
 
   componentWillMount() {
-    this._registerEvents()
+    this._registerEvents();
+    TWVideoModule.initializeCamera()
   }
 
   componentWillUnmount() {
-    this._unregisterEvents()
+    this._unregisterEvents();
   }
 
 

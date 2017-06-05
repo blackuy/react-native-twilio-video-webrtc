@@ -105,7 +105,9 @@ RCT_EXPORT_METHOD(initializeCamera) {
       NSLog(@"Failed to add video track");
     } else {
       // Attach view to video track for local preview
-      [self.localVideoTrack attach:previewView];
+      if (self.previewView) {
+        [self.localVideoTrack attach:self.previewView];
+      }
     }
   }
 }

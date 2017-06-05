@@ -68,27 +68,6 @@ RCT_EXPORT_MODULE();
 
     //previewView.translatesAutoresizingMaskIntoConstraints = NO;
     self.previewView = previewView;
-
-
-    self.localMedia = [[TVILocalMedia alloc] init];
-    self.camera = [[TVICameraCapturer alloc] init];
-    self.camera.delegate = self;
-
-    self.localVideoTrack = [self.localMedia addVideoTrack:YES
-                                                 capturer:self.camera
-                                              constraints:[self videoConstraints]
-                                                    error:nil];
-
-    self.localAudioTrack = [self.localMedia addAudioTrack:YES];
-
-    if (!self.localVideoTrack) {
-      NSLog(@"Failed to add video track");
-    } else {
-      // Attach view to video track for local preview
-      [self.localVideoTrack attach:previewView];
-    }
-
-
   }
   return self;
 }
@@ -107,6 +86,30 @@ RCT_EXPORT_MODULE();
   self.localVideoTrack = nil;
   self.videoClient = nil;
   self.room = nil;
+}
+
+RCT_EXPORT_METHOD(initializeCamera) {
+  if (self && !self.camera) {
+    self.localMedia = [[TVILocalMedia alloc] init];
+    self.camera = [[TVICameraCapturer alloc] init];
+    self.camera.delegate = self;
+
+    self.localVideoTrack = [self.localMedia addVideoTrack:YES
+                                                 capturer:self.camera
+                                              constraints:[self videoConstraints]
+                                                    error:nil];
+
+    self.localAudioTrack = [self.localMedia addAudioTrack:YES];
+
+    if (!self.localVideoTrack) {
+      NSLog(@"Failed to add video track");
+    } else {
+      // Attach view to video track for local preview
+      if (self.previewView) {
+        [self.localVideoTrack attach:self.previewView];
+      }
+    }
+  }
 }
 
 RCT_EXPORT_METHOD(flipCamera) {

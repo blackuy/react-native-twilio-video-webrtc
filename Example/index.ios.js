@@ -1,90 +1,92 @@
-![GitHub Logo](/logo.png)
-
-# Twilio Video (WebRTC) for React Native
-
-Platforms:
-- iOS
-- Android **(Coming soon)**
-
-People using a version < 1.0.1 please move to 1.0.1 since the project changed a lot internally to support the stable TwilioVideo version.
-
-## Installation
-
-- react-native >= 0.40.0: install react-native-twilio-video-webrtc@1.0.1
-- react-native < 0.40.0: install react-native-twilio-video-webrtc@1.0.0
-
-### iOS
-
-#### CocoaPods
-
-Add node package using yarn/NPM:
-
-```shell
-yarn add https://github.com/blackuy/react-native-twilio-video-webrtc`
-```
-
-Add the plugin dependency to your Podfile, pointing at the path where NPM installed it:
-
-```ruby
-pod 'react-native-twilio-video-webrtc', path: '../node_modules/react-native-twilio-video-webrtc'
-```
-
-You will need to point your React code the path where NPM installed it too. If you didn't do it add this to your Pofile:
-
-```ruby
-pod 'Yoga', path: '../node_modules/react-native/ReactCommon/yoga/Yoga.podspec'
-pod 'React', path: '../node_modules/react-native'
-```
-
-Install Pods:
-
-```shell
-pod install
-```
-
-### Permissions
-
-To enable camera usage and microphone usage you will need to add the following entries to your `Info.plist` file:
-
-```
-<key>NSCameraUsageDescription</key>
-<string>Your message to user when the camera is accessed for the first time</string>
-<key>NSMicrophoneUsageDescription</key>
-<string>Your message to user when the microsphone is accessed for the first time</string>
-```
-
-### Android
-
-Coming soon
-
-## Docs
-You can see the documentation [here](./docs).
-
-## Usage
-
-We have three important component to understand:
-
-```javascript
-import {
-  TwilioVideo,
-  TwilioVideoLocalView,
-  TwilioVideoParticipantView
-} from 'react-native-twilio-video-webrtc'
-```
-
-- `TwilioVideo` / is responsible for connecting to rooms, events delivery and camera/audio.
-- `TwilioVideoLocalView` / is responsible local camera feed view
-- `TwilioVideoParticipantView` / is responsible remote peer's camera feed view
-
-Here you can see a complete example of a simple application that uses almost all the apis:
-
-````javascript
 import React, { Component } from 'react';
+import {
+  AppRegistry,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+  Button,
+  TouchableOpacity,
+  Dimensions
+} from 'react-native';
+
 import {
   TwilioVideoLocalView,
   TwilioVideoParticipantView,
   TwilioVideo
 } from 'react-native-twilio-video-webrtc'
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: 'white'
+  },
+  callContainer: {
+    flex: 1,
+    position: "absolute",
+    bottom: 0,
+    top: 0,
+    left: 0,
+    right: 0
+  },
+  welcome: {
+    fontSize: 30,
+    textAlign: 'center',
+    paddingTop: 40
+  },
+  input: {
+    height: 50,
+    borderWidth: 1,
+    marginRight: 70,
+    marginLeft: 70,
+    marginTop: 50,
+    textAlign: 'center',
+    backgroundColor: 'white'
+  },
+  button: {
+    marginTop: 100
+  },
+  localVideo: {
+    flex: 1,
+    width: 150,
+    height: 250,
+    position: "absolute",
+    right: 10,
+    bottom: 10
+  },
+  remoteGrid: {
+    flex: 1,
+    flexDirection: "row",
+    flexWrap: 'wrap'
+  },
+  remoteVideo: {
+    marginTop: 20,
+    marginLeft: 10,
+    marginRight: 10,
+    width: 100,
+    height: 120,
+  },
+  optionsContainer: {
+    position: "absolute",
+    left: 0,
+    bottom: 0,
+    right: 0,
+    height: 100,
+    backgroundColor: 'blue',
+    flexDirection: "row",
+    alignItems: "center"
+  },
+  optionButton: {
+    width: 60,
+    height: 60,
+    marginLeft: 10,
+    marginRight: 10,
+    borderRadius: 100 / 2,
+    backgroundColor: 'grey',
+    justifyContent: 'center',
+    alignItems: "center"
+  }
+});
 
 export default class Example extends Component {
   state = {
@@ -109,6 +111,26 @@ export default class Example extends Component {
   _onMuteButtonPress = () => {
     this.refs.twilioVideo.setLocalAudioEnabled(!this.state.isAudioEnabled)
       .then(isEnabled => this.setState({isAudioEnabled: isEnabled}))
+  }
+
+  _onFlipButtonPress = () => {
+    this.refs.twilioVideo.flipCamera()
+  }
+
+  _onRoomDidConnect = () => {
+    this.setState({status: 'connected'})
+  }
+
+  _onRoomDidDisconnect = ({roomName, error}) => {
+    console.log("ERROR: ", error)
+
+    this.setState({status: 'disconnected'})
+  }
+
+  _onRoomDidFailToConnect = (error) => {
+    console.log("ERROR: ", error)
+
+    this.setState({status: 'disconnected'})
   }
 
   _onParticipantAddedVideoTrack = ({participant, track}) => {
@@ -216,18 +238,3 @@ export default class Example extends Component {
 }
 
 AppRegistry.registerComponent('Example', () => Example);
-````
-
-## Run the Example Application
-
-To run the example application:
-
-- Move to the Example directory: `cd Example`
-- Install node dependencies: `yarn install`
-- Install objective-c dependencies: `cd ios && pod install`
-- Open the xcworkspace and run the app: `open Example.xcworkspace`
-
-## Contact
-
-- Martín Fernández <fmartin91@gmail.com>
-- Gaston Morixe <gaston@black.uy>

@@ -1,0 +1,239 @@
+//
+//  TwilioVideo.js
+//  Black
+//
+//  Created by Martín Fernández on 6/13/17.
+//
+//
+
+import React, { Component, PropTypes } from 'react'
+import {
+  NativeModules,
+  NativeEventEmitter,
+  View,
+} from 'react-native'
+
+const { TWVideoModule } = NativeModules
+
+export default class extends Component {
+
+  static propTypes = {
+    /**
+     * Called when the room has connected
+     *
+     * @param {{roomName, participants}}
+     */
+    onRoomDidConnect: PropTypes.func,
+    /**
+     * Called when the room has disconnected
+     *
+     * @param {{roomName, error}}
+     */
+    onRoomDidDisconnect: PropTypes.func,
+    /**
+     * Called when connection with room failed
+     *
+     * @param {{roomName, error}}
+     */
+    onRoomDidFailToConnect: PropTypes.func,
+    /**
+     * Called when a new participant has connected
+     *
+     * @param {{roomName, participant}}
+     */
+    onRoomParticipantDidConnect: PropTypes.func,
+    /**
+     * Called when a participant has disconnected
+     *
+     * @param {{roomName, participant}}
+     */
+    onRoomParticipantDidDisconnect: PropTypes.func,
+    /**
+     * Called when a new video track has been added
+     *
+     * @param {{participant, track}}
+     */
+    onParticipantAddedVideoTrack: PropTypes.func,
+    /**
+     * Called when a video track has been removed
+     *
+     * @param {{participant, track}}
+     */
+    onParticipantRemovedVideoTrack: PropTypes.func,
+    /**
+     * Called when a new audio track has been added
+     *
+     * @param {{participant, track}}
+     */
+    onParticipantAddedAudioTrack: PropTypes.func,
+    /**
+     * Called when a audio track has been removed
+     *
+     * @param {{participant, track}}
+     */
+    onParticipantRemovedAudioTrack: PropTypes.func,
+    /**
+     * Called when a track has been enabled. This can be audio or video tracks
+     *
+     * @param {{participant, track}}
+     */
+    onParticipantEnabledTrack: PropTypes.func,
+    /**
+     * Called when a track has been disabled. This can be audio or video tracks
+     *
+     * @param {{participant, track}}
+     */
+    onParticipantDisabledTrack: PropTypes.func,
+    /**
+     * Called when the camera has started
+     *
+     */
+    onCameraDidStart: PropTypes.func,
+    /**
+     * Called when the camera has been interrupted
+     *
+     */
+    onCameraWasInterrumpted: PropTypes.func,
+    /**
+     * Called when the camera has stopped runing with an error
+     *
+     * @param {{error}} The error message description
+     */
+    onCameraDidStopRunning: PropTypes.func,
+    ...View.propTypes
+  }
+
+  constructor(props) {
+    super(props)
+
+    this._subscriptions = []
+    this._eventEmitter = new NativeEventEmitter(TWVideoModule)
+
+    this.setLocalVideoEnabled = this.setLocalVideoEnabled.bind(this)
+    this.setLocalAudioEnabled = this.setLocalAudioEnabled.bind(this)
+    this.flipCamera = this.flipCamera.bind(this)
+    this.connect = this.connect.bind(this)
+    this.disconnect = this.disconnect.bind(this)
+  }
+
+  componentWillMount() {
+    this._registerEvents()
+    this._startLocalVideo()
+    this._startLocalAudio()
+  }
+
+  componentWillUnmount() {
+    this._unregisterEvents()
+    this._stopLocalVideo()
+    this._stopLocalAudio()
+  }
+
+  /**
+   * Enable or disable local video
+   */
+  setLocalVideoEnabled(enabled) {
+    return TWVideoModule.setLocalVideoEnabled(enabled)
+  }
+
+  /**
+   * Enable or disable local audio
+   */
+  setLocalAudioEnabled(enabled) {
+    return TWVideoModule.setLocalAudioEnabled(enabled)
+  }
+
+  /**
+   * Filp between the front and back camera
+   */
+  flipCamera() {
+    TWVideoModule.flipCamera()
+  }
+
+  /**
+   * Connect to given room name using the JWT access token
+   * @param  {String} roomName    The connecting room name
+   * @param  {String} accessToken The Twilio's JWT access token
+   */
+  connect({roomName, accessToken}) {
+    TWVideoModule.connect(accessToken, roomName)
+  }
+
+  /**
+   * Disconnect from current room
+   */
+  disconnect() {
+    TWVideoModule.disconnect()
+  }
+
+  _startLocalVideo() {
+    TWVideoModule.startLocalVideo()
+  }
+
+  _stopLocalVideo() {
+    TWVideoModule.stopLocalVideo()
+  }
+
+  _startLocalAudio() {
+    TWVideoModule.startLocalAudio()
+  }
+
+  _stopLocalAudio() {
+    TWVideoModule.stopLocalAudio()
+  }
+
+  _unregisterEvents() {
+    this._subscriptions.forEach(e => e.remove())
+    this._subscriptions = []
+  }
+
+  _registerEvents() {
+    this._subscriptions = [
+      this._eventEmitter.addListener('roomDidConnect', (data) => {
+        if(this.props.onRoomDidConnect){ this.props.onRoomDidConnect(data) }
+      }),
+      this._eventEmitter.addListener('roomDidDisconnect', (data) => {
+        if(this.props.onRoomDidDisconnect){ this.props.onRoomDidDisconnect(data) }
+      }),
+      this._eventEmitter.addListener('roomDidFailToConnect', (data) => {
+        if(this.props.onRoomDidFailToConnect){ this.props.onRoomDidFailToConnect(data) }
+      }),
+      this._eventEmitter.addListener('roomParticipantDidConnect', (data) => {
+        if(this.props.onRoomParticipantDidConnect){ this.props.onRoomParticipantDidConnect(data) }
+      }),
+      this._eventEmitter.addListener('roomParticipantDidDisconnect', (data) => {
+        if(this.props.onRoomParticipantDidDisconnect){ this.props.onRoomParticipantDidDisconnect(data) }
+      }),
+      this._eventEmitter.addListener('participantAddedVideoTrack', (data) => {
+        if(this.props.onParticipantAddedVideoTrack){ this.props.onParticipantAddedVideoTrack(data) }
+      }),
+      this._eventEmitter.addListener('participantRemovedVideoTrack', (data) => {
+        if(this.props.onParticipantRemovedVideoTrack){ this.props.onParticipantRemovedVideoTrack(data) }
+      }),
+      this._eventEmitter.addListener('participantAddedAudioTrack', (data) => {
+        if(this.props.onParticipantAddedAudioTrack){ this.props.onParticipantAddedAudioTrack(data) }
+      }),
+      this._eventEmitter.addListener('participantRemovedAudioTrack', (data) => {
+        if(this.props.onParticipantRemovedAudioTrack){ this.props.onParticipantRemovedAudioTrack(data) }
+      }),
+      this._eventEmitter.addListener('participantEnabledTrack', (data) => {
+        if(this.props.onParticipantEnabledTrack){ this.props.onParticipantEnabledTrack(data) }
+      }),
+      this._eventEmitter.addListener('participantDisabledTrack', (data) => {
+        if(this.props.onParticipantDisabledTrack){ this.props.onParticipantDisabledTrack(data) }
+      }),
+      this._eventEmitter.addListener('cameraDidStart', (data) => {
+        if(this.props.onCameraDidStart){ this.props.onCameraDidStart(data) }
+      }),
+      this._eventEmitter.addListener('cameraWasInterrumpted', (data) => {
+        if(this.props.onCameraWasInterrumpted){ this.props.onCameraWasInterrumpted(data) }
+      }),
+      this._eventEmitter.addListener('cameraDidStopRunning', (data) => {
+        if(this.props.onCameraDidStopRunning){ this.props.onCameraDidStopRunning(data) }
+      })
+    ]
+  }
+
+  render() {
+    return this.props.children || null
+  }
+}

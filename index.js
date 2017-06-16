@@ -1,5 +1,9 @@
-import TwilioVideoPreview from './TwilioVideoPreview'
-import TwilioRemotePreview from './TwilioRemotePreview'
-import TwilioVideo from './TwilioVideo'
+import TwilioVideoLocalView from './src/TwilioVideoLocalView'
+import TwilioVideoParticipantView from './src/TwilioVideoParticipantView'
+import TwilioVideo from './src/TwilioVideo'
 
-export {TwilioVideoPreview, TwilioRemotePreview, TwilioVideo}
+export {
+  TwilioVideoLocalView,
+  TwilioVideoParticipantView,
+  TwilioVideo
+}

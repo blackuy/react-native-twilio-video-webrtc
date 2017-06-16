@@ -1,0 +1,10 @@
+# Uncomment the next line to define a global platform for your project
+source 'https://github.com/CocoaPods/Specs.git'
+
+platform :ios, '9.0'
+
+target 'Example' do
+  pod 'Yoga', path: '../node_modules/react-native/ReactCommon/yoga/Yoga.podspec'
+  pod 'React', path: '../node_modules/react-native'
+  pod 'react-native-twilio-video-webrtc', path: '../../'
+end

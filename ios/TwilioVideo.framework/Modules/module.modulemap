@@ -1,6 +1,0 @@
-framework module TwilioVideo {
-  umbrella header "TwilioVideo.h"
-
-  export *
-  module * { export * }
-}

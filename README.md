@@ -20,7 +20,7 @@ People using a version < 1.0.1 please move to 1.0.1 since the project changed a 
 Add node package using yarn/NPM:
 
 ```shell
-yarn add https://github.com/blackuy/react-native-twilio-video-webrtc`
+yarn add https://github.com/blackuy/react-native-twilio-video-webrtc
 ```
 
 Add the plugin dependency to your Podfile, pointing at the path where NPM installed it:
@@ -50,7 +50,7 @@ To enable camera usage and microphone usage you will need to add the following e
 <key>NSCameraUsageDescription</key>
 <string>Your message to user when the camera is accessed for the first time</string>
 <key>NSMicrophoneUsageDescription</key>
-<string>Your message to user when the microsphone is accessed for the first time</string>
+<string>Your message to user when the microphone is accessed for the first time</string>
 ```
 
 ### Android
@@ -62,7 +62,7 @@ You can see the documentation [here](./docs).
 
 ## Usage
 
-We have three important component to understand:
+We have three important components to understand:
 
 ```javascript
 import {

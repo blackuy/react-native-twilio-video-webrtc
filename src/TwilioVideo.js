@@ -93,7 +93,7 @@ export default class extends Component {
      * Called when the camera has been interrupted
      *
      */
-    onCameraWasInterrumpted: PropTypes.func,
+    onCameraWasInterrupted: PropTypes.func,
     /**
      * Called when the camera has stopped runing with an error
      *
@@ -224,8 +224,8 @@ export default class extends Component {
       this._eventEmitter.addListener('cameraDidStart', (data) => {
         if(this.props.onCameraDidStart){ this.props.onCameraDidStart(data) }
       }),
-      this._eventEmitter.addListener('cameraWasInterrumpted', (data) => {
-        if(this.props.onCameraWasInterrumpted){ this.props.onCameraWasInterrumpted(data) }
+      this._eventEmitter.addListener('cameraWasInterrupted', (data) => {
+        if(this.props.onCameraWasInterrupted){ this.props.onCameraWasInterrupted(data) }
       }),
       this._eventEmitter.addListener('cameraDidStopRunning', (data) => {
         if(this.props.onCameraDidStopRunning){ this.props.onCameraDidStopRunning(data) }

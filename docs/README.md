@@ -26,14 +26,14 @@ Called when the camera has started
 onCameraDidStopRunning: Function
 ```
 
-Called when the camera has stopped runing with an error
+Called when the camera has stopped running with an error
 
 @param {{error}} The error message description
 
-#### onCameraWasInterrumpted
+#### onCameraWasInterrupted
 
 ```js
-onCameraWasInterrumpted: Function
+onCameraWasInterrupted: Function
 ```
 
 Called when the camera has been interrupted

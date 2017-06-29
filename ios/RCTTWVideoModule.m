@@ -24,7 +24,7 @@ static NSString* participantEnabledTrack      = @"participantEnabledTrack";
 static NSString* participantDisabledTrack     = @"participantDisabledTrack";
 
 static NSString* cameraDidStart               = @"cameraDidStart";
-static NSString* cameraWasInterrumpted        = @"cameraWasInterrumpted";
+static NSString* cameraWasInterrupted        = @"cameraWasInterrupted";
 static NSString* cameraDidStopRunning         = @"cameraDidStopRunning";
 
 
@@ -62,7 +62,7 @@ RCT_EXPORT_MODULE();
     participantDisabledTrack,
     cameraDidStopRunning,
     cameraDidStart,
-    cameraWasInterrumpted
+    cameraWasInterrupted
   ];
 }
 
@@ -169,7 +169,7 @@ RCT_EXPORT_METHOD(disconnect) {
 # pragma mark - TVICameraCapturerDelegate
 
 -(void)cameraCapturerWasInterrupted:(TVICameraCapturer *)capturer {
-  [self sendEventWithName:cameraWasInterrumpted body:nil];
+  [self sendEventWithName:cameraWasInterrupted body:nil];
 }
 
 -(void)cameraCapturerPreviewDidStart:(TVICameraCapturer *)capturer {

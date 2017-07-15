@@ -26,6 +26,8 @@ import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_DICONNECTED;
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_PARTICIPANT_CONNECTED;
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_PARTICIPANT_DISCONNECTED;
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_VIDEO_CHANGED;
+import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_PARTICIPANT_ADDED_VIDEO_TRACK;
+import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_PARTICIPANT_REMOVED_VIDEO_TRACK;
 
 public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilioVideoView> {
 
@@ -57,16 +59,16 @@ public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilio
             case DISCONNECT:
                 view.disconnect();
                 break;
-
             case SWITCH_CAMERA:
                 view.switchCamera();
                 break;
-
             case TOGGLE_VIDEO:
-                view.toggleVideo();
+                Boolean videoEnabled = args.getBoolean(0);
+                view.toggleVideo(videoEnabled);
                 break;
             case TOGGLE_SOUND:
-                view.toggleAudio();
+                Boolean audioEnabled = args.getBoolean(0);
+                view.toggleAudio(audioEnabled);
                 break;
         }
     }
@@ -85,7 +87,9 @@ public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilio
         );
 
         map.putAll(MapBuilder.of(
-                ON_PARTICIPANT_DISCONNECTED, MapBuilder.of("registrationName", ON_PARTICIPANT_DISCONNECTED)
+                ON_PARTICIPANT_DISCONNECTED, MapBuilder.of("registrationName", ON_PARTICIPANT_DISCONNECTED),
+                ON_PARTICIPANT_ADDED_VIDEO_TRACK, MapBuilder.of("registrationName", ON_PARTICIPANT_ADDED_VIDEO_TRACK),
+                ON_PARTICIPANT_REMOVED_VIDEO_TRACK, MapBuilder.of("registrationName", ON_PARTICIPANT_REMOVED_VIDEO_TRACK)
         ));
 
         return map;
@@ -95,11 +99,11 @@ public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilio
     @Nullable
     public Map<String, Integer> getCommandsMap() {
         return MapBuilder.of(
-                "connectToRoom", CONNECT_TO_ROOM,
-                "disconnect", DISCONNECT,
-                "switchCamera", SWITCH_CAMERA,
-                "toggleVideo", TOGGLE_VIDEO,
-                "toggleSound", TOGGLE_SOUND
+            "connectToRoom", CONNECT_TO_ROOM,
+            "disconnect", DISCONNECT,
+            "switchCamera", SWITCH_CAMERA,
+            "toggleVideo", TOGGLE_VIDEO,
+            "toggleSound", TOGGLE_SOUND
         );
     }
 }

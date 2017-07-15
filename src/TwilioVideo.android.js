@@ -50,6 +50,20 @@ const propTypes = {
   onRoomDidDisconnect: PropTypes.func,
 
   /**
+   * Called when a new video track has been added
+   *
+   * @param {{participant, track}}
+   */
+  onParticipantAddedVideoTrack: PropTypes.func,
+
+  /**
+   * Called when a video track has been removed
+   *
+   * @param {{participant, track}}
+   */
+  onParticipantRemovedVideoTrack: PropTypes.func,
+
+  /**
    * Callback called a participant enters a room.
    */
   onRoomParticipantDidConnect: PropTypes.func,
@@ -69,24 +83,24 @@ const nativeEvents = {
 };
 
 class CustomTwilioVideoView extends Component {
-  startCall({ accessToken }) {
+  connect({ accessToken }) {
     this.runCommand(nativeEvents.connectToRoom, [accessToken]);
   }
 
-  endCall() {
+  disconnect() {
     this.runCommand(nativeEvents.disconnect, []);
   }
 
-  switchCamera() {
+  flipCamera() {
     this.runCommand(nativeEvents.switchCamera, []);
   }
 
-  toggleVideo() {
-    this.runCommand(nativeEvents.toggleVideo, []);
+  setLocalVideoEnabled(enabled) {
+    this.runCommand(nativeEvents.toggleVideo, [enabled]);
   }
 
-  toggleSound() {
-    this.runCommand(nativeEvents.toggleSound, []);
+  setLocalAudioEnabled(enabled) {
+    this.runCommand(nativeEvents.toggleSound, [enabled]);
   }
 
   runCommand(event, args) {

@@ -58,6 +58,8 @@ import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_DICONNECTED;
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_PARTICIPANT_CONNECTED;
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_PARTICIPANT_DISCONNECTED;
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_VIDEO_CHANGED;
+import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_PARTICIPANT_ADDED_VIDEO_TRACK;
+import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_PARTICIPANT_REMOVED_VIDEO_TRACK;
 
 
 public class CustomTwilioVideoView extends View implements LifecycleEventListener {
@@ -72,7 +74,9 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
             Events.ON_CONNECT_FAILURE,
             Events.ON_DICONNECTED,
             Events.ON_PARTICIPANT_CONNECTED,
-            Events.ON_PARTICIPANT_DISCONNECTED})
+            Events.ON_PARTICIPANT_DISCONNECTED,
+            Events.ON_PARTICIPANT_ADDED_VIDEO_TRACK,
+            Events.ON_PARTICIPANT_REMOVED_VIDEO_TRACK})
     public @interface Events {
         String ON_CAMERA_SWITCHED          = "onCameraSwitched";
         String ON_VIDEO_CHANGED            = "onVideoChanged";
@@ -82,7 +86,8 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         String ON_DICONNECTED              = "onRoomDidDisconnect";
         String ON_PARTICIPANT_CONNECTED    = "onRoomParticipantDidConnect";
         String ON_PARTICIPANT_DISCONNECTED = "onRoomParticipantDidDisconnect";
-
+        String ON_PARTICIPANT_ADDED_VIDEO_TRACK = "onParticipantAddedVideoTrack";
+        String ON_PARTICIPANT_REMOVED_VIDEO_TRACK = "onParticipantRemovedVideoTrack";
     }
 
     private final ThemedReactContext themedReactContext;
@@ -292,13 +297,13 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
 
     public void switchCamera() {
         if (cameraCapturer != null) {
+            cameraCapturer.switchCamera();
+
             CameraCapturer.CameraSource cameraSource = cameraCapturer.getCameraSource();
             final boolean isBackCamera = cameraSource == CameraCapturer.CameraSource.BACK_CAMERA;
-            cameraCapturer.switchCamera();
+
             if (thumbnailVideoView.getVisibility() == View.VISIBLE) {
-                thumbnailVideoView.setMirror(isBackCamera);
-            } else {
-                primaryVideoView.setMirror(isBackCamera);
+                thumbnailVideoView.setMirror(!isBackCamera);
             }
 
             WritableMap event = new WritableNativeMap();
@@ -307,24 +312,22 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         }
     }
 
-    public void toggleVideo() {
+    public void toggleVideo(boolean enabled) {
         if (localVideoTrack != null) {
-            boolean enable = !localVideoTrack.isEnabled();
-            localVideoTrack.enable(enable);
+            localVideoTrack.enable(enabled);
 
             WritableMap event = new WritableNativeMap();
-            event.putBoolean("videoEnabled", enable);
+            event.putBoolean("videoEnabled", enabled);
             pushEvent(CustomTwilioVideoView.this, ON_VIDEO_CHANGED, event);
         }
     }
 
-    public void toggleAudio() {
+    public void toggleAudio(boolean enabled) {
         if (localAudioTrack != null) {
-            boolean enable = !localAudioTrack.isEnabled();
-            localAudioTrack.enable(enable);
+            localAudioTrack.enable(enabled);
 
             WritableMap event = new WritableNativeMap();
-            event.putBoolean("audioEnabled", enable);
+            event.putBoolean("audioEnabled", enabled);
             pushEvent(CustomTwilioVideoView.this, ON_AUDIO_CHANGED, event);
         }
     }
@@ -411,8 +414,10 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
          */
         if (participant.getVideoTracks()
                        .size() > 0) {
-            addParticipantVideo(participant.getVideoTracks()
-                                           .get(0));
+            addParticipantVideo(
+                participant,
+                participant.getVideoTracks().get(0)
+            );
         }
 
         /*
@@ -438,8 +443,10 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
          */
         if (participant.getVideoTracks()
                        .size() > 0) {
-            removeParticipantVideo(participant.getVideoTracks()
-                                              .get(0));
+            removeParticipantVideo(
+                participant,
+                participant.getVideoTracks().get(0)
+            );
         }
         participant.setListener(null);
     }
@@ -461,12 +468,12 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
 
             @Override
             public void onVideoTrackAdded(Participant participant, VideoTrack videoTrack) {
-                addParticipantVideo(videoTrack);
+                addParticipantVideo(participant, videoTrack);
             }
 
             @Override
             public void onVideoTrackRemoved(Participant participant, VideoTrack videoTrack) {
-                removeParticipantVideo(videoTrack);
+                removeParticipantVideo(participant, videoTrack);
             }
 
             @Override
@@ -491,7 +498,20 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         };
     }
 
-    private void addParticipantVideo(VideoTrack videoTrack) {
+    private WritableMap buildParticipantVideoEvent(Participant participant, VideoTrack videoTrack) {
+        WritableMap participantMap = new WritableNativeMap();
+        participantMap.putString("identity", participant.getIdentity());
+
+        WritableMap trackMap = new WritableNativeMap();
+        trackMap.putString("trackId", videoTrack.getTrackId());
+
+        WritableMap event = new WritableNativeMap();
+        event.putMap("participant", participantMap);
+        event.putMap("track", trackMap);
+        return event;
+    }
+
+    private void addParticipantVideo(Participant participant, VideoTrack videoTrack) {
         if (participantVideoTrack != null && primaryVideoView != null) {
             participantVideoTrack.removeRenderer(primaryVideoView);
         }
@@ -499,13 +519,17 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         if (primaryVideoView != null) {
             participantVideoTrack.addRenderer(primaryVideoView);
         }
+        WritableMap event = this.buildParticipantVideoEvent(participant, videoTrack);
+        pushEvent(CustomTwilioVideoView.this, ON_PARTICIPANT_ADDED_VIDEO_TRACK, event);
     }
 
-    private void removeParticipantVideo(VideoTrack videoTrack) {
+    private void removeParticipantVideo(Participant participant, VideoTrack videoTrack) {
         if (participantVideoTrack != null && primaryVideoView != null) {
             participantVideoTrack.removeRenderer(primaryVideoView);
         }
         participantVideoTrack = null;
+        WritableMap event = this.buildParticipantVideoEvent(participant, videoTrack);
+        pushEvent(CustomTwilioVideoView.this, ON_PARTICIPANT_REMOVED_VIDEO_TRACK, event);
     }
     // ===== EVENTS TO RN ==========================================================================
 

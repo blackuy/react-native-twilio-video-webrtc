@@ -98,6 +98,9 @@ For most applications, you'll want to add camera and audio permissions to your `
     <uses-feature android:name="android.hardware.microphone" android:required="false" />
 ```
 
+Newer versions of Android have a different permissions model.  You will need to use the `PermissionsAndroid`
+class in `react-native` in order to request the `CAMERA` and `RECORD_AUDIO` permissions.
+
 ## Docs
 You can see the documentation [here](./docs).
 

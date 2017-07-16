@@ -55,7 +55,48 @@ To enable camera usage and microphone usage you will need to add the following e
 
 ### Android
 
-Coming soon
+As with iOS, make sure the package is installed:
+
+```shell
+yarn add https://github.com/blackuy/react-native-twilio-video-webrtc
+```
+
+Then add the library to your `settings.gradle` file:
+
+```
+include ':react-native-twilio-video-webrtc'
+project(':react-native-twilio-video-webrtc').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-twilio-video-webrtc/android')
+```
+
+Now you're ready to load the package in `MainApplication.java`.  In the imports section, add this:
+
+```java
+import com.twiliorn.library.TwilioPackage;
+```
+
+Then update the `getPackages()` method:
+
+```java
+    protected List<ReactPackage> getPackages() {
+        return Arrays.<ReactPackage>asList(
+            ...
+            new TwilioPackage()
+        );
+    }
+```
+
+### Permissions
+
+For most applications, you'll want to add camera and audio permissions to your `AndroidManifest.xml` file:
+
+```xml
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+    <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
+    <uses-feature android:name="android.hardware.microphone" android:required="false" />
+```
 
 ## Docs
 You can see the documentation [here](./docs).

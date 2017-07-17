@@ -107,7 +107,7 @@ class CustomTwilioVideoView extends Component {
     switch (Platform.OS) {
       case 'android':
         UIManager.dispatchViewManagerCommand(
-          findNodeHandle(this),
+          findNodeHandle(this.refs.videoView),
           event,
           args
         );
@@ -120,6 +120,7 @@ class CustomTwilioVideoView extends Component {
   render() {
     return (
       <NativeCustomTwilioVideoView
+        ref="videoView"
         onConnected={(event) => {
           this.props.onRoomDidConnect && this.props.onRoomDidConnect(event.nativeEvent);
         }}

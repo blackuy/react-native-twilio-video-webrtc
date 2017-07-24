@@ -83,8 +83,8 @@ const nativeEvents = {
 };
 
 class CustomTwilioVideoView extends Component {
-  connect({ accessToken }) {
-    this.runCommand(nativeEvents.connectToRoom, [accessToken]);
+  connect(roomName, accessToken) {
+    this.runCommand(nativeEvents.connectToRoom, [roomName, accessToken]);
   }
 
   disconnect() {

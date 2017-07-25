@@ -1,53 +1,88 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- * @flow
- */
-
-import React, { Component } from 'react';
+import React, { Component } from 'react'
 import {
-  AppRegistry,
+  View,
+  Button,
   StyleSheet,
+  TouchableWithoutFeedback,
   Text,
-  View
-} from 'react-native';
+  Alert
+} from 'react-native'
 
-export default class Example extends Component {
+import {
+  TwilioVideoParticipantView,
+  TwilioVideoLocalView,
+  TwilioVideo
+} from 'react-native-twilio-video-webrtc'
+
+export default class VideoTry extends Component {
+  _onVideoConnectButtonPress = () => {
+    this.refs.twilioVideo.connect({roomName: "myroom_1", accessToken: "access token string"});
+  }
+
+  _onVideoDisconnectButtonPress = () => {
+    this.refs.twilioVideo.disconnect();
+  }
+
+  _onVideoConnectFailure = (response) => {
+      Alert.alert('', 'Connect failure: ' + JSON.stringify(response));
+  };
+
   render() {
     return (
-      <View style={styles.container}>
-        <Text style={styles.welcome}>
-          Welcome to React Native!
-        </Text>
-        <Text style={styles.instructions}>
-          To get started, edit index.android.js
-        </Text>
-        <Text style={styles.instructions}>
-          Double tap R on your keyboard to reload,{'\n'}
-          Shake or press menu button for dev menu
-        </Text>
-      </View>
+        <View style={styles.container}>
+            <TwilioVideo ref="twilioVideo" onRoomDidFailToConnect={this._onVideoConnectFailure} />
+
+            <View style={styles.videoViewParent}>
+                <TwilioVideoLocalView style={styles.videoViewContainer} />
+                <TwilioVideoParticipantView style={styles.videoViewContainer} />
+            </View>
+            <View style={styles.videoControls}>
+                <TouchableWithoutFeedback onPress={this._onVideoConnectButtonPress}>
+                    <View style={styles.videoControlBtn}>
+                        <Text style={styles.videoControlBtnText}>CONNECT</Text>
+                    </View>
+                </TouchableWithoutFeedback>
+                <TouchableWithoutFeedback onPress={this._onVideoDisconnectButtonPress}>
+                    <View style={styles.videoControlBtn}>
+                        <Text style={styles.videoControlBtnText}>DISCONNECT</Text>
+                    </View>
+                </TouchableWithoutFeedback>
+            </View>
+        </View>
     );
   }
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5FCFF',
-  },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
-  },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
-  },
+    container: {
+        flex: 1,
+        backgroundColor: '#FFFFFF'
+    },
+    videoViewParent: {
+        width: '100%',
+        height: 150,
+        flexDirection: 'row',
+        justifyContent: 'center',
+        backgroundColor: '#FFFFFF'
+    },
+    videoViewContainer: {
+        flex: 0.5,
+        backgroundColor: '#FFFFFF'
+    },
+    videoControls: {
+        height: 50,
+        width: '100%',
+        flexDirection: 'row',
+        alignItems: 'center'
+    },
+    videoControlBtn: {
+        flex: 0.5,
+        backgroundColor: '#FF0000'
+    },
+    videoControlBtnText: {
+        fontSize: 20,
+        padding: 10,
+        color: '#FFFFFF',
+        textAlign: 'center'
+    }
 });
-
-AppRegistry.registerComponent('Example', () => Example);

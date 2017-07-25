@@ -54,7 +54,7 @@ import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_AUDIO_CHANGED
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_CAMERA_SWITCHED;
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_CONNECTED;
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_CONNECT_FAILURE;
-import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_DICONNECTED;
+import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_DISCONNECTED;
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_PARTICIPANT_CONNECTED;
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_PARTICIPANT_DISCONNECTED;
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_VIDEO_CHANGED;
@@ -72,7 +72,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
             Events.ON_AUDIO_CHANGED,
             Events.ON_CONNECTED,
             Events.ON_CONNECT_FAILURE,
-            Events.ON_DICONNECTED,
+            Events.ON_DISCONNECTED,
             Events.ON_PARTICIPANT_CONNECTED,
             Events.ON_PARTICIPANT_DISCONNECTED,
             Events.ON_PARTICIPANT_ADDED_VIDEO_TRACK,
@@ -81,9 +81,9 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         String ON_CAMERA_SWITCHED          = "onCameraSwitched";
         String ON_VIDEO_CHANGED            = "onVideoChanged";
         String ON_AUDIO_CHANGED            = "onAudioChanged";
-        String ON_CONNECTED                = "onConnected";
-        String ON_CONNECT_FAILURE          = "onConnectFailure";
-        String ON_DICONNECTED              = "onRoomDidDisconnect";
+        String ON_CONNECTED                = "onRoomDidConnect";
+        String ON_CONNECT_FAILURE          = "onRoomDidFailToConnect";
+        String ON_DISCONNECTED              = "onRoomDidDisconnect";
         String ON_PARTICIPANT_CONNECTED    = "onRoomParticipantDidConnect";
         String ON_PARTICIPANT_DISCONNECTED = "onRoomParticipantDidDisconnect";
         String ON_PARTICIPANT_ADDED_VIDEO_TRACK = "onParticipantAddedVideoTrack";
@@ -141,7 +141,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
 
     // ===== SETUP =================================================================================
 
-    private void createLocalMedia(final String accessToken) {
+    private void createLocalMedia(final String roomName, final String accessToken) {
         // Share your microphone
         localAudioTrack = LocalAudioTrack.create(getContext(), true);
         Log.i("CustomTwilioVideoView", "Create local media");
@@ -174,7 +174,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
                 localVideoTrack.addRenderer(thumbnailVideoView);
             }
         }
-        connectToRoom(accessToken);
+        connectToRoom(roomName, accessToken);
     }
 
     // ===== LIFECYCLE EVENTS ======================================================================
@@ -221,21 +221,23 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
 
     // ====== CONNECTING ===========================================================================
 
-    public void connectToRoomWrapper(String accessToken) {
+    public void connectToRoomWrapper(String roomName, String accessToken) {
         /*
          * Check camera and microphone permissions. Needed in Android M.
          */
         Log.i("CustomTwilioVideoView", "Starting connect flow");
-        createLocalMedia(accessToken);
+        createLocalMedia(roomName, accessToken);
     }
 
-    public void connectToRoom(String accessToken) {
+    public void connectToRoom(String roomName, String accessToken) {
         /*
          * Create a VideoClient allowing you to connect to a Room
          */
         setAudioFocus(true);
         ConnectOptions.Builder connectOptionsBuilder = new ConnectOptions.Builder(accessToken);
-
+		if(roomName != null) {
+			connectOptionsBuilder.roomName(roomName);
+		}
         if (localAudioTrack != null) {
             connectOptionsBuilder.audioTracks(Collections.singletonList(localAudioTrack));
         }
@@ -371,7 +373,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
             public void onDisconnected(Room room, TwilioException e) {
                 WritableMap event = new WritableNativeMap();
                 event.putString("participant", participantIdentity);
-                pushEvent(CustomTwilioVideoView.this, ON_DICONNECTED, event);
+                pushEvent(CustomTwilioVideoView.this, ON_DISCONNECTED, event);
 
                 CustomTwilioVideoView.this.room = null;
                 // Only reinitialize the UI if disconnect was not called from onDestroy()

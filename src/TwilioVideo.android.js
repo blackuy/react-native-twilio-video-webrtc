@@ -42,7 +42,7 @@ const propTypes = {
   /**
    * Callback that is called when connecting to room fails.
    */
-  onConnectFailure: PropTypes.func,
+  onRoomDidFailToConnect: PropTypes.func,
 
   /**
    * Callback that is called when user is disconnected from room.
@@ -83,8 +83,8 @@ const nativeEvents = {
 };
 
 class CustomTwilioVideoView extends Component {
-  connect({ accessToken }) {
-    this.runCommand(nativeEvents.connectToRoom, [accessToken]);
+  connect({roomName, accessToken}) {
+    this.runCommand(nativeEvents.connectToRoom, [roomName, accessToken]);
   }
 
   disconnect() {
@@ -121,9 +121,6 @@ class CustomTwilioVideoView extends Component {
     return (
       <NativeCustomTwilioVideoView
         ref="videoView"
-        onConnected={(event) => {
-          this.props.onRoomDidConnect && this.props.onRoomDidConnect(event.nativeEvent);
-        }}
         {...this.props}
       />
     );

@@ -16,7 +16,7 @@ import {
 
 export default class VideoTry extends Component {
   _onVideoConnectButtonPress = () => {
-    this.refs.twilioVideo.connect("myroom_1", "access token string");
+    this.refs.twilioVideo.connect({roomName: "myroom_1", accessToken: "access token string"});
   }
 
   _onVideoDisconnectButtonPress = () => {
@@ -30,7 +30,7 @@ export default class VideoTry extends Component {
   render() {
     return (
         <View style={styles.container}>
-            <TwilioVideo ref="twilioVideo" onConnectFailure={this._onVideoConnectFailure} />
+            <TwilioVideo ref="twilioVideo" onRoomDidFailToConnect={this._onVideoConnectFailure} />
 
             <View style={styles.videoViewParent}>
                 <TwilioVideoLocalView style={styles.videoViewContainer} />

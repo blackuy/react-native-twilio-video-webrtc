@@ -22,7 +22,7 @@ import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_AUDIO_CHANGED
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_CAMERA_SWITCHED;
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_CONNECTED;
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_CONNECT_FAILURE;
-import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_DICONNECTED;
+import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_DISCONNECTED;
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_PARTICIPANT_CONNECTED;
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_PARTICIPANT_DISCONNECTED;
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_VIDEO_CHANGED;
@@ -30,7 +30,6 @@ import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_PARTICIPANT_A
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_PARTICIPANT_REMOVED_VIDEO_TRACK;
 
 public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilioVideoView> {
-
     public static final String REACT_CLASS = "RNCustomTwilioVideoView";
 
     private static final int CONNECT_TO_ROOM = 1;
@@ -83,7 +82,7 @@ public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilio
                 ON_AUDIO_CHANGED, MapBuilder.of("registrationName", ON_AUDIO_CHANGED),
                 ON_CONNECTED, MapBuilder.of("registrationName", ON_CONNECTED),
                 ON_CONNECT_FAILURE, MapBuilder.of("registrationName", ON_CONNECT_FAILURE),
-                ON_DICONNECTED, MapBuilder.of("registrationName", ON_DICONNECTED),
+                ON_DISCONNECTED, MapBuilder.of("registrationName", ON_DISCONNECTED),
                 ON_PARTICIPANT_CONNECTED, MapBuilder.of("registrationName", ON_PARTICIPANT_CONNECTED)
         );
 

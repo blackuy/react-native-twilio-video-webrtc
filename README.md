@@ -4,7 +4,7 @@
 
 Platforms:
 - iOS
-- Android **(Coming soon)**
+- Android
 
 People using a version < 1.0.1 please move to 1.0.1 since the project changed a lot internally to support the stable TwilioVideo version.
 

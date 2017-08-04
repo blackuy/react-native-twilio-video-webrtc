@@ -15,8 +15,8 @@ import {
   NativeModules,
   findNodeHandle,
 } from 'react-native';
-import React, { PropTypes, Component } from 'react';
-
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 const propTypes = {
   ...View.propTypes,
   /**

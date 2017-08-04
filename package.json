@@ -1,11 +1,11 @@
 {
-  "name": "lisbakke-react-native-twilio-video-webrtc",
+  "name": "react-native-twilio-video-webrtc",
   "repository": {
     "type": "git",
     "url": "https://github.com/blackuy/react-native-twilio-video-webrtc.git"
   },
   "homepage": "https://github.com/blackuy/react-native-twilio-video-webrtc",
-  "version": "1.0.4",
+  "version": "1.0.3",
   "description": "Twilio Video WebRTC for React Native.",
   "main": "index.js",
   "scripts": {

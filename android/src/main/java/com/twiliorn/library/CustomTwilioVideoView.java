@@ -21,6 +21,11 @@ import android.support.annotation.Nullable;
 import android.support.annotation.StringDef;
 import android.util.Log;
 import android.view.View;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 
 import com.facebook.react.bridge.LifecycleEventListener;
 import com.facebook.react.bridge.WritableMap;
@@ -29,9 +34,11 @@ import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableNativeArray;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.events.RCTEventEmitter;
+
 import com.twilio.video.AudioTrack;
 import com.twilio.video.CameraCapturer;
 import com.twilio.video.ConnectOptions;
+import com.twilio.video.LocalParticipant;
 import com.twilio.video.LocalAudioTrack;
 import com.twilio.video.LocalVideoTrack;
 import com.twilio.video.Participant;
@@ -61,9 +68,8 @@ import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_VIDEO_CHANGED
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_PARTICIPANT_ADDED_VIDEO_TRACK;
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_PARTICIPANT_REMOVED_VIDEO_TRACK;
 
-
 public class CustomTwilioVideoView extends View implements LifecycleEventListener {
-
+    private static final int CAMERA_MIC_PERMISSION_REQUEST_CODE = 1;
     private static final String TAG = "CustomTwilioVideoView";
 
     @Retention(RetentionPolicy.SOURCE)
@@ -97,6 +103,9 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
      * A Room represents communication between the client and one or more participants.
      */
     private Room room;
+    private String roomName = null;
+    private String accessToken = null;
+    private LocalParticipant localParticipant;
 
     /*
      * A VideoView receives frames from a local or remote video track and renders them
@@ -128,8 +137,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
          * Enable changing the volume using the up/down keys during a conversation
          */
         if (themedReactContext.getCurrentActivity() != null) {
-            themedReactContext.getCurrentActivity()
-                              .setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
+            themedReactContext.getCurrentActivity().setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
         }
         /*
          * Needed for setting/abandoning audio focus during call
@@ -141,7 +149,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
 
     // ===== SETUP =================================================================================
 
-    private void createLocalMedia(final String roomName, final String accessToken) {
+    private void createLocalMedia() {
         // Share your microphone
         localAudioTrack = LocalAudioTrack.create(getContext(), true);
         Log.i("CustomTwilioVideoView", "Create local media");
@@ -174,7 +182,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
                 localVideoTrack.addRenderer(thumbnailVideoView);
             }
         }
-        connectToRoom(roomName, accessToken);
+        connectToRoom();
     }
 
     // ===== LIFECYCLE EVENTS ======================================================================
@@ -184,15 +192,47 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         /*
          * In case it wasn't set.
          */
-        if (themedReactContext.getCurrentActivity() != null) {
-            themedReactContext.getCurrentActivity()
-                              .setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
+        if (themedReactContext.getCurrentActivity() != null && cameraCapturer != null) {
+            /*
+            * If the local video track was released when the app was put in the background, recreate.
+            */
+            if (localVideoTrack == null && checkPermissionForCameraAndMicrophone()) {
+                localVideoTrack = LocalVideoTrack.create(getContext(), true, cameraCapturer);
+                if (thumbnailVideoView != null && localVideoTrack != null) {
+                    localVideoTrack.addRenderer(thumbnailVideoView);
+                }
+
+                /*
+                * If connected to a Room then share the local video track.
+                */
+                if (localParticipant != null) {
+                    localParticipant.addVideoTrack(localVideoTrack);
+                }
+                themedReactContext.getCurrentActivity().setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
+            }
         }
     }
 
     @Override
     public void onHostPause() {
         Log.i("CustomTwilioVideoView", "Host pause");
+        /*
+         * Release the local video track before going in the background. This ensures that the
+         * camera can be used by other applications while this app is in the background.
+         */
+        if (localVideoTrack != null) {
+            /*
+             * If this local video track is being shared in a Room, remove from local
+             * participant before releasing the video track. Participants will be notified that
+             * the track has been removed.
+             */
+            if (localParticipant != null) {
+                localParticipant.removeVideoTrack(localVideoTrack);
+            }
+
+            localVideoTrack.release();
+            localVideoTrack = null;
+        }
     }
 
     @Override
@@ -219,25 +259,76 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         }
     }
 
+    private void showAlertDialog(String message) {
+        AlertDialog alertDialog = new AlertDialog.Builder(themedReactContext).create();
+        alertDialog.setTitle("Alert");
+        alertDialog.setMessage(message);
+        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+        new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        alertDialog.show();
+    }
+
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == CAMERA_MIC_PERMISSION_REQUEST_CODE) {
+            boolean cameraAndMicPermissionGranted = true;
+
+            for (int grantResult : grantResults) {
+                cameraAndMicPermissionGranted &= (grantResult == PackageManager.PERMISSION_GRANTED);
+            }
+
+            if (cameraAndMicPermissionGranted) {
+                createLocalMedia();
+            } else {
+                showAlertDialog("Camera and Microphone permissions needed to continue. If you had previously chosen not to be prompted for these permissions, you will have to enable them from Settings > Apps.");
+            }
+        }
+    }
+
+    private boolean checkPermissionForCameraAndMicrophone() {
+        int resultCamera = ContextCompat.checkSelfPermission(themedReactContext.getCurrentActivity(), Manifest.permission.CAMERA);
+        int resultMic = ContextCompat.checkSelfPermission(themedReactContext.getCurrentActivity(), Manifest.permission.RECORD_AUDIO);
+        return (resultCamera == PackageManager.PERMISSION_GRANTED && resultMic == PackageManager.PERMISSION_GRANTED);
+    }
+
+    private void requestPermissionForCameraAndMicrophone() {
+        ActivityCompat.requestPermissions(
+            themedReactContext.getCurrentActivity(),
+            new String[] { Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO },
+            CAMERA_MIC_PERMISSION_REQUEST_CODE
+        );
+    }
+
     // ====== CONNECTING ===========================================================================
 
-    public void connectToRoomWrapper(String roomName, String accessToken) {
+    public void connectToRoomWrapper(final String roomName, final String accessToken) {
+        this.roomName = roomName;
+        this.accessToken = accessToken;
+
         /*
          * Check camera and microphone permissions. Needed in Android M.
          */
         Log.i("CustomTwilioVideoView", "Starting connect flow");
-        createLocalMedia(roomName, accessToken);
+        if (!checkPermissionForCameraAndMicrophone()) {
+            requestPermissionForCameraAndMicrophone();
+        } else {
+            createLocalMedia();
+        }
     }
 
-    public void connectToRoom(String roomName, String accessToken) {
+    public void connectToRoom() {
         /*
          * Create a VideoClient allowing you to connect to a Room
          */
         setAudioFocus(true);
-        ConnectOptions.Builder connectOptionsBuilder = new ConnectOptions.Builder(accessToken);
-		if(roomName != null) {
-			connectOptionsBuilder.roomName(roomName);
-		}
+        ConnectOptions.Builder connectOptionsBuilder = new ConnectOptions.Builder(this.accessToken);
+
+        if(this.roomName != null) {
+            connectOptionsBuilder.roomName(this.roomName);
+        }
         if (localAudioTrack != null) {
             connectOptionsBuilder.audioTracks(Collections.singletonList(localAudioTrack));
         }
@@ -302,7 +393,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
             cameraCapturer.switchCamera();
 
             CameraCapturer.CameraSource cameraSource = cameraCapturer.getCameraSource();
-            final boolean isBackCamera = cameraSource == CameraCapturer.CameraSource.BACK_CAMERA;
+            final boolean isBackCamera = (cameraSource == CameraCapturer.CameraSource.BACK_CAMERA);
 
             if (thumbnailVideoView.getVisibility() == View.VISIBLE) {
                 thumbnailVideoView.setMirror(isBackCamera);
@@ -343,6 +434,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         return new Room.Listener() {
             @Override
             public void onConnected(Room room) {
+                localParticipant = room.getLocalParticipant();
                 WritableMap event = new WritableNativeMap();
                 event.putString("room", room.getName());
                 List<Participant> participants = room.getParticipants();
@@ -371,6 +463,10 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
 
             @Override
             public void onDisconnected(Room room, TwilioException e) {
+                localParticipant = null;
+                roomName = null;
+                accessToken = null;
+
                 WritableMap event = new WritableNativeMap();
                 event.putString("participant", participantIdentity);
                 pushEvent(CustomTwilioVideoView.this, ON_DISCONNECTED, event);
@@ -414,8 +510,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         /*
          * Add participant renderer
          */
-        if (participant.getVideoTracks()
-                       .size() > 0) {
+        if (participant.getVideoTracks().size() > 0) {
             addParticipantVideo(
                 participant,
                 participant.getVideoTracks().get(0)
@@ -435,16 +530,14 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         WritableMap event = new WritableNativeMap();
         event.putString("participant", participantIdentity);
         pushEvent(this, ON_PARTICIPANT_DISCONNECTED, event);
-        if (!participant.getIdentity()
-                        .equals(participantIdentity)) {
+        if (!participant.getIdentity().equals(participantIdentity)) {
             return;
         }
 
         /*
          * Remove participant renderer
          */
-        if (participant.getVideoTracks()
-                       .size() > 0) {
+        if (participant.getVideoTracks().size() > 0) {
             removeParticipantVideo(
                 participant,
                 participant.getVideoTracks().get(0)
@@ -539,7 +632,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         eventEmitter.receiveEvent(view.getId(), name, data);
     }
 
-    public static void registerPrimaryVideoView(VideoView v) {
+	public static void registerPrimaryVideoView(VideoView v) {
         primaryVideoView = v;
         if (participantVideoTrack != null) {
             participantVideoTrack.addRenderer(v);

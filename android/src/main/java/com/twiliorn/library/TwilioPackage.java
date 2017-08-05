@@ -19,8 +19,6 @@ import java.util.Collections;
 import java.util.List;
 
 public class TwilioPackage implements ReactPackage {
-	private static CustomTwilioVideoViewManager customTwilioVideoViewManager = null;
-
     @Override
     public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
         return Collections.emptyList();
@@ -33,20 +31,10 @@ public class TwilioPackage implements ReactPackage {
 
     @Override
     public List<ViewManager> createViewManagers(ReactApplicationContext reactContext) {
-		customTwilioVideoViewManager = new CustomTwilioVideoViewManager();
         return Arrays.<ViewManager>asList(
-            customTwilioVideoViewManager,
+            new CustomTwilioVideoViewManager(),
             new TwilioRemotePreviewManager(),
             new TwilioVideoPreviewManager()
         );
     }
-
-	public static void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-		if(customTwilioVideoViewManager != null) {
-			CustomTwilioVideoView customTwilioVideoView = customTwilioVideoViewManager.getCustomTwilioVideoViewInstance();
-			if(customTwilioVideoView != null) {
-				customTwilioVideoView.onRequestPermissionsResult(requestCode, permissions, grantResults);
-			}
-		}
-	}
 }

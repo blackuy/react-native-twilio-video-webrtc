@@ -31,17 +31,12 @@ import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_PARTICIPANT_R
 
 public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilioVideoView> {
     public static final String REACT_CLASS = "RNCustomTwilioVideoView";
-	private CustomTwilioVideoView customTwilioVideoView = null;
 
     private static final int CONNECT_TO_ROOM = 1;
     private static final int DISCONNECT = 2;
     private static final int SWITCH_CAMERA = 3;
     private static final int TOGGLE_VIDEO = 4;
     private static final int TOGGLE_SOUND = 5;
-
-	public CustomTwilioVideoView getCustomTwilioVideoViewInstance() {
-		return this.customTwilioVideoView;
-	}
 
     @Override
     public String getName() {
@@ -50,8 +45,7 @@ public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilio
 
     @Override
     protected CustomTwilioVideoView createViewInstance(ThemedReactContext reactContext) {
-		this.customTwilioVideoView = new CustomTwilioVideoView(reactContext);
-        return this.customTwilioVideoView;
+        return new CustomTwilioVideoView(reactContext);
     }
 
     @Override

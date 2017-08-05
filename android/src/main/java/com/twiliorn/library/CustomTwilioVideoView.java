@@ -9,6 +9,7 @@
 package com.twiliorn.library;
 
 import android.Manifest;
+import android.os.Build;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -289,6 +290,10 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     }
 
     private boolean checkPermissionForCameraAndMicrophone() {
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            return true;
+        }
+
         int resultCamera = ContextCompat.checkSelfPermission(themedReactContext.getCurrentActivity(), Manifest.permission.CAMERA);
         int resultMic = ContextCompat.checkSelfPermission(themedReactContext.getCurrentActivity(), Manifest.permission.RECORD_AUDIO);
         return (resultCamera == PackageManager.PERMISSION_GRANTED && resultMic == PackageManager.PERMISSION_GRANTED);

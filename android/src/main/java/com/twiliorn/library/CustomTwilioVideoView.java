@@ -48,8 +48,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import rx.functions.Action1;
-
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_AUDIO_CHANGED;
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_CAMERA_SWITCHED;
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_CONNECTED;

@@ -26,6 +26,7 @@
     "gulp": "^3.9.1",
     "gulp-concat": "^2.6.1",
     "gulp-load-plugins": "^1.5.0",
-    "gulp-tap": "^1.0.1"
+    "gulp-tap": "^1.0.1",
+    "prop-types": "^15.5.10"
   }
 }

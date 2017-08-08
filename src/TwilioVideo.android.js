@@ -118,11 +118,35 @@ class CustomTwilioVideoView extends Component {
     }
   }
 
+  buildNativeEventWrappers() {
+    return [
+      'onCameraSwitched',
+      'onVideoChanged',
+      'onAudioChanged',
+      'onRoomDidConnect',
+      'onRoomDidFailToConnect',
+      'onRoomDidDisconnect',
+      'onParticipantAddedVideoTrack',
+      'onParticipantRemovedVideoTrack',
+      'onRoomParticipantDidConnect',
+      'onRoomParticipantDidDisconnect',
+    ].reduce((wrappedEvents, eventName) => {
+      if (this.props[eventName]) {
+        return {
+          ...wrappedEvents,
+          [eventName]: (data) => this.props[eventName](data.nativeEvent),
+        };
+      }
+      return wrappedEvents;
+    }, {});
+  }
+
   render() {
     return (
       <NativeCustomTwilioVideoView
         ref="videoView"
         {...this.props}
+        {...this.buildNativeEventWrappers()}
       />
     );
   }

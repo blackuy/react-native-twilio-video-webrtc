@@ -24,7 +24,7 @@ public class TwilioPackage implements ReactPackage {
         return Collections.emptyList();
     }
 
-    @Override
+    // Deprecated by RN 0.47
     public List<Class<? extends JavaScriptModule>> createJSModules() {
         return Collections.emptyList();
     }

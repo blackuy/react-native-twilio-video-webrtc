@@ -119,7 +119,7 @@ class CustomTwilioVideoView extends Component {
   }
 
   buildNativeEventWrappers() {
-    const nativeEvents = [
+    return [
       'onCameraSwitched',
       'onVideoChanged',
       'onAudioChanged',
@@ -130,14 +130,15 @@ class CustomTwilioVideoView extends Component {
       'onParticipantRemovedVideoTrack',
       'onRoomParticipantDidConnect',
       'onRoomParticipantDidDisconnect',
-    ];
-    let wrappedEvents = {};
-    nativeEvents.forEach(eventName => {
+    ].reduce((wrappedEvents, eventName) => {
       if (this.props[eventName]) {
-        wrappedEvents[eventName] = (data) => this.props[eventName](data.nativeEvent);
+        return {
+          ...wrappedEvents,
+          [eventName]: (data) => this.props[eventName](data.nativeEvent),
+        };
       }
-    });
-    return wrappedEvents;
+      return wrappedEvents;
+    }, {});
   }
 
   render() {

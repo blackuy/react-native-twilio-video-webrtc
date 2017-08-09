@@ -105,7 +105,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     private static VideoTrack  participantVideoTrack;
     private static LocalVideoTrack localVideoTrack;
 
-    private CameraCapturer  cameraCapturer;
+    private static CameraCapturer  cameraCapturer;
     private LocalAudioTrack localAudioTrack;
     private AudioManager    audioManager;
     private String          participantIdentity;
@@ -171,6 +171,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
             if (thumbnailVideoView != null && localVideoTrack != null) {
                 localVideoTrack.addRenderer(thumbnailVideoView);
             }
+            setThumbnailMirror();
         }
         connectToRoom(roomName, accessToken);
     }
@@ -294,18 +295,22 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     }
 
     // ===== BUTTON LISTENERS ======================================================================
+    private static void setThumbnailMirror() {
+        if (cameraCapturer != null) {
+            CameraCapturer.CameraSource cameraSource = cameraCapturer.getCameraSource();
+            final boolean isBackCamera = cameraSource == CameraCapturer.CameraSource.BACK_CAMERA;
+            if (thumbnailVideoView != null && thumbnailVideoView.getVisibility() == View.VISIBLE) {
+                thumbnailVideoView.setMirror(isBackCamera);
+            }
+        }
+    }
 
     public void switchCamera() {
         if (cameraCapturer != null) {
             cameraCapturer.switchCamera();
-
+            setThumbnailMirror();
             CameraCapturer.CameraSource cameraSource = cameraCapturer.getCameraSource();
             final boolean isBackCamera = cameraSource == CameraCapturer.CameraSource.BACK_CAMERA;
-
-            if (thumbnailVideoView.getVisibility() == View.VISIBLE) {
-                thumbnailVideoView.setMirror(isBackCamera);
-            }
-
             WritableMap event = new WritableNativeMap();
             event.putBoolean("isBackCamera", isBackCamera);
             pushEvent(CustomTwilioVideoView.this, ON_CAMERA_SWITCHED, event);
@@ -549,5 +554,6 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         if (localVideoTrack != null) {
             localVideoTrack.addRenderer(v);
         }
+        setThumbnailMirror();
     }
 }

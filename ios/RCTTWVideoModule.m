@@ -68,6 +68,11 @@ RCT_EXPORT_MODULE();
 
 - (void)addLocalView:(TVIVideoView *)view {
   [self.localVideoTrack addRenderer:view];
+  if (self.camera && self.camera.source == TVICameraCaptureSourceBackCameraWide) {
+    view.mirror = NO;
+  } else {
+    view.mirror = YES;
+  }
 }
 
 - (void)removeLocalView:(TVIVideoView *)view {
@@ -131,8 +136,18 @@ RCT_REMAP_METHOD(setLocalVideoEnabled, enabled:(BOOL)enabled setLocalVideoEnable
 RCT_EXPORT_METHOD(flipCamera) {
   if (self.camera.source == TVICameraCaptureSourceFrontCamera) {
     [self.camera selectSource:TVICameraCaptureSourceBackCameraWide];
+    if (self.localVideoTrack) {
+      for (TVIVideoView *r in self.localVideoTrack.renderers) {
+        r.mirror = NO;
+      }
+    }
   } else {
     [self.camera selectSource:TVICameraCaptureSourceFrontCamera];
+    if (self.localVideoTrack) {
+      for (TVIVideoView *r in self.localVideoTrack.renderers) {
+        r.mirror = YES;
+      }
+    }
   }
 }
 

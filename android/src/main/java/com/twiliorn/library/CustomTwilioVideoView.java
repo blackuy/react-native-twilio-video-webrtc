@@ -336,14 +336,9 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     private static void setThumbnailMirror() {
         if (cameraCapturer != null) {
             CameraCapturer.CameraSource cameraSource = cameraCapturer.getCameraSource();
-<<<<<<< HEAD
             final boolean isBackCamera = (cameraSource == CameraCapturer.CameraSource.BACK_CAMERA);
 
-            if (thumbnailVideoView.getVisibility() == View.VISIBLE) {
-=======
-            final boolean isBackCamera = cameraSource == CameraCapturer.CameraSource.BACK_CAMERA;
             if (thumbnailVideoView != null && thumbnailVideoView.getVisibility() == View.VISIBLE) {
->>>>>>> 06c0f76... A few switchCamera fixes
                 thumbnailVideoView.setMirror(isBackCamera);
             }
         }

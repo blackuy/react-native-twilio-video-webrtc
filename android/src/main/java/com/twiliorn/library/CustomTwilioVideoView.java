@@ -9,7 +9,6 @@
 package com.twiliorn.library;
 
 import android.Manifest;
-import android.os.Build;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -22,11 +21,6 @@ import android.support.annotation.Nullable;
 import android.support.annotation.StringDef;
 import android.util.Log;
 import android.view.View;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 
 import com.facebook.react.bridge.LifecycleEventListener;
 import com.facebook.react.bridge.WritableMap;
@@ -70,7 +64,6 @@ import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_PARTICIPANT_A
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_PARTICIPANT_REMOVED_VIDEO_TRACK;
 
 public class CustomTwilioVideoView extends View implements LifecycleEventListener {
-    private static final int CAMERA_MIC_PERMISSION_REQUEST_CODE = 1;
     private static final String TAG = "CustomTwilioVideoView";
 
     @Retention(RetentionPolicy.SOURCE)
@@ -197,7 +190,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
             /*
             * If the local video track was released when the app was put in the background, recreate.
             */
-            if (localVideoTrack == null && checkPermissionForCameraAndMicrophone()) {
+            if (localVideoTrack == null) {
                 localVideoTrack = LocalVideoTrack.create(getContext(), true, cameraCapturer);
                 if (thumbnailVideoView != null && localVideoTrack != null) {
                     localVideoTrack.addRenderer(thumbnailVideoView);
@@ -260,53 +253,6 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         }
     }
 
-    private void showAlertDialog(String message) {
-        AlertDialog alertDialog = new AlertDialog.Builder(themedReactContext).create();
-        alertDialog.setTitle("Alert");
-        alertDialog.setMessage(message);
-        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
-        new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
-        alertDialog.show();
-    }
-
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == CAMERA_MIC_PERMISSION_REQUEST_CODE) {
-            boolean cameraAndMicPermissionGranted = true;
-
-            for (int grantResult : grantResults) {
-                cameraAndMicPermissionGranted &= (grantResult == PackageManager.PERMISSION_GRANTED);
-            }
-
-            if (cameraAndMicPermissionGranted) {
-                createLocalMedia();
-            } else {
-                showAlertDialog("Camera and Microphone permissions needed to continue. If you had previously chosen not to be prompted for these permissions, you will have to enable them from Settings > Apps.");
-            }
-        }
-    }
-
-    private boolean checkPermissionForCameraAndMicrophone() {
-		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            return true;
-        }
-
-        int resultCamera = ContextCompat.checkSelfPermission(themedReactContext.getCurrentActivity(), Manifest.permission.CAMERA);
-        int resultMic = ContextCompat.checkSelfPermission(themedReactContext.getCurrentActivity(), Manifest.permission.RECORD_AUDIO);
-        return (resultCamera == PackageManager.PERMISSION_GRANTED && resultMic == PackageManager.PERMISSION_GRANTED);
-    }
-
-    private void requestPermissionForCameraAndMicrophone() {
-        ActivityCompat.requestPermissions(
-            themedReactContext.getCurrentActivity(),
-            new String[] { Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO },
-            CAMERA_MIC_PERMISSION_REQUEST_CODE
-        );
-    }
-
     // ====== CONNECTING ===========================================================================
 
     public void connectToRoomWrapper(final String roomName, final String accessToken) {
@@ -317,11 +263,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
          * Check camera and microphone permissions. Needed in Android M.
          */
         Log.i("CustomTwilioVideoView", "Starting connect flow");
-        if (!checkPermissionForCameraAndMicrophone()) {
-            requestPermissionForCameraAndMicrophone();
-        } else {
-            createLocalMedia();
-        }
+        createLocalMedia();
     }
 
     public void connectToRoom() {

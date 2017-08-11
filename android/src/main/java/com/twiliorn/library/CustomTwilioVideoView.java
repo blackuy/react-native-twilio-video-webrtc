@@ -185,24 +185,27 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         /*
          * In case it wasn't set.
          */
-        if (themedReactContext.getCurrentActivity() != null && cameraCapturer != null) {
+        if (themedReactContext.getCurrentActivity() != null) {
             /*
             * If the local video track was released when the app was put in the background, recreate.
             */
-            if (localVideoTrack == null) {
+            if (cameraCapturer != null && localVideoTrack == null) {
                 localVideoTrack = LocalVideoTrack.create(getContext(), true, cameraCapturer);
-                if (thumbnailVideoView != null && localVideoTrack != null) {
+            }
+
+            if(localVideoTrack != null) {
+                if (thumbnailVideoView != null) {
                     localVideoTrack.addRenderer(thumbnailVideoView);
                 }
 
-                /*
-                * If connected to a Room then share the local video track.
-                */
-                if (localParticipant != null) {
-                    localParticipant.addVideoTrack(localVideoTrack);
-                }
-                themedReactContext.getCurrentActivity().setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
+               	/*
+               	* If connected to a Room then share the local video track.
+               	*/
+               	if (localParticipant != null) {
+               	    localParticipant.addVideoTrack(localVideoTrack);
+               	}
             }
+            themedReactContext.getCurrentActivity().setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
         }
     }
 
@@ -272,7 +275,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         setAudioFocus(true);
         ConnectOptions.Builder connectOptionsBuilder = new ConnectOptions.Builder(this.accessToken);
 
-        if(this.roomName != null) {
+        if (this.roomName != null) {
             connectOptionsBuilder.roomName(this.roomName);
         }
         if (localAudioTrack != null) {
@@ -583,7 +586,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         eventEmitter.receiveEvent(view.getId(), name, data);
     }
 
-	public static void registerPrimaryVideoView(VideoView v) {
+    public static void registerPrimaryVideoView(VideoView v) {
         primaryVideoView = v;
         if (participantVideoTrack != null) {
             participantVideoTrack.addRenderer(v);

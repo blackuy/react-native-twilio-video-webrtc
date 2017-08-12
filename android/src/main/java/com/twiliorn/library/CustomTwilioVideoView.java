@@ -95,7 +95,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
      * A Room represents communication between the client and one or more participants.
      */
     private Room room;
-	private String roomName = null;
+    private String roomName = null;
     private String accessToken = null;
     private LocalParticipant localParticipant;
 
@@ -198,12 +198,12 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
                     localVideoTrack.addRenderer(thumbnailVideoView);
                 }
 
-               	/*
-               	* If connected to a Room then share the local video track.
-               	*/
-               	if (localParticipant != null) {
-               	    localParticipant.addVideoTrack(localVideoTrack);
-               	}
+                /*
+                * If connected to a Room then share the local video track.
+                */
+                if (localParticipant != null) {
+                    localParticipant.addVideoTrack(localVideoTrack);
+                }
             }
             themedReactContext.getCurrentActivity().setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
         }

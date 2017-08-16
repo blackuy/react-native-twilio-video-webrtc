@@ -1,0 +1,23 @@
+machine:
+  node:
+    version: 7.8.0
+  environment:
+    PATH: "${PATH}:${HOME}/${CIRCLE_PROJECT_REPONAME}/node_modules/.bin"
+
+dependencies:
+  pre:
+    - rm -rf ~/.yarn
+    - npm i -g yarn
+    - yarn -v
+  override:
+    - yarn
+  cache_directories:
+    - ~/.cache/yarn
+
+test:
+  override:
+    - yarn run ci
+
+test:
+  override:
+    - yarn run ci

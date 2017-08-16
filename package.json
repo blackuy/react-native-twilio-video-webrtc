@@ -9,7 +9,13 @@
   "description": "Twilio Video WebRTC for React Native.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "standard 'src/**/*.js'",
+    "lint:fix": "standard 'src/**/*.js' --fix",
+    "ci": "yarn lint"
+  },
+  "standard": {
+    "parser": "babel-eslint"
   },
   "keywords": [
     "react-native"
@@ -17,8 +23,10 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
+    "babel-eslint": "^7.2.3",
     "gulp-react-docs": "^0.1.2",
-    "react-docgen": "^2.15.0"
+    "react-docgen": "^2.15.0",
+    "standard": "^10.0.3"
   },
   "dependencies": {
     "del": "^3.0.0",

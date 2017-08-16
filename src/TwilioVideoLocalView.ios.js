@@ -18,7 +18,7 @@ class TwilioVideoLocalView extends Component {
     enabled: PropTypes.bool.isRequired
   }
 
-  render() {
+  render () {
     return <RCTTWLocalVideoView {...this.props}>{this.props.children}</RCTTWLocalVideoView>
   }
 }

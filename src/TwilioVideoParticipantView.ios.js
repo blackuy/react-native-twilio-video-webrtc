@@ -24,7 +24,7 @@ class TwilioVideoParticipantView extends Component {
     })
   }
 
-  render() {
+  render () {
     return <RCTTWRemoteVideoView {...this.props}>{this.props.children}</RCTTWRemoteVideoView>
   }
 }

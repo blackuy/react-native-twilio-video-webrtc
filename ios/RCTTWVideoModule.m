@@ -91,12 +91,12 @@ RCT_EXPORT_MODULE();
   }
 }
 
-RCT_EXPORT_METHOD(startLocalVideo) {
+RCT_EXPORT_METHOD(startLocalVideo:(NSDictionary *)constraints) {
   if ([TVICameraCapturer availableSources].count > 0) {
     self.camera = [[TVICameraCapturer alloc] init];
     self.camera.delegate = self;
 
-    self.localVideoTrack = [TVILocalVideoTrack trackWithCapturer:self.camera enabled:YES constraints:[self videoConstraints]];
+    self.localVideoTrack = [TVILocalVideoTrack trackWithCapturer:self.camera enabled:YES constraints:[self videoConstraints:constraints]];
   }
 }
 
@@ -156,13 +156,112 @@ RCT_EXPORT_METHOD(disconnect) {
   [self.room disconnect];
 }
 
--(TVIVideoConstraints*) videoConstraints {
+-(TVIVideoConstraints*) videoConstraints:(NSDictionary *)constraints {
   return [TVIVideoConstraints constraintsWithBlock:^(TVIVideoConstraintsBuilder *builder) {
-    builder.minSize = TVIVideoConstraintsSize960x540;
-    builder.maxSize = TVIVideoConstraintsSize1280x720;
-    builder.aspectRatio = TVIAspectRatio16x9;
-    builder.minFrameRate = TVIVideoConstraintsFrameRateNone;
-    builder.maxFrameRate = TVIVideoConstraintsFrameRateNone;
+    NSString *aspectRatio = constraints[@"aspectRatio"];
+    NSNumber *minWidth = constraints[@"minWidth"];
+    NSNumber *maxWidth = constraints[@"maxWidth"];
+    NSNumber *minFrameRate = constraints[@"minFrameRate"];
+    NSNumber *maxFrameRate = constraints[@"maxFrameRate"];
+
+    // Set builder.aspectRatio
+    if ([aspectRatio isEqualToString:@"4:3"]) {
+      builder.aspectRatio = TVIAspectRatio4x3;
+    } else {
+      builder.aspectRatio = TVIAspectRatio16x9;
+    }
+
+    // Set builder.minSize
+    if ([minWidth intValue] == 1280) {
+      if ([aspectRatio isEqualToString:@"4:3"]) {
+        builder.minSize = TVIVideoConstraintsSize1280x960;
+      } else {
+        builder.minSize = TVIVideoConstraintsSize1280x720;
+      }
+    } else if ([minWidth intValue] == 960) {
+      // Twilio only has 960x540 (16:9) available
+      builder.minSize = TVIVideoConstraintsSize960x540;
+      if ([aspectRatio isEqualToString:@"4:3"]) {
+        builder.aspectRatio = TVIAspectRatio16x9;
+      }
+    } else if ([minWidth intValue] == 640) {
+      // Twilio only has 640x480 (4:3) available
+      builder.minSize = TVIVideoConstraintsSize640x480;
+      if ([aspectRatio isEqualToString:@"16:9"]) {
+        builder.aspectRatio = TVIAspectRatio4x3;
+      }
+    } else if ([minWidth intValue] == 480) {
+      // Twilio only has 480x360 (4:3) available
+      builder.minSize = TVIVideoConstraintsSize480x360;
+      if ([aspectRatio isEqualToString:@"16:9"]) {
+        builder.aspectRatio = TVIAspectRatio4x3;
+      }
+    } else {
+      // Twilio only has 960x540 (16:9) available
+      builder.minSize = TVIVideoConstraintsSize960x540;
+      if ([aspectRatio isEqualToString:@"4:3"]) {
+        builder.aspectRatio = TVIAspectRatio16x9;
+      }
+    }
+
+    // Set builder.maxSize
+    if ([maxWidth intValue] == 1280) {
+      if ([aspectRatio isEqualToString:@"4:3"]) {
+        builder.maxSize = TVIVideoConstraintsSize1280x960;
+      } else {
+        builder.maxSize = TVIVideoConstraintsSize1280x720;
+      }
+    } else if ([maxWidth intValue] == 960) {
+      // Twilio only has 960x540 (16:9) available
+      builder.maxSize = TVIVideoConstraintsSize960x540;
+      if ([aspectRatio isEqualToString:@"4:3"]) {
+        builder.aspectRatio = TVIAspectRatio16x9;
+      }
+    } else if ([maxWidth intValue] == 640) {
+      // Twilio only has 640x480 (4:3) available
+      builder.maxSize = TVIVideoConstraintsSize640x480;
+      if ([aspectRatio isEqualToString:@"16:9"]) {
+        builder.aspectRatio = TVIAspectRatio4x3;
+      }
+    } else if ([maxWidth intValue] == 480) {
+      // Twilio only has 480x360 (4:3) available
+      builder.maxSize = TVIVideoConstraintsSize480x360;
+      if ([aspectRatio isEqualToString:@"16:9"]) {
+        builder.aspectRatio = TVIAspectRatio4x3;
+      }
+    } else {
+      if ([aspectRatio isEqualToString:@"4:3"]) {
+        builder.maxSize = TVIVideoConstraintsSize1280x960;
+      } else {
+        builder.maxSize = TVIVideoConstraintsSize1280x720;
+      }
+    }
+
+    // Set builder.minFrameRate
+    if ([minFrameRate intValue] == 30) {
+      builder.minFrameRate = TVIVideoConstraintsFrameRate30;
+    } else if ([minFrameRate intValue] == 20) {
+      builder.minFrameRate = TVIVideoConstraintsFrameRate20;
+    } else if ([minFrameRate intValue] == 15) {
+      builder.minFrameRate = TVIVideoConstraintsFrameRate15;
+    } else if ([minFrameRate intValue] == 10) {
+      builder.minFrameRate = TVIVideoConstraintsFrameRate10;
+    } else {
+      builder.minFrameRate = TVIVideoConstraintsFrameRateNone;
+    }
+
+    // Set builder.maxFrameRate
+    if ([maxFrameRate intValue] == 30) {
+      builder.maxFrameRate = TVIVideoConstraintsFrameRate30;
+    } else if ([maxFrameRate intValue] == 20) {
+      builder.maxFrameRate = TVIVideoConstraintsFrameRate20;
+    } else if ([maxFrameRate intValue] == 15) {
+      builder.maxFrameRate = TVIVideoConstraintsFrameRate15;
+    } else if ([maxFrameRate intValue] == 10) {
+      builder.maxFrameRate = TVIVideoConstraintsFrameRate10;
+    } else {
+      builder.maxFrameRate = TVIVideoConstraintsFrameRateNone;
+    }
   }];
 }
 

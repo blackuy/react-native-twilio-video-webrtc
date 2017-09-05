@@ -19,6 +19,10 @@ const { TWVideoModule } = NativeModules
 export default class extends Component {
   static propTypes = {
     /**
+     * Flag that enables screen sharing RCTRootView instead of camera capture
+     */
+    screenShare: PropTypes.bool,
+    /**
      * Called when the room has connected
      *
      * @param {{roomName, participants}}
@@ -166,7 +170,8 @@ export default class extends Component {
   }
 
   _startLocalVideo () {
-    TWVideoModule.startLocalVideo()
+    const screenShare = this.props.screenShare || false
+    TWVideoModule.startLocalVideo(screenShare)
   }
 
   _stopLocalVideo () {

@@ -31,6 +31,7 @@ static NSString* cameraDidStopRunning         = @"cameraDidStopRunning";
 @interface RCTTWVideoModule () <TVIParticipantDelegate, TVIRoomDelegate, TVICameraCapturerDelegate>
 
 @property (strong, nonatomic) TVICameraCapturer *camera;
+@property (strong, nonatomic) TVIScreenCapturer *screen;
 @property (strong, nonatomic) TVILocalVideoTrack* localVideoTrack;
 @property (strong, nonatomic) TVILocalAudioTrack* localAudioTrack;
 @property (strong, nonatomic) TVIRoom *room;
@@ -96,8 +97,13 @@ RCT_EXPORT_MODULE();
   }
 }
 
-RCT_EXPORT_METHOD(startLocalVideo) {
-  if ([TVICameraCapturer availableSources].count > 0) {
+RCT_EXPORT_METHOD(startLocalVideo:(BOOL)screenShare) {
+  if (screenShare) {
+    UIViewController *rootViewController = [UIApplication sharedApplication].delegate.window.rootViewController;
+    self.screen = [[TVIScreenCapturer alloc] initWithView:rootViewController.view];
+
+    self.localVideoTrack = [TVILocalVideoTrack trackWithCapturer:self.screen enabled:YES constraints:[self videoConstraints]];
+  } else if ([TVICameraCapturer availableSources].count > 0) {
     self.camera = [[TVICameraCapturer alloc] init];
     self.camera.delegate = self;
 

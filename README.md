@@ -4,7 +4,7 @@
 
 Platforms:
 - iOS
-- Android **(Coming soon)**
+- Android
 
 People using a version < 1.0.1 please move to 1.0.1 since the project changed a lot internally to support the stable TwilioVideo version.
 
@@ -68,6 +68,17 @@ include ':react-native-twilio-video-webrtc'
 project(':react-native-twilio-video-webrtc').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-twilio-video-webrtc/android')
 ```
 
+And include the library in your dependencies in `android/app/build.gradle`:
+
+```
+dependencies {
+    .....
+    .....
+    .....
+    compile project(':react-native-twilio-video-webrtc')
+}
+```
+
 Now you're ready to load the package in `MainApplication.java`.  In the imports section, add this:
 
 ```java
@@ -100,6 +111,19 @@ For most applications, you'll want to add camera and audio permissions to your `
 
 Newer versions of Android have a different permissions model.  You will need to use the `PermissionsAndroid`
 class in `react-native` in order to request the `CAMERA` and `RECORD_AUDIO` permissions.
+
+### Additional Tips
+
+Under default settings, the Android build will fail if the total number of symbols exceeds a certain threshold. If you should encounter this issue when adding this library (e.g., if your build fails with `com.android.dex.DexIndexOverflowException`), you can turn on jumbo mode by editing your `app/build.gradle`:
+
+```
+android {
+  ...
+  dexOptions {
+    jumboMode true
+  }
+}
+```
 
 ## Docs
 You can see the documentation [here](./docs).

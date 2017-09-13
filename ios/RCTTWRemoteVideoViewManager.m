@@ -48,7 +48,11 @@
 RCT_EXPORT_MODULE()
 
 - (UIView *)view {
-  return [[TVIVideoView alloc] init];
+  UIView *container = [[UIView alloc] init];
+  TVIVideoView *inner = [[TVIVideoView alloc] init];
+  inner.contentMode = UIViewContentModeScaleAspectFill;
+  [container addSubview:inner];
+  return container;
 }
 
 RCT_CUSTOM_VIEW_PROPERTY(trackIdentifier, RCTTWVideoTrackIdentifier, TVIVideoView) {
@@ -56,7 +60,7 @@ RCT_CUSTOM_VIEW_PROPERTY(trackIdentifier, RCTTWVideoTrackIdentifier, TVIVideoVie
     RCTTWVideoModule *videoModule = [self.bridge moduleForName:@"TWVideoModule"];
     RCTTWVideoTrackIdentifier *id = [RCTConvert RCTTWVideoTrackIdentifier:json];
 
-    [videoModule addParticipantView:view identity:id.participantIdentity trackId:id.videoTrackId];
+    [videoModule addParticipantView:view.subviews[0] identity:id.participantIdentity trackId:id.videoTrackId];
   }
 }
 

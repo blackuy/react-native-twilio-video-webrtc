@@ -21,14 +21,14 @@ public class RNVideoViewGroup extends ViewGroup {
   private int videoWidth = 0;
   private int videoHeight = 0;
   private final Object layoutSync = new Object();
-  private RendererCommon.ScalingType scalingType = RendererCommon.ScalingType.SCALE_ASPECT_FIT;
+  private RendererCommon.ScalingType scalingType = RendererCommon.ScalingType.SCALE_ASPECT_FILL;
 
 
   public RNVideoViewGroup(Context context) {
     super(context);
 
     surfaceViewRenderer = new VideoView(context);
-    surfaceViewRenderer.setVideoScaleType(VideoScaleType.ASPECT_FIT);
+    surfaceViewRenderer.setVideoScaleType(VideoScaleType.ASPECT_FILL);
     addView(surfaceViewRenderer);
     surfaceViewRenderer.setListener(
         new VideoRenderer.Listener() {

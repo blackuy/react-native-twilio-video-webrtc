@@ -7,23 +7,24 @@
 //
 
 import React, { Component } from 'react'
+import PropTypes from 'prop-types'
 import { requireNativeComponent } from 'react-native'
 
 class TwilioVideoParticipantView extends Component {
   static propTypes = {
-    trackIdentifier: React.PropTypes.shape({
+    trackIdentifier: PropTypes.shape({
       /**
        * The participant identifier.
        */
-      participantIdentity: React.PropTypes.string.isRequired,
+      participantIdentity: PropTypes.string.isRequired,
       /**
        * The participant's video track you want to render in the view.
        */
-      videoTrackId: React.PropTypes.string.isRequired
+      videoTrackId: PropTypes.string.isRequired
     })
   }
 
-  render() {
+  render () {
     return <RCTTWRemoteVideoView {...this.props}>{this.props.children}</RCTTWRemoteVideoView>
   }
 }

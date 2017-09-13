@@ -97,12 +97,12 @@ RCT_EXPORT_MODULE();
   }
 }
 
-RCT_EXPORT_METHOD(startLocalVideo:(NSDictionary *)constraints (BOOL)screenShare) {
+RCT_EXPORT_METHOD(startLocalVideo:(BOOL)screenShare constraints:(NSDictionary *)constraints) {
   if (screenShare) {
     UIViewController *rootViewController = [UIApplication sharedApplication].delegate.window.rootViewController;
     self.screen = [[TVIScreenCapturer alloc] initWithView:rootViewController.view];
 
-    self.localVideoTrack = [TVILocalVideoTrack trackWithCapturer:self.screen enabled:YES constraints:[self videoConstraints]];
+    self.localVideoTrack = [TVILocalVideoTrack trackWithCapturer:self.screen enabled:YES constraints:[self videoConstraints:constraints]];
   } else if ([TVICameraCapturer availableSources].count > 0) {
     self.camera = [[TVICameraCapturer alloc] init];
     self.camera.delegate = self;

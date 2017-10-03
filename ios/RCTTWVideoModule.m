@@ -97,17 +97,17 @@ RCT_EXPORT_MODULE();
   }
 }
 
-RCT_EXPORT_METHOD(startLocalVideo:(BOOL)screenShare) {
+RCT_EXPORT_METHOD(startLocalVideo:(BOOL)screenShare constraints:(NSDictionary *)constraints) {
   if (screenShare) {
     UIViewController *rootViewController = [UIApplication sharedApplication].delegate.window.rootViewController;
     self.screen = [[TVIScreenCapturer alloc] initWithView:rootViewController.view];
 
-    self.localVideoTrack = [TVILocalVideoTrack trackWithCapturer:self.screen enabled:YES constraints:[self videoConstraints]];
+    self.localVideoTrack = [TVILocalVideoTrack trackWithCapturer:self.screen enabled:YES constraints:[self videoConstraints:constraints]];
   } else if ([TVICameraCapturer availableSources].count > 0) {
     self.camera = [[TVICameraCapturer alloc] init];
     self.camera.delegate = self;
 
-    self.localVideoTrack = [TVILocalVideoTrack trackWithCapturer:self.camera enabled:YES constraints:[self videoConstraints]];
+    self.localVideoTrack = [TVILocalVideoTrack trackWithCapturer:self.camera enabled:YES constraints:[self videoConstraints:constraints]];
   }
 }
 
@@ -177,13 +177,37 @@ RCT_EXPORT_METHOD(disconnect) {
   [self.room disconnect];
 }
 
--(TVIVideoConstraints*) videoConstraints {
+-(TVIVideoConstraints*) videoConstraints:(NSDictionary *)constraints {
   return [TVIVideoConstraints constraintsWithBlock:^(TVIVideoConstraintsBuilder *builder) {
-    builder.minSize = TVIVideoConstraintsSize960x540;
-    builder.maxSize = TVIVideoConstraintsSize1280x720;
-    builder.aspectRatio = TVIAspectRatio16x9;
-    builder.minFrameRate = TVIVideoConstraintsFrameRateNone;
-    builder.maxFrameRate = TVIVideoConstraintsFrameRateNone;
+    NSString *aspectRatio = constraints[@"aspectRatio"];
+    int32_t minWidth = [constraints[@"minWidth"] intValue];
+    int32_t maxWidth = [constraints[@"maxWidth"] intValue];
+    NSUInteger minFrameRate = [constraints[@"minFrameRate"] intValue];
+    NSUInteger maxFrameRate = [constraints[@"maxFrameRate"] intValue];
+
+    CMVideoDimensions minDimensions;
+    minDimensions.width = minWidth;
+    minDimensions.height = [aspectRatio isEqualToString:@"4:3"]
+      ? minWidth * (3 / 4)
+      : minWidth * (9 / 16);
+
+    CMVideoDimensions maxDimensions;
+    maxDimensions.width = maxWidth;
+    maxDimensions.height = [aspectRatio isEqualToString:@"4:3"]
+      ? maxWidth * (3 / 4)
+      : maxWidth * (9 / 16);
+
+    builder.minSize = minDimensions;
+    builder.maxSize = maxDimensions;
+    builder.aspectRatio = [aspectRatio isEqualToString:@"4:3"]
+      ? TVIAspectRatio4x3
+      : TVIAspectRatio16x9;
+    builder.minFrameRate = minFrameRate == 0
+      ? TVIVideoConstraintsFrameRateNone
+      : minFrameRate;
+    builder.maxFrameRate = maxFrameRate == 0
+      ? TVIVideoConstraintsFrameRateNone
+      : maxFrameRate;
   }];
 }
 

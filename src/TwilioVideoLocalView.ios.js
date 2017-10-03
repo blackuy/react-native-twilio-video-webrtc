@@ -6,7 +6,8 @@
 //
 //
 
-import React, { Component, PropTypes } from 'react'
+import React, { Component } from 'react'
+import PropTypes from 'prop-types'
 import { requireNativeComponent } from 'react-native'
 
 class TwilioVideoLocalView extends Component {
@@ -17,7 +18,7 @@ class TwilioVideoLocalView extends Component {
     enabled: PropTypes.bool.isRequired
   }
 
-  render() {
+  render () {
     return <RCTTWLocalVideoView {...this.props}>{this.props.children}</RCTTWLocalVideoView>
   }
 }

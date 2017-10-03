@@ -18,7 +18,11 @@
 RCT_EXPORT_MODULE()
 
 - (UIView *)view {
-  return [[TVIVideoView alloc] init];
+  UIView *container = [[UIView alloc] init];
+  TVIVideoView *inner = [[TVIVideoView alloc] init];
+  inner.contentMode = UIViewContentModeScaleAspectFill;
+  [container addSubview:inner];
+  return container;
 }
 
 RCT_CUSTOM_VIEW_PROPERTY(enabled, BOOL, TVIVideoView) {
@@ -27,9 +31,9 @@ RCT_CUSTOM_VIEW_PROPERTY(enabled, BOOL, TVIVideoView) {
     BOOL isEnabled = [RCTConvert BOOL:json];
 
     if (isEnabled) {
-      [videoModule addLocalView:view];
+      [videoModule addLocalView:view.subviews[0]];
     } else {
-      [videoModule removeLocalView:view];
+      [videoModule removeLocalView:view.subviews[0]];
     }
   }
 }

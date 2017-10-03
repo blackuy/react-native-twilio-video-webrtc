@@ -7,27 +7,27 @@
 
 import {
   requireNativeComponent,
-  View,
-} from 'react-native';
-import React from 'react';
+  View
+} from 'react-native'
+import React from 'react'
 
 const propTypes = {
-  ...View.propTypes,
-};
+  ...View.propTypes
+}
 
 class TwilioVideoPreview extends React.Component {
-  render() {
+  render () {
     return (
       <NativeTwilioVideoPreview {...this.props} />
-    );
+    )
   }
 }
 
-TwilioVideoPreview.propTypes = propTypes;
+TwilioVideoPreview.propTypes = propTypes
 
 const NativeTwilioVideoPreview = requireNativeComponent(
   'RNTwilioVideoPreview',
   TwilioVideoPreview
-);
+)
 
-module.exports = TwilioVideoPreview;
+module.exports = TwilioVideoPreview

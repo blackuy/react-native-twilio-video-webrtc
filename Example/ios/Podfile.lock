@@ -20,18 +20,18 @@ DEPENDENCIES:
 
 EXTERNAL SOURCES:
   React:
-    :path: ../node_modules/react-native
+    :path: "../node_modules/react-native"
   react-native-twilio-video-webrtc:
-    :path: ../../
+    :path: "../../"
   Yoga:
-    :path: ../node_modules/react-native/ReactCommon/yoga/Yoga.podspec
+    :path: "../node_modules/react-native/ReactCommon/yoga/Yoga.podspec"
 
 SPEC CHECKSUMS:
   React: d2077cc20245ccdc8bfe1fdc002f2003318ae8d8
-  react-native-twilio-video-webrtc: c518caca85e15604f0aacb1aa11d8a8567d3478f
+  react-native-twilio-video-webrtc: 6d4633518af04efe4e09a0ebd92badac451fdaac
   TwilioVideo: 2a41b5557ab6dc343beb57e395fdc4da5a6e3450
   Yoga: a92a5d8e128905bf9f29c82f870192a6e873dd98
 
 PODFILE CHECKSUM: 7de9b5c58c19538b30544a079a9f6bfc33fe7dcf
 
-COCOAPODS: 1.3.1
+COCOAPODS: 1.2.1

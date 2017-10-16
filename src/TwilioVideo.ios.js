@@ -108,6 +108,9 @@ export default class extends Component {
      * Constraints for _startLocalVideo()
      *
      */
+
+    onStatsReceived: PropTypes.func,
+
     constraints: PropTypes.object,
     ...View.propTypes
   }
@@ -184,6 +187,10 @@ export default class extends Component {
     TWVideoModule.disconnect()
   }
 
+    getStats () {
+        TWVideoModule.getStats();
+    }
+
   _startLocalVideo () {
     const screenShare = this.props.screenShare || false
     const constraints = this.props.constraints
@@ -250,7 +257,10 @@ export default class extends Component {
       }),
       this._eventEmitter.addListener('cameraDidStopRunning', (data) => {
         if (this.props.onCameraDidStopRunning) { this.props.onCameraDidStopRunning(data) }
-      })
+      }),
+        this._eventEmitter.addListener('gotStats', (data) => {
+            if (this.props.onStatsReceived) { this.props.onStatsReceived(data) }
+        }),
     ]
   }
 

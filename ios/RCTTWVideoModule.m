@@ -388,12 +388,12 @@ RCT_EXPORT_METHOD(startLocalVideo:(BOOL)screenShare constraints:(NSDictionary *)
     UIViewController *rootViewController = [UIApplication sharedApplication].delegate.window.rootViewController;
     self.screen = [[TVIScreenCapturer alloc] initWithView:rootViewController.view];
 
-    self.localVideoTrack = [TVILocalVideoTrack trackWithCapturer:self.screen enabled:YES constraints:[self simpleConstraints]];
+    self.localVideoTrack = [TVILocalVideoTrack trackWithCapturer:self.screen enabled:YES constraints:[self videoConstraints:constraints]];
   } else if ([TVICameraCapturer availableSources].count > 0) {
     self.camera = [[TVICameraCapturer alloc] init];
     self.camera.delegate = self;
 
-    self.localVideoTrack = [TVILocalVideoTrack trackWithCapturer:self.camera enabled:YES constraints:[self simpleConstraints]];
+    self.localVideoTrack = [TVILocalVideoTrack trackWithCapturer:self.camera enabled:YES constraints:[self videoConstraints:constraints]];
   }
 }
 
@@ -463,15 +463,6 @@ RCT_EXPORT_METHOD(disconnect) {
   [self.room disconnect];
 }
 
--(TVIVideoConstraints*) simpleConstraints {
-  return [TVIVideoConstraints constraintsWithBlock:^(TVIVideoConstraintsBuilder *builder) {
-    builder.minSize = TVIVideoConstraintsSize480x360;
-    builder.maxSize = TVIVideoConstraintsSize480x360;
-    builder.aspectRatio = TVIAspectRatio4x3;
-    builder.minFrameRate = TVIVideoConstraintsFrameRateNone;
-    builder.maxFrameRate = TVIVideoConstraintsFrameRateNone;
-  }];
-}
 -(TVIVideoConstraints*) videoConstraints:(NSDictionary *)constraints {
   return [TVIVideoConstraints constraintsWithBlock:^(TVIVideoConstraintsBuilder *builder) {
     NSString *aspectRatio = constraints[@"aspectRatio"];

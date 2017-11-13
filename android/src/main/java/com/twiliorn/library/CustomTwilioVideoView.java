@@ -245,15 +245,15 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         /*
          * Release the local media ensuring any memory allocated to audio or video is freed.
          */
-        if (localVideoTrack != null) {
-            localVideoTrack.release();
-            localVideoTrack = null;
-        }
+        //if (localVideoTrack != null) {
+        //    localVideoTrack.release();
+        //    localVideoTrack = null;
+        //}
 
-        if (localAudioTrack != null) {
-            localAudioTrack.release();
-            localAudioTrack = null;
-        }
+        //if (localAudioTrack != null) {
+        //    localAudioTrack.release();
+        //    localAudioTrack = null;
+        //}
     }
 
     // ====== CONNECTING ===========================================================================
@@ -263,7 +263,12 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         this.accessToken = accessToken;
 
         Log.i("CustomTwilioVideoView", "Starting connect flow");
-        createLocalMedia();
+
+        if(cameraCapturer == null){
+          createLocalMedia();
+        }else{
+          connectToRoom();
+        }
     }
 
     public void connectToRoom() {

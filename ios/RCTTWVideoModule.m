@@ -463,7 +463,22 @@ RCT_EXPORT_METHOD(disconnect) {
   [self.room disconnect];
 }
 
+
+
 -(TVIVideoConstraints*) videoConstraints:(NSDictionary *)constraints {
+  return [TVIVideoConstraints constraintsWithBlock:^(TVIVideoConstraintsBuilder *builder) {
+    builder.minSize = TVIVideoConstraintsSize352x288;
+    builder.maxSize = TVIVideoConstraintsSize352x288;
+    builder.aspectRatio = TVIAspectRatio11x9;
+    builder.minFrameRate = TVIVideoConstraintsFrameRate10;
+    builder.maxFrameRate = TVIVideoConstraintsFrameRate15;
+  }];
+}
+
+
+
+
+-(TVIVideoConstraints*) old_videoConstraints:(NSDictionary *)constraints {
   return [TVIVideoConstraints constraintsWithBlock:^(TVIVideoConstraintsBuilder *builder) {
     NSString *aspectRatio = constraints[@"aspectRatio"];
     int32_t minWidth = [constraints[@"minWidth"] intValue];

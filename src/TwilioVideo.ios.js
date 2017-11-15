@@ -193,7 +193,7 @@ export default class extends Component {
 
   _startLocalVideo () {
     const screenShare = this.props.screenShare || false
-    const constraints = this.props.constraints
+    const constraints = this.props.constraints || false
     TWVideoModule.startLocalVideo(screenShare, constraints)
   }
 

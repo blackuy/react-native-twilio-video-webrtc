@@ -23,7 +23,6 @@ static NSString* participantRemovedAudioTrack = @"participantRemovedAudioTrack";
 static NSString* participantEnabledTrack      = @"participantEnabledTrack";
 static NSString* participantDisabledTrack     = @"participantDisabledTrack";
 
-static NSString* gotStats               = @"gotStats";
 static NSString* cameraDidStart               = @"cameraDidStart";
 static NSString* cameraWasInterrupted        = @"cameraWasInterrupted";
 static NSString* cameraDidStopRunning         = @"cameraDidStopRunning";
@@ -64,8 +63,7 @@ RCT_EXPORT_MODULE();
     participantDisabledTrack,
     cameraDidStopRunning,
     cameraDidStart,
-    cameraWasInterrupted,
-    gotStats
+    cameraWasInterrupted
   ];
 }
 
@@ -98,302 +96,18 @@ RCT_EXPORT_MODULE();
     }
   }
 }
-RCT_EXPORT_METHOD(getStats) {
-    NSLog(@"GET STATS");
-    [self.room getStatsWithBlock:^(NSArray<TVIStatsReport *> * _Nonnull statsReports) {
-        NSNumberFormatter *f = [[NSNumberFormatter alloc] init];
-        f.numberStyle = NSNumberFormatterDecimalStyle;
 
-
-        NSMutableDictionary *condensedStats = [[NSMutableDictionary alloc]initWithCapacity:10];
-        NSMutableDictionary *incomingAudioTracks = [[NSMutableDictionary alloc]initWithCapacity:10];
-        NSMutableDictionary *incomingVideoTracks = [[NSMutableDictionary alloc]initWithCapacity:10];
-        NSMutableDictionary *localVideoTracks = [[NSMutableDictionary alloc]initWithCapacity:10];
-        NSMutableDictionary *localAudioTracks = [[NSMutableDictionary alloc]initWithCapacity:10];
-
-               for (id statReport in statsReports) {
-                   if([statReport peerConnectionId]){
-                   NSLog(@"%@",[statReport peerConnectionId]);
-                       [condensedStats setObject:[statReport peerConnectionId] forKey:@"peerConnectionId"];
-                   }
-
-
-
-                   if([statReport localAudioTrackStats]){
-                       NSArray *audioTracks = [statReport localAudioTrackStats];
-                       for (id audioTrack in audioTracks) {
-                           NSMutableDictionary *outgoingTrack= [[NSMutableDictionary alloc]initWithCapacity:10];
-                           NSString *trackId = nil;
-                           if([audioTrack roundTripTime]){
-                               NSNumber *roundTripTime= [f  numberFromString:[NSString stringWithFormat:@"%llu", [audioTrack roundTripTime]]];
-                               [outgoingTrack setObject:roundTripTime forKey:@"roundTripTime"];
-                           }
-                           if([audioTrack audioLevel]){
-                               NSNumber *audioLevel= [f  numberFromString:[NSString stringWithFormat:@"%lu", (unsigned long)[audioTrack audioLevel]]];
-                               [outgoingTrack setObject:audioLevel forKey:@"audioLevel"];
-                           }
-                           if([audioTrack jitter]){
-                               NSNumber *jitter= [f  numberFromString:[NSString stringWithFormat:@"%lu", [audioTrack jitter]]];
-                               [outgoingTrack setObject:jitter forKey:@"jitter"];
-                           }
-                           if([audioTrack codec]){
-                               NSString *codec = [NSString stringWithFormat:@"%@", [audioTrack codec]];
-                               [outgoingTrack setObject:codec forKey:@"codec"];
-                           }
-
-                           if([audioTrack ssrc]){
-                               NSNumber *ssrc= [f  numberFromString:[NSString stringWithFormat:@"%lu", [audioTrack jitter]]];
-                               [outgoingTrack setObject:ssrc forKey:@"ssrc"];
-                           }
-                           if([audioTrack trackId]){
-                               trackId = [NSString stringWithFormat:@"%@", [audioTrack trackId]];
-                               [outgoingTrack setObject:trackId forKey:@"trackId"];
-                           }
-
-                           if([audioTrack packetsSent]){
-                               NSNumber *packetsSent= [f  numberFromString:[NSString stringWithFormat:@"%lu", [audioTrack packetsSent]]];
-                               [outgoingTrack setObject:packetsSent forKey:@"packetsSent"];
-                           }
-
-                           if([audioTrack packetsLost]){
-                               NSNumber *packetsLost= [f  numberFromString:[NSString stringWithFormat:@"%lu", [audioTrack packetsLost]]];
-                               [outgoingTrack setObject:packetsLost forKey:@"packetsLost"];
-                           }
-                           if([audioTrack valueForKey:@"timestamp"]){
-                               NSNumber *timestamp= [f  numberFromString:[NSString stringWithFormat:@"%lu", (unsigned long)[audioTrack valueForKey:@"timestamp"]]];
-                               [outgoingTrack setObject:timestamp forKey:@"timestamp"];
-                           }
-
-                           [localAudioTracks setObject:outgoingTrack forKey:trackId];
-
-
-                       }
-                   }
-
-
-
-
-
-
-                   if([statReport localVideoTrackStats]){
-                       NSArray *videoTracks = [statReport localVideoTrackStats];
-                       for (id videoTrack in videoTracks) {
-
-                           NSMutableDictionary *outgoingTrack= [[NSMutableDictionary alloc]initWithCapacity:10];
-                           NSString *trackId = nil;
-
-
-
-                           if([videoTrack bytesSent]){
-                               NSNumber *bytesSent= [f  numberFromString:[NSString stringWithFormat:@"%llu", [videoTrack bytesSent]]];
-
-                               [outgoingTrack setObject:bytesSent forKey:@"bytesSent"];
-                           }
-                           if([videoTrack roundTripTime]){
-                               NSNumber *roundTripTime= [f  numberFromString:[NSString stringWithFormat:@"%llu", [videoTrack roundTripTime]]];
-                                [outgoingTrack setObject:roundTripTime forKey:@"roundTripTime"];
-                           }
-                           if([videoTrack codec]){
-                               NSString *codec = [NSString stringWithFormat:@"%@", [videoTrack codec]];
-                               [outgoingTrack setObject:codec forKey:@"codec"];
-                           }
-                           if([videoTrack frameRate]){
-                                  NSNumber *frameRate= [f  numberFromString:[NSString stringWithFormat:@"%lu", (unsigned long)[videoTrack frameRate]]];
-
-                               [outgoingTrack setObject:frameRate forKey:@"frameRate"];
-                           }
-                           if([videoTrack trackId]){
-                               trackId = [NSString stringWithFormat:@"%@", [videoTrack trackId]];
-                               [outgoingTrack setObject:trackId forKey:@"trackId"];
-                           }
-
-                           if([videoTrack packetsSent]){
-                               NSNumber *packetsSent= [f  numberFromString:[NSString stringWithFormat:@"%lu", (unsigned long)[videoTrack packetsSent]]];
-                               [outgoingTrack setObject:packetsSent forKey:@"packetsSent"];
-                           }
-
-                           if([videoTrack packetsLost]){
-                               NSNumber *packetsLost= [f  numberFromString:[NSString stringWithFormat:@"%lu", (unsigned long)[videoTrack packetsLost]]];
-                               [outgoingTrack setObject:packetsLost forKey:@"packetsLost"];
-                           }
-
-                           if([videoTrack valueForKey:@"dimensions"]){
-                               CMVideoDimensions dimensions =  [videoTrack dimensions];
-
-                               NSNumber *height= [f  numberFromString:[NSString stringWithFormat:@"%d", dimensions.height]];
-
-                               [outgoingTrack setObject:height forKey:@"height"];
-
-                               NSNumber *width= [f  numberFromString:[NSString stringWithFormat:@"%d", dimensions.width]];
-
-                               [outgoingTrack setObject:width forKey:@"width"];
-
-                           }
-
-                           if([videoTrack valueForKey:@"timestamp"]){
-
-                               NSNumber *timestamp= [f  numberFromString:[NSString stringWithFormat:@"%lu", (unsigned long)[videoTrack valueForKey:@"timestamp"]]];
-
-                               [outgoingTrack setObject:timestamp forKey:@"timestamp"];
-                           }
-
-                           [localVideoTracks setObject:outgoingTrack forKey:trackId];
-
-
-                       }
-                   }
-
-
-                   if([statReport audioTrackStats]){
-                       NSArray *audioTracks = [statReport audioTrackStats];
-                       for (id audioTrack in audioTracks) {
-                           NSString *trackId = nil;
-                           NSMutableDictionary *incomingTrack= [[NSMutableDictionary alloc]initWithCapacity:10];
-
-                           if([audioTrack bytesReceived]){
-                               NSNumber *bytesReceived= [f  numberFromString:[NSString stringWithFormat:@"%lu", (unsigned long)[audioTrack bytesReceived]]];
-
-                               [incomingTrack setObject:bytesReceived forKey:@"bytesReceived"];
-                           }
-                           if([audioTrack audioLevel]){
-                               NSNumber *audioLevel= [f  numberFromString:[NSString stringWithFormat:@"%lu", (unsigned long)[audioTrack audioLevel]]];
-                               [incomingTrack setObject:audioLevel forKey:@"audioLevel"];
-                           }
-                           if([audioTrack jitter]){
-                               NSNumber *jitter= [f  numberFromString:[NSString stringWithFormat:@"%lu", [audioTrack jitter]]];
-                               [incomingTrack setObject:jitter forKey:@"jitter"];
-                           }
-                           if([audioTrack codec]){
-                               NSString *codec = [NSString stringWithFormat:@"%@", [audioTrack codec]];
-                               [incomingTrack setObject:codec forKey:@"codec"];
-                           }
-
-                           if([audioTrack ssrc]){
-                               NSNumber *ssrc= [f  numberFromString:[NSString stringWithFormat:@"%lu", [audioTrack jitter]]];
-                               [incomingTrack setObject:ssrc forKey:@"ssrc"];
-                           }
-                           if([audioTrack trackId]){
-                               trackId = [NSString stringWithFormat:@"%@", [audioTrack trackId]];
-                               [incomingTrack setObject:trackId forKey:@"trackId"];
-                           }
-
-                           if([audioTrack packetsReceived]){
-                               NSNumber *packetsReceived= [f  numberFromString:[NSString stringWithFormat:@"%lu", [audioTrack packetsReceived]]];
-                               [incomingTrack setObject:packetsReceived forKey:@"packetsSent"];
-                           }
-
-                           if([audioTrack packetsLost]){
-                               NSNumber *packetsLost= [f  numberFromString:[NSString stringWithFormat:@"%lu", [audioTrack packetsLost]]];
-                               [incomingTrack setObject:packetsLost forKey:@"packetsLost"];
-                           }
-                           if([audioTrack valueForKey:@"timestamp"]){
-                               NSNumber *timestamp= [f  numberFromString:[NSString stringWithFormat:@"%lu", (unsigned long)[audioTrack valueForKey:@"timestamp"]]];
-                               [incomingTrack setObject:timestamp forKey:@"timestamp"];
-                           }
-
-
-
-
-
-
-                           [incomingAudioTracks setObject:incomingTrack forKey:trackId];
-
-                       }
-                   }
-
-
-
-                   if([statReport videoTrackStats]){
-                       NSArray *videoStats = [statReport videoTrackStats];
-                       for (id videoTrack in videoStats) {
-                           NSString *trackId = nil;
-                           NSMutableDictionary *incomingTrack= [[NSMutableDictionary alloc]initWithCapacity:10];
-
-
-                           if([videoTrack bytesReceived]){
-                               NSNumber *bytesReceived= [f  numberFromString:[NSString stringWithFormat:@"%lu", (unsigned long)[videoTrack bytesReceived]]];
-
-                              [incomingTrack setObject:bytesReceived forKey:@"bytesReceived"];
-                           }
-
-                           if([videoTrack codec]){
-                               NSString *codec = [NSString stringWithFormat:@"%@", [videoTrack codec]];
-                               [incomingTrack setObject:codec forKey:@"codec"];
-                           }
-                           if([videoTrack frameRate]){
-                               NSNumber *frameRate= [f  numberFromString:[NSString stringWithFormat:@"%lu", (unsigned long)[videoTrack frameRate]]];
-
-                               [incomingTrack setObject:frameRate forKey:@"frameRate"];
-                           }
-                           if([videoTrack trackId]){
-                               trackId = [NSString stringWithFormat:@"%@", [videoTrack trackId]];
-                               [incomingTrack setObject:trackId forKey:@"trackId"];
-                           }
-
-                           if([videoTrack packetsReceived]){
-                               NSNumber *packetsReceived= [f  numberFromString:[NSString stringWithFormat:@"%lu", (unsigned long)[videoTrack packetsReceived]]];
-                               [incomingTrack setObject:packetsReceived forKey:@"packetsReceived"];
-                           }
-
-                           if([videoTrack packetsLost]){
-
-                               NSNumber *packetsLost= [f  numberFromString:[NSString stringWithFormat:@"%lu", (unsigned long)[videoTrack packetsLost]]];
-                               [incomingTrack setObject:packetsLost forKey:@"packetsLost"];
-                           }
-
-                           if([videoTrack valueForKey:@"dimensions"]){
-                               CMVideoDimensions dimensions =  [videoTrack dimensions];
-
-                               NSNumber *height= [f  numberFromString:[NSString stringWithFormat:@"%d", dimensions.height]];
-
-                               [incomingTrack setObject:height forKey:@"height"];
-
-                               NSNumber *width= [f  numberFromString:[NSString stringWithFormat:@"%d", dimensions.width]];
-
-                               [incomingTrack setObject:width forKey:@"width"];
-
-                           }
-
-                           if([videoTrack valueForKey:@"timestamp"]){
-
-                               NSNumber *timestamp= [f  numberFromString:[NSString stringWithFormat:@"%lu", (unsigned long)[videoTrack valueForKey:@"timestamp"]]];
-
-                               [incomingTrack setObject:timestamp forKey:@"timestamp"];
-                           }
-
-
-
-
-                           [incomingVideoTracks setObject:incomingTrack forKey:trackId];
-
-                       }
-                   }
-
-
-               }
-        [condensedStats setObject:incomingVideoTracks forKey:@"remoteVideoTracks"];
-        [condensedStats setObject:incomingAudioTracks forKey:@"remoteAudioTracks"];
-
-        [condensedStats setObject:localVideoTracks forKey:@"localVideoTracks"];
-        [condensedStats setObject:localAudioTracks forKey:@"localAudioTracks"];
-
-
-        [self sendEventWithName:gotStats body:condensedStats];
-
-    }];
-}
-
-RCT_EXPORT_METHOD(startLocalVideo:(BOOL)screenShare constraints:(NSDictionary *)constraints) {
+RCT_EXPORT_METHOD(startLocalVideo:(BOOL)screenShare) {
   if (screenShare) {
     UIViewController *rootViewController = [UIApplication sharedApplication].delegate.window.rootViewController;
     self.screen = [[TVIScreenCapturer alloc] initWithView:rootViewController.view];
 
-    self.localVideoTrack = [TVILocalVideoTrack trackWithCapturer:self.screen enabled:YES constraints:[self videoConstraints:constraints]];
+    self.localVideoTrack = [TVILocalVideoTrack trackWithCapturer:self.screen enabled:YES constraints:[self videoConstraints]];
   } else if ([TVICameraCapturer availableSources].count > 0) {
     self.camera = [[TVICameraCapturer alloc] init];
     self.camera.delegate = self;
 
-    self.localVideoTrack = [TVILocalVideoTrack trackWithCapturer:self.camera enabled:YES constraints:[self videoConstraints:constraints]];
+    self.localVideoTrack = [TVILocalVideoTrack trackWithCapturer:self.camera enabled:YES constraints:[self videoConstraints]];
   }
 }
 
@@ -463,37 +177,13 @@ RCT_EXPORT_METHOD(disconnect) {
   [self.room disconnect];
 }
 
--(TVIVideoConstraints*) videoConstraints:(NSDictionary *)constraints {
+-(TVIVideoConstraints*) videoConstraints {
   return [TVIVideoConstraints constraintsWithBlock:^(TVIVideoConstraintsBuilder *builder) {
-    NSString *aspectRatio = constraints[@"aspectRatio"];
-    int32_t minWidth = [constraints[@"minWidth"] intValue];
-    int32_t maxWidth = [constraints[@"maxWidth"] intValue];
-    NSUInteger minFrameRate = [constraints[@"minFrameRate"] intValue];
-    NSUInteger maxFrameRate = [constraints[@"maxFrameRate"] intValue];
-
-    CMVideoDimensions minDimensions;
-    minDimensions.width = minWidth;
-    minDimensions.height = [aspectRatio isEqualToString:@"4:3"]
-      ? minWidth * (3 / 4)
-      : minWidth * (9 / 16);
-
-    CMVideoDimensions maxDimensions;
-    maxDimensions.width = maxWidth;
-    maxDimensions.height = [aspectRatio isEqualToString:@"4:3"]
-      ? maxWidth * (3 / 4)
-      : maxWidth * (9 / 16);
-
-    builder.minSize = minDimensions;
-    builder.maxSize = maxDimensions;
-    builder.aspectRatio = [aspectRatio isEqualToString:@"4:3"]
-      ? TVIAspectRatio4x3
-      : TVIAspectRatio16x9;
-    builder.minFrameRate = minFrameRate == 0
-      ? TVIVideoConstraintsFrameRateNone
-      : minFrameRate;
-    builder.maxFrameRate = maxFrameRate == 0
-      ? TVIVideoConstraintsFrameRateNone
-      : maxFrameRate;
+    builder.minSize = TVIVideoConstraintsSize960x540;
+    builder.maxSize = TVIVideoConstraintsSize1280x720;
+    builder.aspectRatio = TVIAspectRatio16x9;
+    builder.minFrameRate = TVIVideoConstraintsFrameRateNone;
+    builder.maxFrameRate = TVIVideoConstraintsFrameRateNone;
   }];
 }
 

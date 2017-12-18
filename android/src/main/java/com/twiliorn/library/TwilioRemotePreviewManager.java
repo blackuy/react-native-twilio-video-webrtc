@@ -8,8 +8,6 @@
 package com.twiliorn.library;
 
 import android.support.annotation.Nullable;
-import android.util.Log;
-
 import com.facebook.react.uimanager.SimpleViewManager;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.annotations.ReactProp;
@@ -26,10 +24,7 @@ public class TwilioRemotePreviewManager extends SimpleViewManager<TwilioRemotePr
 
     @ReactProp(name = "trackId")
     public void setTrackId(TwilioRemotePreview view, @Nullable String trackId) {
-
-        Log.i("CustomTwilioVideoView","Initialize Twilio REMOTEEEEEEEEE" );
-        Log.i("CustomTwilioVideoView",trackId );
-        myTrackId =  trackId;
+     myTrackId =  trackId;
         CustomTwilioVideoView.registerPrimaryVideoView(view.getSurfaceViewRenderer(), trackId);
     }
 

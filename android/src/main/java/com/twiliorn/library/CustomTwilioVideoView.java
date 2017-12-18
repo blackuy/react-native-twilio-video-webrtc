@@ -266,15 +266,15 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         /*
          * Release the local media ensuring any memory allocated to audio or video is freed.
          */
-        //if (localVideoTrack != null) {
-        //    localVideoTrack.release();
-        //    localVideoTrack = null;
-        //}
+        if (localVideoTrack != null) {
+            localVideoTrack.release();
+            localVideoTrack = null;
+        }
 
-        //if (localAudioTrack != null) {
-        //    localAudioTrack.release();
-        //    localAudioTrack = null;
-        //}
+        if (localAudioTrack != null) {
+            localAudioTrack.release();
+            localAudioTrack = null;
+        }
     }
 
     // ====== CONNECTING ===========================================================================
@@ -443,13 +443,14 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
 
             @Override
             public void onDisconnected(Room room, TwilioException e) {
+                               WritableMap event = new WritableNativeMap();
+                               event.putString("participant", localParticipant.getIdentity());
+                               pushEvent(CustomTwilioVideoView.this, ON_DISCONNECTED, event);
+
                 localParticipant = null;
                 roomName = null;
                 accessToken = null;
 
-                WritableMap event = new WritableNativeMap();
-                event.putString("participant", localParticipant.getIdentity());
-                pushEvent(CustomTwilioVideoView.this, ON_DISCONNECTED, event);
 
                 CustomTwilioVideoView.this.room = null;
                 // Only reinitialize the UI if disconnect was not called from onDestroy()

@@ -53,6 +53,13 @@ To enable camera usage and microphone usage you will need to add the following e
 <string>Your message to user when the microphone is accessed for the first time</string>
 ```
 
+### Known Issues
+
+TwilioVideo version 1.3.8 (latest) has the following know issues.
+
+- Participant disconnect event can take up to 120 seconds to occur. [Issue 99](https://github.com/twilio/video-quickstart-swift/issues/99)
+- AVPlayer audio content does not mix properly with Room audio. [Issue 62](https://github.com/twilio/video-quickstart-objc/issues/62)
+
 ### Android
 
 As with iOS, make sure the package is installed:

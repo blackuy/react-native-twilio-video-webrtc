@@ -599,11 +599,6 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     }
 
     private void addParticipantVideo(Participant participant, VideoTrack videoTrack) {
-
-
-
-
-
         Log.i("CustomTwilioVideoView", "add Participant Video");
 
         participantVideoTracks.add(participantVideoTracks.size(),videoTrack);
@@ -612,21 +607,24 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         pushEvent(CustomTwilioVideoView.this, ON_PARTICIPANT_ADDED_VIDEO_TRACK, event);
     }
 
-    private void removeParticipantVideo(Participant participant, VideoTrack videoTrack) {
-       // if (participantVideoTrack != null && primaryVideoView != null) {
-       //     participantVideoTrack.removeRenderer(primaryVideoView);
-      // }
-      //  participantVideoTrack = null;
-        Log.i("CustomTwilioVideoView", "Remove participant");
+     private void removeParticipantVideo(Participant participant, VideoTrack deleteVideoTrack) {
+           Log.i("CustomTwilioVideoView", "Remove participant");
+              List<VideoTrack> newParticipantTracks= new ArrayList<VideoTrack>();
+               for (VideoTrack videoTrack: participantVideoTracks) {
+                   Log.i("CustomTwilioVideoView", videoTrack.getTrackId());
 
+                       if (videoTrack.getTrackId().equals(deleteVideoTrack.getTrackId())) {
+                           Log.i("CustomTwilioVideoView", "FOUND THE MATCHING TRACK");
 
+                       } else {
+                       newParticipantTracks.add(newParticipantTracks.size(),videoTrack);
+                       }
+               }
 
-
-
-
-        WritableMap event = this.buildParticipantVideoEvent(participant, videoTrack);
-        pushEvent(CustomTwilioVideoView.this, ON_PARTICIPANT_REMOVED_VIDEO_TRACK, event);
-    }
+               participantVideoTracks = newParticipantTracks;
+           WritableMap event = this.buildParticipantVideoEvent(participant, deleteVideoTrack);
+           pushEvent(CustomTwilioVideoView.this, ON_PARTICIPANT_REMOVED_VIDEO_TRACK, event);
+       }
     // ===== EVENTS TO RN ==========================================================================
 
     void pushEvent(View view, String name, WritableMap data) {
@@ -639,41 +637,16 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
 
         Log.i("CustomTwilioVideoView", "register Primary Video");
         Log.i("CustomTwilioVideoView", trackId);
-
-
         primaryVideoView = v;
-
-
-
-//        VideoTrack videoTrack = participantVideoTracks.get(renderCount);
-//        videoTrack.removeRenderer(v);
-//        videoTrack.addRenderer(v);
-
-
-//        Log.i("CustomTwilioVideoView", );
 
         if (participantVideoTracks != null) {
 
             Log.i("CustomTwilioVideoView", "Found Partiipant tracks");
 
-
-
-
-
-
-
             for (VideoTrack videoTrack: participantVideoTracks) {
                 Log.i("CustomTwilioVideoView", videoTrack.getTrackId());
 
                 List<VideoRenderer> renders = videoTrack.getRenderers();
-
-               // if (renders.size() > 0) {
-
-              //      Log.i("CustomTwilioVideoView", "RENDERER already attached, do nothing");
-
-              //  } else {
-
-
                     if (videoTrack.getTrackId().equals(trackId)) {
                         Log.i("CustomTwilioVideoView", "FOUND THE MATCHING TRACK");
                         videoTrack.addRenderer(v);
@@ -682,8 +655,6 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
 
                     }
                 }
-            //}
-
         }
     }
 

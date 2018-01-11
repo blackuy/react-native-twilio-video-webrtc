@@ -1,40 +1,106 @@
 {
-  "name": "react-native-twilio-video-webrtc",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/blackuy/react-native-twilio-video-webrtc.git"
-  },
-  "homepage": "https://github.com/blackuy/react-native-twilio-video-webrtc",
-  "version": "1.0.2",
-  "description": "Twilio Video WebRTC for React Native.",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "standard 'src/**/*.js'",
-    "lint:fix": "standard 'src/**/*.js' --fix",
-    "ci": "yarn lint"
-  },
-  "standard": {
-    "parser": "babel-eslint"
-  },
-  "keywords": [
-    "react-native"
+  "_args": [
+    [
+      {
+        "raw": "react-native-twilio-video-webrtc-withandroid@^1.0.0",
+        "scope": null,
+        "escapedName": "react-native-twilio-video-webrtc-withandroid",
+        "name": "react-native-twilio-video-webrtc-withandroid",
+        "rawSpec": "^1.0.0",
+        "spec": ">=1.0.0 <2.0.0",
+        "type": "range"
+      },
+      "C:\\Users\\nhill\\Documents\\hl-livepractice"
+    ],
+    [
+      {
+        "raw": "react-native-twilio-video-webrtc-withandroid@^1.0.0",
+        "scope": null,
+        "escapedName": "react-native-twilio-video-webrtc-withandroid",
+        "name": "react-native-twilio-video-webrtc-withandroid",
+        "rawSpec": "^1.0.0",
+        "spec": ">=1.0.0 <2.0.0",
+        "type": "range"
+      },
+      "C:\\Users\\Nathan\\Documents\\hl-livepractice"
+    ]
   ],
-  "author": "",
-  "license": "MIT",
-  "devDependencies": {
-    "babel-eslint": "^7.2.3",
-    "gulp-react-docs": "^0.1.2",
-    "react-docgen": "^2.15.0",
-    "standard": "^10.0.3"
+  "_from": "react-native-twilio-video-webrtc-withandroid@^1.0.0",
+  "_id": "react-native-twilio-video-webrtc-withandroid@1.0.2",
+  "_inCache": true,
+  "_location": "/react-native-twilio-video-webrtc-withandroid",
+  "_nodeVersion": "6.11.0",
+  "_npmOperationalInternal": {
+    "host": "s3://npm-registry-packages",
+    "tmp": "tmp/react-native-twilio-video-webrtc-withandroid-1.0.2.tgz_1499892527079_0.003136806422844529"
   },
+  "_npmUser": {
+    "name": "nhill52",
+    "email": "nhill52@gmail.com"
+  },
+  "_npmVersion": "3.10.10",
+  "_phantomChildren": {
+    "array-union": "1.0.2",
+    "glob": "7.1.2",
+    "is-path-cwd": "1.0.0",
+    "is-path-in-cwd": "1.0.0",
+    "object-assign": "4.1.1",
+    "p-map": "1.1.1",
+    "pinkie-promise": "2.0.1",
+    "rimraf": "2.6.1"
+  },
+  "_requested": {
+    "raw": "react-native-twilio-video-webrtc-withandroid@^1.0.0",
+    "scope": null,
+    "escapedName": "react-native-twilio-video-webrtc-withandroid",
+    "name": "react-native-twilio-video-webrtc-withandroid",
+    "rawSpec": "^1.0.0",
+    "spec": ">=1.0.0 <2.0.0",
+    "type": "range"
+  },
+  "_requiredBy": [
+    "/"
+  ],
+  "_resolved": "https://registry.npmjs.org/react-native-twilio-video-webrtc-withandroid/-/react-native-twilio-video-webrtc-withandroid-1.0.2.tgz",
+  "_shasum": "0c4f76ae5ece52e1738b172f73aaecc469c13321",
+  "_shrinkwrap": null,
+  "_spec": "react-native-twilio-video-webrtc-withandroid@^1.0.0",
+  "_where": "C:\\Users\\Nathan\\Documents\\hl-livepractice",
+  "author": "",
   "dependencies": {
     "del": "^3.0.0",
     "doctoc": "^1.3.0",
     "gulp": "^3.9.1",
     "gulp-concat": "^2.6.1",
     "gulp-load-plugins": "^1.5.0",
-    "gulp-tap": "^1.0.1",
-    "prop-types": "^15.5.10"
-  }
+    "gulp-tap": "^1.0.1"
+  },
+  "description": "Twilio Video WebRTC for React Native with Android support. Branched From react-native-twilio-video-webrtc.",
+  "devDependencies": {
+    "gulp-react-docs": "^0.1.2",
+    "react-docgen": "^2.15.0"
+  },
+  "directories": {},
+  "dist": {
+    "shasum": "d678c8abc02e9d3e7abace9ec95e8816af8c4dbf",
+    "tarball": "https://registry.npmjs.org/react-native-twilio-video-webrtc-withandroid/-/react-native-twilio-video-webrtc-withandroid-1.0.1.tgz"
+  },
+  "keywords": [
+    "react-native"
+  ],
+  "license": "MIT",
+  "main": "index.js",
+  "maintainers": [
+    {
+      "name": "nhill52",
+      "email": "nhill52@gmail.com"
+    }
+  ],
+  "name": "react-native-twilio-video-webrtc-withandroid",
+  "optionalDependencies": {},
+  "readme": "ERROR: No README data found!",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "version": "1.0.3"
 }

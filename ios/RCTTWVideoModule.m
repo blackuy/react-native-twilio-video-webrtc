@@ -31,7 +31,6 @@ static NSString* cameraDidStopRunning         = @"cameraDidStopRunning";
 @interface RCTTWVideoModule () <TVIParticipantDelegate, TVIRoomDelegate, TVICameraCapturerDelegate>
 
 @property (strong, nonatomic) TVICameraCapturer *camera;
-@property (strong, nonatomic) TVIScreenCapturer *screen;
 @property (strong, nonatomic) TVILocalVideoTrack* localVideoTrack;
 @property (strong, nonatomic) TVILocalAudioTrack* localAudioTrack;
 @property (strong, nonatomic) TVIRoom *room;
@@ -69,11 +68,6 @@ RCT_EXPORT_MODULE();
 
 - (void)addLocalView:(TVIVideoView *)view {
   [self.localVideoTrack addRenderer:view];
-  if (self.camera && self.camera.source == TVICameraCaptureSourceBackCameraWide) {
-    view.mirror = NO;
-  } else {
-    view.mirror = YES;
-  }
 }
 
 - (void)removeLocalView:(TVIVideoView *)view {
@@ -97,13 +91,8 @@ RCT_EXPORT_MODULE();
   }
 }
 
-RCT_EXPORT_METHOD(startLocalVideo:(BOOL)screenShare) {
-  if (screenShare) {
-    UIViewController *rootViewController = [UIApplication sharedApplication].delegate.window.rootViewController;
-    self.screen = [[TVIScreenCapturer alloc] initWithView:rootViewController.view];
-
-    self.localVideoTrack = [TVILocalVideoTrack trackWithCapturer:self.screen enabled:YES constraints:[self videoConstraints]];
-  } else if ([TVICameraCapturer availableSources].count > 0) {
+RCT_EXPORT_METHOD(startLocalVideo) {
+  if ([TVICameraCapturer availableSources].count > 0) {
     self.camera = [[TVICameraCapturer alloc] init];
     self.camera.delegate = self;
 
@@ -142,18 +131,8 @@ RCT_REMAP_METHOD(setLocalVideoEnabled, enabled:(BOOL)enabled setLocalVideoEnable
 RCT_EXPORT_METHOD(flipCamera) {
   if (self.camera.source == TVICameraCaptureSourceFrontCamera) {
     [self.camera selectSource:TVICameraCaptureSourceBackCameraWide];
-    if (self.localVideoTrack) {
-      for (TVIVideoView *r in self.localVideoTrack.renderers) {
-        r.mirror = NO;
-      }
-    }
   } else {
     [self.camera selectSource:TVICameraCaptureSourceFrontCamera];
-    if (self.localVideoTrack) {
-      for (TVIVideoView *r in self.localVideoTrack.renderers) {
-        r.mirror = YES;
-      }
-    }
   }
 }
 

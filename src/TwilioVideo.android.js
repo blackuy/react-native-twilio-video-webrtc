@@ -12,10 +12,11 @@ import {
   View,
   Platform,
   UIManager,
-  findNodeHandle
-} from 'react-native'
-import React, { Component } from 'react'
-import PropTypes from 'prop-types'
+  NativeModules,
+  findNodeHandle,
+  NativeAppEventEmitter
+} from 'react-native';
+import React, { PropTypes, Component } from 'react';
 
 const propTypes = {
   ...View.propTypes,
@@ -42,26 +43,12 @@ const propTypes = {
   /**
    * Callback that is called when connecting to room fails.
    */
-  onRoomDidFailToConnect: PropTypes.func,
+  onConnectFailure: PropTypes.func,
 
   /**
    * Callback that is called when user is disconnected from room.
    */
   onRoomDidDisconnect: PropTypes.func,
-
-  /**
-   * Called when a new video track has been added
-   *
-   * @param {{participant, track}}
-   */
-  onParticipantAddedVideoTrack: PropTypes.func,
-
-  /**
-   * Called when a video track has been removed
-   *
-   * @param {{participant, track}}
-   */
-  onParticipantRemovedVideoTrack: PropTypes.func,
 
   /**
    * Callback called a participant enters a room.
@@ -71,88 +58,132 @@ const propTypes = {
   /**
    * Callback that is called when a participant exits a room.
    */
-  onRoomParticipantDidDisconnect: PropTypes.func
-}
+  onRoomParticipantDidDisconnect: PropTypes.func,
+};
 
 const nativeEvents = {
-  connectToRoom: 1,
-  disconnect: 2,
-  switchCamera: 3,
-  toggleVideo: 4,
-  toggleSound: 5
-}
+  connectToRoom: 7,
+  disconnect: 8,
+  switchCamera: 9,
+  toggleVideo: 10,
+  toggleSound: 11,
+};
 
 class CustomTwilioVideoView extends Component {
-  connect ({roomName, accessToken}) {
-    this.runCommand(nativeEvents.connectToRoom, [roomName, accessToken])
+  constructor(props) {
+    super(props)
+
+    this._subscriptions = [];
+    this._eventEmitter = NativeAppEventEmitter;
+
+    this.setLocalVideoEnabled = this.toggleVideo.bind(this)
+    this.setLocalAudioEnabled = this.toggleSound.bind(this)
+    this.connect = this.startCall.bind(this)
+    this.disconnect = this.endCall.bind(this)
+    this.switchCamera = this.switchCamera.bind(this);
   }
 
-  disconnect () {
-    this.runCommand(nativeEvents.disconnect, [])
+  componentWillMount() {
+    this._registerEvents();
   }
 
-  flipCamera () {
-    this.runCommand(nativeEvents.switchCamera, [])
+  startCall({ accessToken }) {
+    this.runCommand(nativeEvents.connectToRoom, [accessToken]);
   }
 
-  setLocalVideoEnabled (enabled) {
-    this.runCommand(nativeEvents.toggleVideo, [enabled])
+  endCall() {
+    this.runCommand(nativeEvents.disconnect, []);
   }
 
-  setLocalAudioEnabled (enabled) {
-    this.runCommand(nativeEvents.toggleSound, [enabled])
+  switchCamera() {
+    this.runCommand(nativeEvents.switchCamera, []);
   }
 
-  runCommand (event, args) {
+  toggleVideo() {
+    this.runCommand(nativeEvents.toggleVideo, []);
+  }
+
+  toggleSound() {
+    this.runCommand(nativeEvents.toggleSound, []);
+  }
+
+  runCommand(event, args) {
     switch (Platform.OS) {
       case 'android':
         UIManager.dispatchViewManagerCommand(
-          findNodeHandle(this.refs.videoView),
+          findNodeHandle(this),
           event,
           args
-        )
-        break
+        );
+        break;
       default:
-        break
+        break;
     }
   }
 
-  buildNativeEventWrappers () {
-    return [
-      'onCameraSwitched',
-      'onVideoChanged',
-      'onAudioChanged',
-      'onRoomDidConnect',
-      'onRoomDidFailToConnect',
-      'onRoomDidDisconnect',
-      'onParticipantAddedVideoTrack',
-      'onParticipantRemovedVideoTrack',
-      'onRoomParticipantDidConnect',
-      'onRoomParticipantDidDisconnect'
-    ].reduce((wrappedEvents, eventName) => {
-      if (this.props[eventName]) {
-        return {
-          ...wrappedEvents,
-          [eventName]: (data) => this.props[eventName](data.nativeEvent)
-        }
-      }
-      return wrappedEvents
-    }, {})
+  _registerEvents() {
+      this._eventEmitter.addListener('onRoomDidConnect', (data) => {
+        if(this.props.onRoomDidConnect){ this.props.onRoomDidConnect(data)  }
+      });
+      this._eventEmitter.addListener('onConnectFailure', (data) => {
+        if(this.props.onRoomDidFailToConnect){ this.props.onRoomDidFailToConnect(data) }
+      });
+      this._eventEmitter.addListener('onRoomDidDisconnect', (data) => {
+        if(this.props.onRoomDidDisconnect){ this.props.onRoomDidDisconnect(data) }
+      });
+      this._eventEmitter.addListener('onRoomDidFailToConnect', (data) => {
+        if(this.props.onRoomDidFailToConnect){ this.props.onRoomDidFailToConnect(data) }
+      });
+      this._eventEmitter.addListener('onRoomParticipantDidConnect', (data) => {
+        if(this.props.onRoomParticipantDidConnect){ this.props.onRoomParticipantDidConnect(data) }
+      });
+      this._eventEmitter.addListener('onRoomParticipantDidDisconnect', (data) => {
+        if(this.props.onRoomParticipantDidDisconnect){ this.props.onRoomParticipantDidDisconnect(data) }
+      });
+      this._eventEmitter.addListener('onParticipantAddedVideoTrack', (data) => {
+        if(this.props.onParticipantAddedVideoTrack){ this.props.onParticipantAddedVideoTrack(data) }
+      });
+      this._eventEmitter.addListener('onParticipantRemovedVideoTrack', (data) => {
+        if(this.props.onParticipantRemovedVideoTrack){ this.props.onParticipantRemovedVideoTrack(data) }
+      });
+      this._eventEmitter.addListener('onParticipantAddedAudioTrack', (data) => {
+        if(this.props.onParticipantAddedAudioTrack){ this.props.onParticipantAddedAudioTrack(data) }
+      });
+      this._eventEmitter.addListener('onParticipantRemovedAudioTrack', (data) => {
+        if(this.props.onParticipantRemovedAudioTrack){ this.props.onParticipantRemovedAudioTrack(data) }
+      });
+      this._eventEmitter.addListener('participantEnabledTrack', (data) => {
+        if(this.props.onParticipantEnabledTrack){ this.props.onParticipantEnabledTrack(data) }
+      });
+      this._eventEmitter.addListener('participantDisabledTrack', (data) => {
+        if(this.props.onParticipantDisabledTrack){ this.props.onParticipantDisabledTrack(data) }
+      });
+      this._eventEmitter.addListener('onCameraDidStart', (data) => {
+        if(this.props.onCameraDidStart){ this.props.onCameraDidStart(data) }
+      });
+      this._eventEmitter.addListener('onCameraWasInterrupted', (data) => {
+        if(this.props.onCameraWasInterrupted){ this.props.onCameraWasInterrupted(data) }
+      });
+      this._eventEmitter.addListener('onCameraDidStopRunning', (data) => {
+        if(this.props.onCameraDidStopRunning){ this.props.onCameraDidStopRunning(data) }
+      });
+
   }
 
-  render () {
+  render() {
     return (
       <NativeCustomTwilioVideoView
-        ref='videoView'
+        onConnected={(event) => {
+          this.props.onRoomDidConnect && this.props.onRoomDidConnect(event.nativeEvent);
+        }}
         {...this.props}
-        {...this.buildNativeEventWrappers()}
       />
-    )
+    );
   }
 }
 
-CustomTwilioVideoView.propTypes = propTypes
+CustomTwilioVideoView.propTypes = propTypes;
 
-const NativeCustomTwilioVideoView = requireNativeComponent('RNCustomTwilioVideoView', CustomTwilioVideoView)
+const NativeCustomTwilioVideoView = requireNativeComponent('RNCustomTwilioVideoView', CustomTwilioVideoView);
 
-module.exports = CustomTwilioVideoView
+module.exports = CustomTwilioVideoView;

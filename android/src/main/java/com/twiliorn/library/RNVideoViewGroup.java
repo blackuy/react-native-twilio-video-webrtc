@@ -9,6 +9,7 @@ package com.twiliorn.library;
 import android.content.Context;
 import android.graphics.Point;
 import android.view.ViewGroup;
+import android.util.DisplayMetrics;
 
 import com.twilio.video.VideoRenderer;
 import com.twilio.video.VideoScaleType;
@@ -21,14 +22,14 @@ public class RNVideoViewGroup extends ViewGroup {
   private int videoWidth = 0;
   private int videoHeight = 0;
   private final Object layoutSync = new Object();
-  private RendererCommon.ScalingType scalingType = RendererCommon.ScalingType.SCALE_ASPECT_FILL;
+  private RendererCommon.ScalingType scalingType = RendererCommon.ScalingType.SCALE_ASPECT_FIT;
 
 
   public RNVideoViewGroup(Context context) {
     super(context);
 
     surfaceViewRenderer = new VideoView(context);
-    surfaceViewRenderer.setVideoScaleType(VideoScaleType.ASPECT_FILL);
+    surfaceViewRenderer.setVideoScaleType(VideoScaleType.ASPECT_FIT);
     addView(surfaceViewRenderer);
     surfaceViewRenderer.setListener(
         new VideoRenderer.Listener() {
@@ -72,9 +73,10 @@ public class RNVideoViewGroup extends ViewGroup {
       }
 
       if (videoHeight == 0 || videoWidth == 0) {
+        DisplayMetrics metrics = getContext().getResources().getDisplayMetrics();
         // These are Twilio defaults.
-        videoHeight = 480;
-        videoWidth = 640;
+        videoHeight = metrics.heightPixels;
+        videoWidth = metrics.widthPixels;
       }
 
       Point displaySize = RendererCommon.getDisplaySize(

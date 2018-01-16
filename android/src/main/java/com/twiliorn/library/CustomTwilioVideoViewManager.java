@@ -1,10 +1,10 @@
 /**
  * Component to orchestrate the Twilio Video connection and the various video
  * views.
- *
+ * <p>
  * Authors:
- *   Ralph Pina <ralph.pina@gmail.com>
- *   Jonathan Chang <slycoder@gmail.com>
+ * Ralph Pina <ralph.pina@gmail.com>
+ * Jonathan Chang <slycoder@gmail.com>
  */
 package com.twiliorn.library;
 
@@ -99,11 +99,11 @@ public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilio
     @Nullable
     public Map<String, Integer> getCommandsMap() {
         return MapBuilder.of(
-            "connectToRoom", CONNECT_TO_ROOM,
-            "disconnect", DISCONNECT,
-            "switchCamera", SWITCH_CAMERA,
-            "toggleVideo", TOGGLE_VIDEO,
-            "toggleSound", TOGGLE_SOUND
+                "connectToRoom", CONNECT_TO_ROOM,
+                "disconnect", DISCONNECT,
+                "switchCamera", SWITCH_CAMERA,
+                "toggleVideo", TOGGLE_VIDEO,
+                "toggleSound", TOGGLE_SOUND
         );
     }
 }

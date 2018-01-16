@@ -1,8 +1,8 @@
 /**
  * Component for Twilio Video local views.
- *
+ * <p>
  * Authors:
- *   Jonathan Chang <slycoder@gmail.com>
+ * Jonathan Chang <slycoder@gmail.com>
  */
 
 package com.twiliorn.library;

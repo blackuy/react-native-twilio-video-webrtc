@@ -1,9 +1,9 @@
 /**
  * Twilio Video for React Native.
- *
+ * <p>
  * Authors:
- *   Ralph Pina <ralph.pina@gmail.com>
- *   Jonathan Chang <slycoder@gmail.com>
+ * Ralph Pina <ralph.pina@gmail.com>
+ * Jonathan Chang <slycoder@gmail.com>
  */
 
 package com.twiliorn.library;
@@ -32,9 +32,9 @@ public class TwilioPackage implements ReactPackage {
     @Override
     public List<ViewManager> createViewManagers(ReactApplicationContext reactContext) {
         return Arrays.<ViewManager>asList(
-            new CustomTwilioVideoViewManager(),
-            new TwilioRemotePreviewManager(),
-            new TwilioVideoPreviewManager()
+                new CustomTwilioVideoViewManager(),
+                new TwilioRemotePreviewManager(),
+                new TwilioVideoPreviewManager()
         );
     }
 }

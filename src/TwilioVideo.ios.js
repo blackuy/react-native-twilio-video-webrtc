@@ -104,7 +104,25 @@ export default class extends Component {
      * @param {{error}} The error message description
      */
     onCameraDidStopRunning: PropTypes.func,
+    /**
+     * Constraints for _startLocalVideo()
+     *
+     */
+
+    onStatsReceived: PropTypes.func,
+
+    constraints: PropTypes.object,
     ...View.propTypes
+  }
+
+  static defaultProps = {
+    constraints: {
+      aspectRatio: '16:9',
+      minWidth: 960,
+      maxWidth: 1280,
+      minFrameRate: 0,
+      maxFrameRate: 0
+    }
   }
 
   constructor (props) {
@@ -169,9 +187,14 @@ export default class extends Component {
     TWVideoModule.disconnect()
   }
 
+    getStats () {
+        TWVideoModule.getStats();
+    }
+
   _startLocalVideo () {
     const screenShare = this.props.screenShare || false
-    TWVideoModule.startLocalVideo(screenShare)
+    const constraints = this.props.constraints || false
+    TWVideoModule.startLocalVideo(screenShare, constraints)
   }
 
   _stopLocalVideo () {
@@ -234,7 +257,10 @@ export default class extends Component {
       }),
       this._eventEmitter.addListener('cameraDidStopRunning', (data) => {
         if (this.props.onCameraDidStopRunning) { this.props.onCameraDidStopRunning(data) }
-      })
+      }),
+        this._eventEmitter.addListener('gotStats', (data) => {
+            if (this.props.onStatsReceived) { this.props.onStatsReceived(data) }
+        }),
     ]
   }
 

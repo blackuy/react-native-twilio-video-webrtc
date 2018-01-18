@@ -187,9 +187,9 @@ export default class extends Component {
     TWVideoModule.disconnect()
   }
 
-    getStats () {
-        TWVideoModule.getStats();
-    }
+  getStats () {
+    TWVideoModule.getStats()
+  }
 
   _startLocalVideo () {
     const screenShare = this.props.screenShare || false
@@ -258,9 +258,9 @@ export default class extends Component {
       this._eventEmitter.addListener('cameraDidStopRunning', (data) => {
         if (this.props.onCameraDidStopRunning) { this.props.onCameraDidStopRunning(data) }
       }),
-        this._eventEmitter.addListener('gotStats', (data) => {
-            if (this.props.onStatsReceived) { this.props.onStatsReceived(data) }
-        }),
+      this._eventEmitter.addListener('gotStats', (data) => {
+        if (this.props.onStatsReceived) { this.props.onStatsReceived(data) }
+      })
     ]
   }
 

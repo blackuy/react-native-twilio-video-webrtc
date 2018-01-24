@@ -8,18 +8,40 @@
 
 #import "RCTTWSerializable.h"
 
-@implementation TVIParticipant(RCTTWSerializable)
+@implementation TVIRemoteParticipant(RCTTWSerializable)
 
 - (id)toJSON {
-  return @{ @"identity": self.identity };
+    return @{ @"identity": self.identity };
 }
 
 @end
 
-@implementation TVITrack(RCTTWSerializable)
+@implementation TVILocalAudioTrack(RCTTWSerializable)
 
 - (id)toJSON {
-  return @{ @"trackId": self.trackId };
+    return @{ @"trackId": self.trackId };
+}
+@end
+
+@implementation TVILocalVideoTrack(RCTTWSerializable)
+
+- (id)toJSON {
+    return @{ @"trackId": self.trackId };
+}
+
+@end
+
+@implementation TVIRemoteAudioTrack(RCTTWSerializable)
+
+- (id)toJSON {
+    return @{ @"trackId": self.name };
+}
+@end
+
+@implementation TVIRemoteVideoTrack(RCTTWSerializable)
+
+- (id)toJSON {
+    return @{ @"trackId": self.name };
 }
 
 @end

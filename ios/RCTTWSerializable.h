@@ -15,8 +15,17 @@
 
 @end
 
-@interface TVIParticipant(RCTTWSerializable)<RCTTWSerializable>
+@interface TVIRemoteParticipant(RCTTWSerializable)<RCTTWSerializable>
 @end
 
-@interface TVITrack(RCTTWSerializable)<RCTTWSerializable>
+@interface TVILocalAudioTrack(RCTTWSerializable)<RCTTWSerializable>
+@end
+
+@interface TVILocalVideoTrack(RCTTWSerializable)<RCTTWSerializable>
+@end
+
+@interface TVIRemoteAudioTrack(RCTTWSerializable)<RCTTWSerializable>
+@end
+
+@interface TVIRemoteVideoTrack(RCTTWSerializable)<RCTTWSerializable>
 @end

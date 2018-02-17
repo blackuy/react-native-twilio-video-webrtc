@@ -45,3 +45,11 @@
 }
 
 @end
+
+@implementation TVIRemoteVideoTrackPublication(RCTTWSerializable)
+
+- (id)toJSON {
+  return @{ @"remoteTrackId": self.remoteTrack.name };
+}
+
+@end

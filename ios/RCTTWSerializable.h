@@ -29,3 +29,6 @@
 
 @interface TVIRemoteVideoTrack(RCTTWSerializable)<RCTTWSerializable>
 @end
+
+@interface TVIRemoteVideoTrackPublication(RCTTWSerializable)<RCTTWSerializable>
+@end

@@ -345,13 +345,13 @@ RCT_EXPORT_METHOD(disconnect) {
 - (void)remoteParticipant:(TVIRemoteParticipant *)participant
         enabledVideoTrack:(TVIRemoteVideoTrackPublication *)publication {
   [self logMessage:[NSString stringWithFormat:@"Participant %@ enabled video track.", participant.identity]];
-  //TBA      [self sendEventWithName:participantEnabledTrack body:@{ @"participant": [participant toJSON], @"track": [publication toJSON] }];
+  [self sendEventWithName:participantEnabledTrack body:@{ @"participant": [participant toJSON], @"track": [publication toJSON] }];
 }
 
 - (void)remoteParticipant:(TVIRemoteParticipant *)participant
        disabledVideoTrack:(TVIRemoteVideoTrackPublication *)publication {
   [self logMessage:[NSString stringWithFormat:@"Participant %@ disabled video track.", participant.identity]];
-  //TBA    [self sendEventWithName:participantDisabledTrack body:@{ @"participant": [participant toJSON], @"track": [publication toJSON] }];
+  [self sendEventWithName:participantDisabledTrack body:@{ @"participant": [participant toJSON], @"track": [publication toJSON] }];
 }
 
 - (void)remoteParticipant:(TVIRemoteParticipant *)participant

@@ -29,8 +29,8 @@ class TwilioRemotePreview extends React.Component {
   }
 
   render () {
-    const { trackIdentifier } = this.props;
-    return <NativeTwilioRemotePreview trackId={trackIdentifier && trackIdentifier.videoTrackId} {...this.props}/>
+    const { trackIdentifier } = this.props
+    return <NativeTwilioRemotePreview trackId={trackIdentifier && trackIdentifier.videoTrackId} {...this.props} />
   }
 }
 

@@ -28,7 +28,7 @@ static NSString* cameraWasInterrupted        = @"cameraWasInterrupted";
 static NSString* cameraDidStopRunning         = @"cameraDidStopRunning";
 
 
-@interface RCTTWVideoModule () <TVIParticipantDelegate, TVIRoomDelegate, TVICameraCapturerDelegate>
+@interface RCTTWVideoModule () <TVIRemoteParticipantDelegate, TVIRoomDelegate, TVICameraCapturerDelegate>
 
 @property (strong, nonatomic) TVICameraCapturer *camera;
 @property (strong, nonatomic) TVIScreenCapturer *screen;
@@ -50,21 +50,21 @@ RCT_EXPORT_MODULE();
 
 - (NSArray<NSString *> *)supportedEvents {
   return @[
-    roomDidConnect,
-    roomDidDisconnect,
-    roomDidFailToConnect,
-    roomParticipantDidConnect,
-    roomParticipantDidDisconnect,
-    participantAddedVideoTrack,
-    participantRemovedVideoTrack,
-    participantAddedAudioTrack,
-    participantRemovedAudioTrack,
-    participantEnabledTrack,
-    participantDisabledTrack,
-    cameraDidStopRunning,
-    cameraDidStart,
-    cameraWasInterrupted
-  ];
+           roomDidConnect,
+           roomDidDisconnect,
+           roomDidFailToConnect,
+           roomParticipantDidConnect,
+           roomParticipantDidDisconnect,
+           participantAddedVideoTrack,
+           participantRemovedVideoTrack,
+           participantAddedAudioTrack,
+           participantRemovedAudioTrack,
+           participantEnabledTrack,
+           participantDisabledTrack,
+           cameraDidStopRunning,
+           cameraDidStart,
+           cameraWasInterrupted
+           ];
 }
 
 - (void)addLocalView:(TVIVideoView *)view {
@@ -86,33 +86,37 @@ RCT_EXPORT_MODULE();
 
 - (void)addParticipantView:(TVIVideoView *)view identity:(NSString *)identity  trackId:(NSString *)trackId {
   // Lookup for the participant in the room
-  for (TVIParticipant *participant in self.room.participants) {
+  for (TVIRemoteParticipant *participant in self.room.remoteParticipants) {
     if ([participant.identity isEqualToString:identity]) {
-
       // Lookup for the given trackId
-      for (TVIVideoTrack *videoTrack in participant.videoTracks) {
-        [videoTrack addRenderer:view];
+      for (TVIRemoteVideoTrackPublication *videoTrackPublication in participant.videoTracks) {
+        [videoTrackPublication.videoTrack addRenderer:view];
       }
     }
   }
+}
+
+- (void)logMessage:(NSString *)msg {
+  // Uncomment for debugging purposes
+  //  NSLog(@"%@", msg);
 }
 
 RCT_EXPORT_METHOD(startLocalVideo:(BOOL)screenShare) {
   if (screenShare) {
     UIViewController *rootViewController = [UIApplication sharedApplication].delegate.window.rootViewController;
     self.screen = [[TVIScreenCapturer alloc] initWithView:rootViewController.view];
-
-    self.localVideoTrack = [TVILocalVideoTrack trackWithCapturer:self.screen enabled:YES constraints:[self videoConstraints]];
+    
+    self.localVideoTrack = [TVILocalVideoTrack trackWithCapturer:self.screen enabled:YES constraints:[self videoConstraints] name:@"Screen"];
   } else if ([TVICameraCapturer availableSources].count > 0) {
     self.camera = [[TVICameraCapturer alloc] init];
     self.camera.delegate = self;
-
-    self.localVideoTrack = [TVILocalVideoTrack trackWithCapturer:self.camera enabled:YES constraints:[self videoConstraints]];
+    
+    self.localVideoTrack = [TVILocalVideoTrack trackWithCapturer:self.camera enabled:YES constraints:[self videoConstraints] name:@"Camera"];
   }
 }
 
 RCT_EXPORT_METHOD(startLocalAudio) {
-  self.localAudioTrack = [TVILocalAudioTrack trackWithOptions:nil enabled:YES];
+  self.localAudioTrack = [TVILocalAudioTrack trackWithOptions:nil enabled:YES name:@"Microphone"];
 }
 
 RCT_EXPORT_METHOD(stopLocalVideo) {
@@ -125,16 +129,16 @@ RCT_EXPORT_METHOD(stopLocalAudio) {
 }
 
 RCT_REMAP_METHOD(setLocalAudioEnabled, enabled:(BOOL)enabled setLocalAudioEnabledWithResolver:(RCTPromiseResolveBlock)resolve
-    rejecter:(RCTPromiseRejectBlock)reject) {
+                 rejecter:(RCTPromiseRejectBlock)reject) {
   [self.localAudioTrack setEnabled:enabled];
-
+  
   resolve(@(enabled));
 }
 
 RCT_REMAP_METHOD(setLocalVideoEnabled, enabled:(BOOL)enabled setLocalVideoEnabledWithResolver:(RCTPromiseResolveBlock)resolve
                  rejecter:(RCTPromiseRejectBlock)reject) {
   [self.localVideoTrack setEnabled:enabled];
-
+  
   resolve(@(enabled));
 }
 
@@ -162,14 +166,14 @@ RCT_EXPORT_METHOD(connect:(NSString *)accessToken roomName:(NSString *)roomName)
     if (self.localVideoTrack) {
       builder.videoTracks = @[self.localVideoTrack];
     }
-
+    
     if (self.localAudioTrack) {
       builder.audioTracks = @[self.localAudioTrack];
     }
-
+    
     builder.roomName = roomName;
   }];
-
+  
   self.room = [TwilioVideo connectWithOptions:connectOptions delegate:self];
 }
 
@@ -205,74 +209,173 @@ RCT_EXPORT_METHOD(disconnect) {
 
 - (void)didConnectToRoom:(TVIRoom *)room {
   NSMutableArray *participants = [NSMutableArray array];
-
-  for (TVIParticipant *p in room.participants) {
+  [self logMessage:[NSString stringWithFormat:@"Connected to room %@ as %@", room.name, room.localParticipant.identity]];
+  
+  for (TVIRemoteParticipant *p in room.remoteParticipants) {
     p.delegate = self;
     [participants addObject:[p toJSON]];
   }
-
+  
   [self sendEventWithName:roomDidConnect body:@{ @"roomName" : room.name , @"participants" : participants }];
 }
 
 - (void)room:(TVIRoom *)room didDisconnectWithError:(nullable NSError *)error {
+  [self logMessage:[NSString stringWithFormat:@"Disconncted from room %@, error = %@", room.name, error]];
   self.room = nil;
-
+  
   NSMutableDictionary *body = [@{ @"roomName": room.name } mutableCopy];
-
+  
   if (error) {
     [body addEntriesFromDictionary:@{ @"error" : error.localizedDescription }];
   }
-
+  
   [self sendEventWithName:roomDidDisconnect body:body];
 }
 
 - (void)room:(TVIRoom *)room didFailToConnectWithError:(nonnull NSError *)error{
+  [self logMessage:[NSString stringWithFormat:@"Failed to connect to room, error = %@", error]];
   self.room = nil;
-
+  
   NSMutableDictionary *body = [@{ @"roomName": room.name } mutableCopy];
-
+  
   if (error) {
     [body addEntriesFromDictionary:@{ @"error" : error.localizedDescription }];
   }
-
+  
   [self sendEventWithName:roomDidFailToConnect body:body];
 }
 
 
-- (void)room:(TVIRoom *)room participantDidConnect:(TVIParticipant *)participant {
+- (void)room:(TVIRoom *)room participantDidConnect:(TVIRemoteParticipant *)participant {
+  [self logMessage:[NSString stringWithFormat:@"Participant %@ connected with %lu audio and %lu video tracks",
+                    participant.identity,
+                    (unsigned long)[participant.audioTracks count],
+                    (unsigned long)[participant.videoTracks count]]];
+  
   participant.delegate = self;
-
+  
   [self sendEventWithName:roomParticipantDidConnect body:@{ @"roomName": room.name, @"participant": [participant toJSON] }];
 }
 
-- (void)room:(TVIRoom *)room participantDidDisconnect:(TVIParticipant *)participant {
+- (void)room:(TVIRoom *)room participantDidDisconnect:(TVIRemoteParticipant *)participant {
+  [self logMessage:[NSString stringWithFormat:@"Room %@ participant %@ disconnected", room.name, participant.identity]];
   [self sendEventWithName:roomParticipantDidDisconnect body:@{ @"roomName": room.name, @"participant": [participant toJSON] }];
 }
 
-# pragma mark - TVIParticipantDelegate
+# pragma mark - TVIRemoteParticipantDelegate
 
-- (void)participant:(TVIParticipant *)participant addedVideoTrack:(TVIVideoTrack *)videoTrack {
+- (void)remoteParticipant:(TVIRemoteParticipant *)participant
+      publishedVideoTrack:(TVIRemoteVideoTrackPublication *)publication {
+  
+  // Remote Participant has offered to share the video Track.
+  
+  [self logMessage:[NSString stringWithFormat:@"Participant %@ published video track.", participant.identity]];
+}
+
+- (void)remoteParticipant:(TVIRemoteParticipant *)participant
+    unpublishedVideoTrack:(TVIRemoteVideoTrackPublication *)publication {
+  
+  // Remote Participant has stopped sharing the video Track.
+  
+  [self logMessage:[NSString stringWithFormat:@"Participant %@ unpublished video track.", participant.identity]];
+}
+
+- (void)remoteParticipant:(TVIRemoteParticipant *)participant
+      publishedAudioTrack:(TVIRemoteAudioTrackPublication *)publication {
+  
+  // Remote Participant has offered to share the audio Track.
+  
+  [self logMessage:[NSString stringWithFormat:@"Participant %@ published audio track.", participant.identity]];
+}
+
+- (void)remoteParticipant:(TVIRemoteParticipant *)participant
+    unpublishedAudioTrack:(TVIRemoteAudioTrackPublication *)publication {
+  
+  // Remote Participant has stopped sharing the audio Track.
+  
+  [self logMessage:[NSString stringWithFormat:@"Participant %@ unpublished audio track.", participant.identity]];
+}
+
+- (void)subscribedToVideoTrack:(TVIRemoteVideoTrack *)videoTrack
+                   publication:(TVIRemoteVideoTrackPublication *)publication
+                forParticipant:(TVIRemoteParticipant *)participant {
+  
+  // We are subscribed to the remote Participant's audio Track. We will start receiving the
+  // remote Participant's video frames now.
+  
+  [self logMessage:[NSString stringWithFormat:@"Subscribed to video track for Participant %@", participant.identity]];
+  
   [self sendEventWithName:participantAddedVideoTrack body:@{ @"participant": [participant toJSON], @"track": [videoTrack toJSON] }];
 }
 
-- (void)participant:(TVIParticipant *)participant removedVideoTrack:(TVIVideoTrack *)videoTrack {
+- (void)unsubscribedFromVideoTrack:(TVIRemoteVideoTrack *)videoTrack
+                       publication:(TVIRemoteVideoTrackPublication *)publication
+                    forParticipant:(TVIRemoteParticipant *)participant {
+  
+  // We are unsubscribed from the remote Participant's video Track. We will no longer receive the
+  // remote Participant's video.
+  
+  [self logMessage:[NSString stringWithFormat:@"Unsubscribed from video track for Participant %@", participant.identity]];
+  
   [self sendEventWithName:participantRemovedVideoTrack body:@{ @"participant": [participant toJSON], @"track": [videoTrack toJSON] }];
 }
 
-- (void)participant:(TVIParticipant *)participant addedAudioTrack:(TVIAudioTrack *)audioTrack {
+- (void)subscribedToAudioTrack:(TVIRemoteAudioTrack *)audioTrack
+                   publication:(TVIRemoteAudioTrackPublication *)publication
+                forParticipant:(TVIRemoteParticipant *)participant {
+  
+  // We are subscribed to the remote Participant's audio Track. We will start receiving the
+  // remote Participant's audio now.
+  
+  [self logMessage:[NSString stringWithFormat:@"Subscribed to audio track for Participant %@", participant.identity]];
   [self sendEventWithName:participantAddedAudioTrack body:@{ @"participant": [participant toJSON], @"track": [audioTrack toJSON] }];
 }
 
-- (void)participant:(TVIParticipant *)participant removedAudioTrack:(TVIAudioTrack *)audioTrack {
+- (void)unsubscribedFromAudioTrack:(TVIRemoteAudioTrack *)audioTrack
+                       publication:(TVIRemoteAudioTrackPublication *)publication
+                    forParticipant:(TVIRemoteParticipant *)participant {
+  
+  // We are unsubscribed from the remote Participant's audio Track. We will no longer receive the
+  // remote Participant's audio.
+  
+  [self logMessage:[NSString stringWithFormat:@"Unsubscribed from audio track for Participant %@", participant.identity]];
   [self sendEventWithName:participantRemovedAudioTrack body:@{ @"participant": [participant toJSON], @"track": [audioTrack toJSON] }];
 }
 
-- (void)participant:(TVIParticipant *)participant enabledTrack:(TVITrack *)track {
-  [self sendEventWithName:participantEnabledTrack body:@{ @"participant": [participant toJSON], @"track": [track toJSON] }];
+- (void)remoteParticipant:(TVIRemoteParticipant *)participant
+        enabledVideoTrack:(TVIRemoteVideoTrackPublication *)publication {
+  [self logMessage:[NSString stringWithFormat:@"Participant %@ enabled video track.", participant.identity]];
+  [self sendEventWithName:participantEnabledTrack body:@{ @"participant": [participant toJSON], @"track": [publication toJSON] }];
 }
 
-- (void)participant:(TVIParticipant *)participant disabledTrack:(TVITrack *)track {
-  [self sendEventWithName:participantDisabledTrack body:@{ @"participant": [participant toJSON], @"track": [track toJSON] }];
+- (void)remoteParticipant:(TVIRemoteParticipant *)participant
+       disabledVideoTrack:(TVIRemoteVideoTrackPublication *)publication {
+  [self logMessage:[NSString stringWithFormat:@"Participant %@ disabled video track.", participant.identity]];
+  [self sendEventWithName:participantDisabledTrack body:@{ @"participant": [participant toJSON], @"track": [publication toJSON] }];
+}
+
+- (void)remoteParticipant:(TVIRemoteParticipant *)participant
+        enabledAudioTrack:(TVIRemoteAudioTrackPublication *)publication {
+  [self logMessage:[NSString stringWithFormat:@"Participant %@ enabled audio track.", participant.identity]];
+}
+
+- (void)remoteParticipant:(TVIRemoteParticipant *)participant
+       disabledAudioTrack:(TVIRemoteAudioTrackPublication *)publication {
+  [self logMessage:[NSString stringWithFormat:@"Participant %@ disabled audio track.", participant.identity]];
+}
+
+- (void)failedToSubscribeToAudioTrack:(TVIRemoteAudioTrackPublication *)publication
+                                error:(NSError *)error
+                       forParticipant:(TVIRemoteParticipant *)participant {
+  [self logMessage:[NSString stringWithFormat:@"Participant %@ failed to subscribe to %@ audio track.",
+                    participant.identity, publication.trackName]];
+}
+
+- (void)failedToSubscribeToVideoTrack:(TVIRemoteVideoTrackPublication *)publication
+                                error:(NSError *)error
+                       forParticipant:(TVIRemoteParticipant *)participant {
+  [self logMessage:[NSString stringWithFormat:@"Participant %@ failed to subscribe to %@ video track.",
+                    participant.identity, publication.trackName]];
 }
 
 @end

@@ -11,6 +11,12 @@ import React from 'react'
 
 class TwilioRemotePreview extends React.Component {
   static propTypes = {
+    trackIdentifier: PropTypes.shape({
+      /**
+       * The participant's video track you want to render in the view.
+       */
+      videoTrackId: PropTypes.string.isRequired
+    }),
     trackId: PropTypes.string,
     renderToHardwareTextureAndroid: PropTypes.string,
     onLayout: PropTypes.string,
@@ -23,7 +29,8 @@ class TwilioRemotePreview extends React.Component {
   }
 
   render () {
-    return <NativeTwilioRemotePreview {...this.props} />
+    const { trackIdentifier } = this.props;
+    return <NativeTwilioRemotePreview trackId={trackIdentifier && trackIdentifier.videoTrackId} {...this.props}/>
   }
 }
 

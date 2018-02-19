@@ -23,17 +23,10 @@ Add node package using yarn/NPM:
 yarn add https://github.com/blackuy/react-native-twilio-video-webrtc
 ```
 
-Add the plugin dependency to your Podfile, pointing at the path where NPM installed it:
+Add the Twilio dependency to your Podfile:
 
 ```ruby
-pod 'react-native-twilio-video-webrtc', path: '../node_modules/react-native-twilio-video-webrtc'
-```
-
-You will need to point your React code the path where NPM installed it too. If you didn't do it add this to your Pofile:
-
-```ruby
-pod 'Yoga', path: '../node_modules/react-native/ReactCommon/yoga/Yoga.podspec'
-pod 'React', path: '../node_modules/react-native'
+pod 'TwilioVideo'
 ```
 
 Install Pods:
@@ -41,6 +34,14 @@ Install Pods:
 ```shell
 pod install
 ```
+
+Add the XCode project to your own XCode project's "Libraries" directory from:
+
+```
+node_modules/react-native-twilio-video-webrtc/ios/RNTwilioVideoWebRTC.xcodeproj
+```
+
+Add `libRNTwilioVideoWebRTC.a` to your XCode project target's "Linked Frameworks and Libraries"
 
 ### Permissions
 

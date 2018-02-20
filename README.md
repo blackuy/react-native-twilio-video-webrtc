@@ -187,6 +187,22 @@ export default class Example extends Component {
       .then(isEnabled => this.setState({isAudioEnabled: isEnabled}))
   }
 
+  _onFlipButtonPress = () => {
+    this.refs.twilioVideo.flipCamera()
+  }
+
+  _onRoomDidDisconnect = ({roomName, error}) => {
+    console.log("ERROR: ", error)
+
+    this.setState({status: 'disconnected'})
+  }
+
+  _onRoomDidFailToConnect = (error) => {
+    console.log("ERROR: ", error)
+
+    this.setState({status: 'disconnected'})
+  }
+
   _onParticipantAddedVideoTrack = ({participant, track}) => {
     console.log("onParticipantAddedVideoTrack: ", participant, track)
 

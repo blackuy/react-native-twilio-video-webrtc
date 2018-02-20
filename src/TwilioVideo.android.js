@@ -71,7 +71,12 @@ const propTypes = {
   /**
    * Callback that is called when a participant exits a room.
    */
-  onRoomParticipantDidDisconnect: PropTypes.func
+  onRoomParticipantDidDisconnect: PropTypes.func,
+
+  /**
+   * Callback that is called when stats are received (after calling getStats)
+   */
+  onStatsReceived: PropTypes.func
 }
 
 const nativeEvents = {
@@ -79,7 +84,8 @@ const nativeEvents = {
   disconnect: 2,
   switchCamera: 3,
   toggleVideo: 4,
-  toggleSound: 5
+  toggleSound: 5,
+  getStats: 6
 }
 
 class CustomTwilioVideoView extends Component {
@@ -101,6 +107,10 @@ class CustomTwilioVideoView extends Component {
 
   setLocalAudioEnabled (enabled) {
     this.runCommand(nativeEvents.toggleSound, [enabled])
+  }
+
+  getStats () {
+    this.runCommand(nativeEvents.getStats, [])
   }
 
   runCommand (event, args) {
@@ -128,7 +138,8 @@ class CustomTwilioVideoView extends Component {
       'onParticipantAddedVideoTrack',
       'onParticipantRemovedVideoTrack',
       'onRoomParticipantDidConnect',
-      'onRoomParticipantDidDisconnect'
+      'onRoomParticipantDidDisconnect',
+      'onStatsReceived'
     ].reduce((wrappedEvents, eventName) => {
       if (this.props[eventName]) {
         return {

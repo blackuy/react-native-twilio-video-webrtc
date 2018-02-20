@@ -28,6 +28,8 @@ import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_PARTICIPANT_D
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_VIDEO_CHANGED;
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_PARTICIPANT_ADDED_VIDEO_TRACK;
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_PARTICIPANT_REMOVED_VIDEO_TRACK;
+import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_STATS_RECEIVED;
+
 
 public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilioVideoView> {
     public static final String REACT_CLASS = "RNCustomTwilioVideoView";
@@ -37,6 +39,7 @@ public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilio
     private static final int SWITCH_CAMERA = 3;
     private static final int TOGGLE_VIDEO = 4;
     private static final int TOGGLE_SOUND = 5;
+    private static final int GET_STATS = 6;
 
     @Override
     public String getName() {
@@ -70,6 +73,9 @@ public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilio
                 Boolean audioEnabled = args.getBoolean(0);
                 view.toggleAudio(audioEnabled);
                 break;
+            case GET_STATS:
+                view.getStats();
+                break;
         }
     }
 
@@ -89,7 +95,8 @@ public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilio
         map.putAll(MapBuilder.of(
                 ON_PARTICIPANT_DISCONNECTED, MapBuilder.of("registrationName", ON_PARTICIPANT_DISCONNECTED),
                 ON_PARTICIPANT_ADDED_VIDEO_TRACK, MapBuilder.of("registrationName", ON_PARTICIPANT_ADDED_VIDEO_TRACK),
-                ON_PARTICIPANT_REMOVED_VIDEO_TRACK, MapBuilder.of("registrationName", ON_PARTICIPANT_REMOVED_VIDEO_TRACK)
+                ON_PARTICIPANT_REMOVED_VIDEO_TRACK, MapBuilder.of("registrationName", ON_PARTICIPANT_REMOVED_VIDEO_TRACK),
+                ON_STATS_RECEIVED, MapBuilder.of("registrationName", ON_STATS_RECEIVED)
         ));
 
         return map;
@@ -103,7 +110,8 @@ public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilio
                 "disconnect", DISCONNECT,
                 "switchCamera", SWITCH_CAMERA,
                 "toggleVideo", TOGGLE_VIDEO,
-                "toggleSound", TOGGLE_SOUND
+                "toggleSound", TOGGLE_SOUND,
+                "getStats", GET_STATS
         );
     }
 }

@@ -31,18 +31,27 @@ import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.events.RCTEventEmitter;
 
 import com.twilio.video.AudioTrack;
+import com.twilio.video.AudioTrackStats;
+import com.twilio.video.BaseTrackStats;
 import com.twilio.video.CameraCapturer;
 import com.twilio.video.ConnectOptions;
 import com.twilio.video.LocalParticipant;
 import com.twilio.video.LocalAudioTrack;
+import com.twilio.video.LocalAudioTrackStats;
+import com.twilio.video.LocalTrackStats;
 import com.twilio.video.LocalVideoTrack;
+import com.twilio.video.LocalVideoTrackStats;
 import com.twilio.video.Participant;
 import com.twilio.video.Room;
 import com.twilio.video.RoomState;
+import com.twilio.video.StatsListener;
+import com.twilio.video.StatsReport;
+import com.twilio.video.TrackStats;
 import com.twilio.video.TwilioException;
 import com.twilio.video.Video;
 import com.twilio.video.VideoRenderer;
 import com.twilio.video.VideoTrack;
+import com.twilio.video.VideoTrackStats;
 import com.twilio.video.VideoView;
 import com.twilio.video.VideoConstraints;
 import com.twilio.video.VideoDimensions;
@@ -64,6 +73,7 @@ import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_PARTICIPANT_D
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_VIDEO_CHANGED;
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_PARTICIPANT_ADDED_VIDEO_TRACK;
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_PARTICIPANT_REMOVED_VIDEO_TRACK;
+import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_STATS_RECEIVED;
 
 public class CustomTwilioVideoView extends View implements LifecycleEventListener {
     private static final String TAG = "CustomTwilioVideoView";
@@ -78,7 +88,8 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
             Events.ON_PARTICIPANT_CONNECTED,
             Events.ON_PARTICIPANT_DISCONNECTED,
             Events.ON_PARTICIPANT_ADDED_VIDEO_TRACK,
-            Events.ON_PARTICIPANT_REMOVED_VIDEO_TRACK})
+            Events.ON_PARTICIPANT_REMOVED_VIDEO_TRACK,
+            Events.ON_STATS_RECEIVED})
     public @interface Events {
         String ON_CAMERA_SWITCHED = "onCameraSwitched";
         String ON_VIDEO_CHANGED = "onVideoChanged";
@@ -90,6 +101,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         String ON_PARTICIPANT_DISCONNECTED = "onRoomParticipantDidDisconnect";
         String ON_PARTICIPANT_ADDED_VIDEO_TRACK = "onParticipantAddedVideoTrack";
         String ON_PARTICIPANT_REMOVED_VIDEO_TRACK = "onParticipantRemovedVideoTrack";
+        String ON_STATS_RECEIVED = "onStatsReceived";
     }
 
     private final ThemedReactContext themedReactContext;
@@ -396,6 +408,107 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
             WritableMap event = new WritableNativeMap();
             event.putBoolean("audioEnabled", enabled);
             pushEvent(CustomTwilioVideoView.this, ON_AUDIO_CHANGED, event);
+        }
+    }
+
+
+    private void convertBaseTrackStats(BaseTrackStats bs, WritableMap result) {
+        result.putString("codec", bs.codec);
+        result.putInt("packetsLost", bs.packetsLost);
+        result.putString("ssrc", bs.ssrc);
+        result.putDouble("timestamp", bs.timestamp);
+        result.putString("trackId", bs.trackId);
+    }
+
+    private void convertLocalTrackStats(LocalTrackStats ts, WritableMap result) {
+        result.putDouble("bytesSent", ts.bytesSent);
+        result.putInt("packetsSent", ts.packetsSent);
+        result.putDouble("roundTripTime", ts.roundTripTime);
+    }
+
+    private void convertTrackStats(TrackStats ts, WritableMap result) {
+        result.putDouble("bytesReceived", ts.bytesReceived);
+        result.putInt("packetsReceived", ts.packetsReceived);
+    }
+
+    private WritableMap convertAudioTrackStats(AudioTrackStats as) {
+        WritableMap result = new WritableNativeMap();
+        result.putInt("audioLevel", as.audioLevel);
+        result.putInt("jitter", as.jitter);
+        convertBaseTrackStats(as, result);
+        convertTrackStats(as, result);
+        return result;
+    }
+
+    private WritableMap convertLocalAudioTrackStats(LocalAudioTrackStats as) {
+        WritableMap result = new WritableNativeMap();
+        result.putInt("audioLevel", as.audioLevel);
+        result.putInt("jitter", as.jitter);
+        convertBaseTrackStats(as, result);
+        convertLocalTrackStats(as, result);
+        return result;
+    }
+
+    private WritableMap convertVideoTrackStats(VideoTrackStats vs) {
+        WritableMap result = new WritableNativeMap();
+        WritableMap dimensions = new WritableNativeMap();
+        dimensions.putInt("height", vs.dimensions.height);
+        dimensions.putInt("width", vs.dimensions.width);
+        result.putMap("dimensions", dimensions);
+        result.putInt("frameRate", vs.frameRate);
+        convertBaseTrackStats(vs, result);
+        convertTrackStats(vs, result);
+        return result;
+    }
+
+    private WritableMap convertLocalVideoTrackStats(LocalVideoTrackStats vs) {
+        WritableMap result = new WritableNativeMap();
+        WritableMap dimensions = new WritableNativeMap();
+        dimensions.putInt("height", vs.dimensions.height);
+        dimensions.putInt("width", vs.dimensions.width);
+        result.putMap("dimensions", dimensions);
+        result.putInt("frameRate", vs.frameRate);
+        convertBaseTrackStats(vs, result);
+        convertLocalTrackStats(vs, result);
+        return result;
+    }
+
+    public void getStats() {
+        if (room != null) {
+            room.getStats(new StatsListener() {
+                @Override
+                public void onStats(List<StatsReport> statsReports) {
+                    WritableMap event = new WritableNativeMap();
+                    for (StatsReport sr : statsReports) {
+                        WritableMap connectionStats = new WritableNativeMap();
+                        WritableArray as = new WritableNativeArray();
+                        for (AudioTrackStats s : sr.getAudioTrackStats()) {
+                            as.pushMap(convertAudioTrackStats(s));
+                        }
+                        connectionStats.putArray("audioTrackStats", as);
+
+                        WritableArray vs = new WritableNativeArray();
+                        for (VideoTrackStats s : sr.getVideoTrackStats()) {
+                            vs.pushMap(convertVideoTrackStats(s));
+                        }
+                        connectionStats.putArray("videoTrackStats", vs);
+
+                        WritableArray las = new WritableNativeArray();
+                        for (LocalAudioTrackStats s : sr.getLocalAudioTrackStats()) {
+                            las.pushMap(convertLocalAudioTrackStats(s));
+                        }
+                        connectionStats.putArray("localAudioTrackStats", las);
+
+                        WritableArray lvs = new WritableNativeArray();
+                        for (LocalVideoTrackStats s : sr.getLocalVideoTrackStats()) {
+                            lvs.pushMap(convertLocalVideoTrackStats(s));
+                        }
+                        connectionStats.putArray("localVideoTrackStats", lvs);
+                        event.putMap(sr.getPeerConnectionId(), connectionStats);
+                    }
+                    pushEvent(CustomTwilioVideoView.this, ON_STATS_RECEIVED, event);
+                }
+            });
         }
     }
 

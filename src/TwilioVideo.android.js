@@ -85,7 +85,8 @@ const nativeEvents = {
   switchCamera: 3,
   toggleVideo: 4,
   toggleSound: 5,
-  getStats: 6
+  getStats: 6,
+  disableOpenSLES: 7
 }
 
 class CustomTwilioVideoView extends Component {
@@ -111,6 +112,10 @@ class CustomTwilioVideoView extends Component {
 
   getStats () {
     this.runCommand(nativeEvents.getStats, [])
+  }
+
+  disableOpenSLES() {
+    this.runCommand(nativeEvents.disableOpenSLES, [])
   }
 
   runCommand (event, args) {

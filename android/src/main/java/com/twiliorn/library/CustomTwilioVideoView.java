@@ -512,6 +512,10 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         }
     }
 
+    public void disableOpenSLES() {
+      WebRtcAudioManager.setBlacklistDeviceForOpenSLESUsage(true);
+    }
+
     // ====== ROOM LISTENER ========================================================================
 
     /*

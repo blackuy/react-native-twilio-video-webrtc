@@ -114,7 +114,7 @@ class CustomTwilioVideoView extends Component {
     this.runCommand(nativeEvents.getStats, [])
   }
 
-  disableOpenSLES() {
+  disableOpenSLES () {
     this.runCommand(nativeEvents.disableOpenSLES, [])
   }
 

@@ -55,6 +55,7 @@ import com.twilio.video.VideoTrackStats;
 import com.twilio.video.VideoView;
 import com.twilio.video.VideoConstraints;
 import com.twilio.video.VideoDimensions;
+import org.webrtc.voiceengine.WebRtcAudioManager;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -510,6 +511,10 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
                 }
             });
         }
+    }
+
+    public void disableOpenSLES() {
+      WebRtcAudioManager.setBlacklistDeviceForOpenSLESUsage(true);
     }
 
     // ====== ROOM LISTENER ========================================================================

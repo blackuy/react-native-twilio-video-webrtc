@@ -133,6 +133,14 @@ android {
 }
 ```
 
+If you are using proguard (very likely), you will also need to ensure that the symbols needed by
+this library are not stripped. To do that, add these two lines to `proguard-rules.pro`:
+
+```
+  -keep class org.webrtc.** { *; }
+  -keep class com.twilio.** { *; }
+```
+
 ## Docs
 You can see the documentation [here](./docs).
 

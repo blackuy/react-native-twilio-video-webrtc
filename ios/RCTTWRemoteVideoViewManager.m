@@ -13,8 +13,8 @@
 
 @interface RCTTWVideoTrackIdentifier : NSObject
 
-@property (strong) NSString *participantIdentity;
-@property (strong) NSString *videoTrackId;
+@property (strong) NSString *participantSid;
+@property (strong) NSString *videoTrackSid;
 
 @end
 
@@ -32,8 +32,8 @@
 
 + (RCTTWVideoTrackIdentifier *)RCTTWVideoTrackIdentifier:(id)json {
   RCTTWVideoTrackIdentifier *trackIdentifier = [[RCTTWVideoTrackIdentifier alloc] init];
-  trackIdentifier.participantIdentity = json[@"participantIdentity"];
-  trackIdentifier.videoTrackId = json[@"videoTrackId"];
+  trackIdentifier.participantSid = json[@"participantSid"];
+  trackIdentifier.videoTrackSid = json[@"videoTrackSid"];
 
   return trackIdentifier;
 }
@@ -60,7 +60,7 @@ RCT_CUSTOM_VIEW_PROPERTY(trackIdentifier, RCTTWVideoTrackIdentifier, TVIVideoVie
     RCTTWVideoModule *videoModule = [self.bridge moduleForName:@"TWVideoModule"];
     RCTTWVideoTrackIdentifier *id = [RCTConvert RCTTWVideoTrackIdentifier:json];
 
-    [videoModule addParticipantView:view.subviews[0] identity:id.participantIdentity trackId:id.videoTrackId];
+    [videoModule addParticipantView:view.subviews[0] sid:id.participantSid trackSid:id.videoTrackSid];
   }
 }
 

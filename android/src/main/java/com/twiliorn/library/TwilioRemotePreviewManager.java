@@ -17,7 +17,7 @@ import com.facebook.react.uimanager.annotations.ReactProp;
 public class TwilioRemotePreviewManager extends SimpleViewManager<TwilioRemotePreview> {
 
     public static final String REACT_CLASS = "RNTwilioRemotePreview";
-    public String myTrackId = "";
+    public String myTrackSid = "";
 
     @Override
     public String getName() {
@@ -25,18 +25,18 @@ public class TwilioRemotePreviewManager extends SimpleViewManager<TwilioRemotePr
     }
 
 
-    @ReactProp(name = "trackId")
-    public void setTrackId(TwilioRemotePreview view, @Nullable String trackId) {
+    @ReactProp(name = "trackSid")
+    public void setTrackId(TwilioRemotePreview view, @Nullable String trackSid) {
 
-        Log.i("CustomTwilioVideoView", "Initialize Twilio REMOTEEEEEEEEE");
-        Log.i("CustomTwilioVideoView", trackId);
-        myTrackId = trackId;
-        CustomTwilioVideoView.registerPrimaryVideoView(view.getSurfaceViewRenderer(), trackId);
+        Log.i("CustomTwilioVideoView", "Initialize Twilio REMOTE");
+        Log.i("CustomTwilioVideoView", trackSid);
+        myTrackSid = trackSid;
+        CustomTwilioVideoView.registerPrimaryVideoView(view.getSurfaceViewRenderer(), trackSid);
     }
 
 
     @Override
     protected TwilioRemotePreview createViewInstance(ThemedReactContext reactContext) {
-        return new TwilioRemotePreview(reactContext, myTrackId);
+        return new TwilioRemotePreview(reactContext, myTrackSid);
     }
 }

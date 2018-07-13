@@ -15,9 +15,9 @@ class TwilioRemotePreview extends React.Component {
       /**
        * The participant's video track you want to render in the view.
        */
-      videoTrackId: PropTypes.string.isRequired
+      videoTrackSid: PropTypes.string.isRequired
     }),
-    trackId: PropTypes.string,
+    trackSid: PropTypes.string,
     renderToHardwareTextureAndroid: PropTypes.string,
     onLayout: PropTypes.string,
     accessibilityLiveRegion: PropTypes.string,
@@ -30,7 +30,7 @@ class TwilioRemotePreview extends React.Component {
 
   render () {
     const { trackIdentifier } = this.props
-    return <NativeTwilioRemotePreview trackId={trackIdentifier && trackIdentifier.videoTrackId} {...this.props} />
+    return <NativeTwilioRemotePreview trackSid={trackIdentifier && trackIdentifier.videoTrackSid} {...this.props} />
   }
 }
 

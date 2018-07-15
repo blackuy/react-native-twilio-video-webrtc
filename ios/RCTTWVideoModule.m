@@ -246,7 +246,7 @@ RCT_EXPORT_METHOD(getStats) {
         }
         eventBody[statsReport.peerConnectionId] = @{
           @"remoteAudioTrackStats": audioTrackStats,
-          @"remoteAideoTrackStats": videoTrackStats,
+          @"remoteVideoTrackStats": videoTrackStats,
           @"localAudioTrackStats": localAudioTrackStats,
           @"localVideoTrackStats": localVideoTrackStats
         };

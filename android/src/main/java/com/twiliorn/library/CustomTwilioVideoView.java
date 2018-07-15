@@ -71,6 +71,10 @@ import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_PARTICIPANT_D
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_VIDEO_CHANGED;
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_PARTICIPANT_ADDED_VIDEO_TRACK;
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_PARTICIPANT_REMOVED_VIDEO_TRACK;
+import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_PARTICIPANT_ENABLED_VIDEO_TRACK;
+import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_PARTICIPANT_DISABLED_VIDEO_TRACK;
+import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_PARTICIPANT_ENABLED_AUDIO_TRACK;
+import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_PARTICIPANT_DISABLED_AUDIO_TRACK;
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_STATS_RECEIVED;
 
 public class CustomTwilioVideoView extends View implements LifecycleEventListener {
@@ -87,6 +91,10 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
             Events.ON_PARTICIPANT_DISCONNECTED,
             Events.ON_PARTICIPANT_ADDED_VIDEO_TRACK,
             Events.ON_PARTICIPANT_REMOVED_VIDEO_TRACK,
+            Events.ON_PARTICIPANT_ENABLED_VIDEO_TRACK,
+            Events.ON_PARTICIPANT_DISABLED_VIDEO_TRACK
+            Events.ON_PARTICIPANT_ENABLED_AUDIO_TRACK,
+            Events.ON_PARTICIPANT_DISABLED_AUDIO_TRACK,
             Events.ON_STATS_RECEIVED})
     public @interface Events {
         String ON_CAMERA_SWITCHED = "onCameraSwitched";
@@ -99,6 +107,10 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         String ON_PARTICIPANT_DISCONNECTED = "onRoomParticipantDidDisconnect";
         String ON_PARTICIPANT_ADDED_VIDEO_TRACK = "onParticipantAddedVideoTrack";
         String ON_PARTICIPANT_REMOVED_VIDEO_TRACK = "onParticipantRemovedVideoTrack";
+        String ON_PARTICIPANT_ENABLED_VIDEO_TRACK = "onParticipantEnabledVideoTrack";
+        String ON_PARTICIPANT_DISABLED_VIDEO_TRACK = "onParticipantDisabledVideoTrack";
+        String ON_PARTICIPANT_ENABLED_AUDIO_TRACK = "onParticipantEnabledAudioTrack";
+        String ON_PARTICIPANT_DISABLED_AUDIO_TRACK = "onParticipantDisabledAudioTrack";
         String ON_STATS_RECEIVED = "onStatsReceived";
     }
 
@@ -481,13 +493,13 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
                         for (RemoteAudioTrackStats s : sr.getRemoteAudioTrackStats()) {
                             as.pushMap(convertAudioTrackStats(s));
                         }
-                        connectionStats.putArray("audioTrackStats", as);
+                        connectionStats.putArray("remoteAudioTrackStats", as);
 
                         WritableArray vs = new WritableNativeArray();
                         for (RemoteVideoTrackStats s : sr.getRemoteVideoTrackStats()) {
                             vs.pushMap(convertVideoTrackStats(s));
                         }
-                        connectionStats.putArray("videoTrackStats", vs);
+                        connectionStats.putArray("remoteVideoTrackStats", vs);
 
                         WritableArray las = new WritableNativeArray();
                         for (LocalAudioTrackStats s : sr.getLocalAudioTrackStats()) {
@@ -706,22 +718,26 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
 
             @Override
             public void onAudioTrackEnabled(RemoteParticipant participant, RemoteAudioTrackPublication publication) {
-
+                WritableMap event = buildParticipantVideoEvent(participant, publication);
+                pushEvent(CustomTwilioVideoView.this, ON_PARTICIPANT_ENABLED_AUDIO_TRACK, event);
             }
 
             @Override
             public void onAudioTrackDisabled(RemoteParticipant participant, RemoteAudioTrackPublication publication) {
-
+                WritableMap event = buildParticipantVideoEvent(participant, publication);
+                pushEvent(CustomTwilioVideoView.this, ON_PARTICIPANT_DISABLED_AUDIO_TRACK, event);
             }
 
             @Override
             public void onVideoTrackEnabled(RemoteParticipant participant, RemoteVideoTrackPublication publication) {
-
+                WritableMap event = buildParticipantVideoEvent(participant, publication);
+                pushEvent(CustomTwilioVideoView.this, ON_PARTICIPANT_ENABLED_VIDEO_TRACK, event);
             }
 
             @Override
             public void onVideoTrackDisabled(RemoteParticipant participant, RemoteVideoTrackPublication publication) {
-
+                WritableMap event = buildParticipantVideoEvent(participant, publication);
+                pushEvent(CustomTwilioVideoView.this, ON_PARTICIPANT_DISABLED_VIDEO_TRACK, event);
             }
         };
     }
@@ -733,7 +749,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         return participantMap;
     }
 
-    private WritableMap buildParticipantVideoEvent(Participant participant, RemoteVideoTrackPublication publication) {
+    private WritableMap buildParticipantVideoEvent(Participant participant, TrackPublication publication) {
         WritableMap participantMap = buildParticipant(participant);
 
         WritableMap trackMap = new WritableNativeMap();

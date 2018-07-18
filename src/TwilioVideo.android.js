@@ -72,7 +72,30 @@ const propTypes = {
    * Callback that is called when a participant exits a room.
    */
   onRoomParticipantDidDisconnect: PropTypes.func,
-
+  /**
+    * Called when a video track has been enabled.
+    *
+    * @param {{participant, track}}
+    */
+  onParticipantEnabledVideoTrack: PropTypes.func,
+  /**
+   * Called when a video track has been disabled.
+   *
+   * @param {{participant, track}}
+   */
+  onParticipantDisabledVideoTrack: PropTypes.func,
+  /**
+    * Called when an audio track has been enabled.
+    *
+    * @param {{participant, track}}
+    */
+  onParticipantEnabledAudioTrack: PropTypes.func,
+  /**
+   * Called when an audio track has been disabled.
+   *
+   * @param {{participant, track}}
+   */
+  onParticipantDisabledAudioTrack: PropTypes.func,
   /**
    * Callback that is called when stats are received (after calling getStats)
    */
@@ -144,6 +167,10 @@ class CustomTwilioVideoView extends Component {
       'onParticipantRemovedVideoTrack',
       'onRoomParticipantDidConnect',
       'onRoomParticipantDidDisconnect',
+      'onParticipantEnabledVideoTrack',
+      'onParticipantDisabledVideoTrack',
+      'onParticipantEnabledAudioTrack',
+      'onParticipantDisabledAudioTrack',
       'onStatsReceived'
     ].reduce((wrappedEvents, eventName) => {
       if (this.props[eventName]) {

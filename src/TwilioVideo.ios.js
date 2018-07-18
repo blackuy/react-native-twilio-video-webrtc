@@ -77,17 +77,29 @@ export default class extends Component {
      */
     onParticipantRemovedAudioTrack: PropTypes.func,
     /**
-     * Called when a track has been enabled. This can be audio or video tracks
+     * Called when a video track has been enabled.
      *
      * @param {{participant, track}}
      */
-    onParticipantEnabledTrack: PropTypes.func,
+    onParticipantEnabledVideoTrack: PropTypes.func,
     /**
-     * Called when a track has been disabled. This can be audio or video tracks
+     * Called when a video track has been disabled.
      *
      * @param {{participant, track}}
      */
-    onParticipantDisabledTrack: PropTypes.func,
+    onParticipantDisabledVideoTrack: PropTypes.func,
+    /**
+     * Called when an audio track has been enabled.
+     *
+     * @param {{participant, track}}
+     */
+    onParticipantEnabledAudioTrack: PropTypes.func,
+    /**
+     * Called when an audio track has been disabled.
+     *
+     * @param {{participant, track}}
+     */
+    onParticipantDisabledAudioTrack: PropTypes.func,
     /**
      * Called when the camera has started
      *
@@ -232,11 +244,17 @@ export default class extends Component {
       this._eventEmitter.addListener('participantRemovedAudioTrack', (data) => {
         if (this.props.onParticipantRemovedAudioTrack) { this.props.onParticipantRemovedAudioTrack(data) }
       }),
-      this._eventEmitter.addListener('participantEnabledTrack', (data) => {
-        if (this.props.onParticipantEnabledTrack) { this.props.onParticipantEnabledTrack(data) }
+      this._eventEmitter.addListener('participantEnabledVideoTrack', (data) => {
+        if (this.props.onParticipantEnabledVideoTrack) { this.props.onParticipantEnabledVideoTrack(data) }
       }),
-      this._eventEmitter.addListener('participantDisabledTrack', (data) => {
-        if (this.props.onParticipantDisabledTrack) { this.props.onParticipantDisabledTrack(data) }
+      this._eventEmitter.addListener('participantDisabledVideoTrack', (data) => {
+        if (this.props.onParticipantDisabledVideoTrack) { this.props.onParticipantDisabledVideoTrack(data) }
+      }),
+      this._eventEmitter.addListener('participantEnabledAudioTrack', (data) => {
+        if (this.props.onParticipantEnabledAudioTrack) { this.props.onParticipantEnabledAudioTrack(data) }
+      }),
+      this._eventEmitter.addListener('participantDisabledAudioTrack', (data) => {
+        if (this.props.onParticipantDisabledAudioTrack) { this.props.onParticipantDisabledAudioTrack(data) }
       }),
       this._eventEmitter.addListener('cameraDidStart', (data) => {
         if (this.props.onCameraDidStart) { this.props.onCameraDidStart(data) }

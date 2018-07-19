@@ -15,6 +15,6 @@
 
 - (void)addLocalView:(TVIVideoView *)view;
 - (void)removeLocalView:(TVIVideoView *)view;
-- (void)addParticipantView:(TVIVideoView *)view identity:(NSString *)identity trackId:(NSString *)trackId;
+- (void)addParticipantView:(TVIVideoView *)view sid:(NSString *)sid trackSid:(NSString *)trackSid;
 
 @end

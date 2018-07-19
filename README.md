@@ -214,14 +214,19 @@ export default class Example extends Component {
   _onParticipantAddedVideoTrack = ({participant, track}) => {
     console.log("onParticipantAddedVideoTrack: ", participant, track)
 
-    this.setState({videoTracks: { ...this.state.videoTracks, [track.trackId]: { ...participant, ...track }}})
+    this.setState({
+      videoTracks: new Map([
+        ...this.state.videoTracks,
+        [track.trackSid, { participantSid: participant.sid, videoTrackSid: track.trackSid }]
+      ]),
+    });
   }
 
   _onParticipantRemovedVideoTrack = ({participant, track}) => {
     console.log("onParticipantRemovedVideoTrack: ", participant, track)
 
     const videoTracks = this.state.videoTracks
-    videoTracks.delete(track.trackId)
+    videoTracks.delete(track.trackSid)
 
     this.setState({videoTracks: { ...videoTracks }})
   }
@@ -262,15 +267,12 @@ export default class Example extends Component {
               this.state.status === 'connected' &&
               <View style={styles.remoteGrid}>
                 {
-                  Object.keys(this.state.videoTracks).map(trackId => {
+                  Array.from(this.state.videoTracks, ([trackSid, trackIdentifier]) => {
                     return (
                       <TwilioVideoParticipantView
                         style={styles.remoteVideo}
-                        key={trackId}
-                        trackIdentifier={{
-                          participantIdentity: this.state.videoTracks[trackId].identity,
-                          videoTrackId: trackId
-                        }}
+                        key={trackSid}
+                        trackIdentifier={trackIdentifier}
                       />
                     )
                   })
@@ -326,6 +328,19 @@ To run the example application:
 - Install node dependencies: `yarn install`
 - Install objective-c dependencies: `cd ios && pod install`
 - Open the xcworkspace and run the app: `open Example.xcworkspace`
+
+## Migrating from 1.x to 2.x
+
+* Make sure your pod dependencies are updated.  If you manually specified a pod version, you'll want to update it as follows:
+
+```
+  s.dependency 'TwilioVideo', '~> 2.2.0'
+```
+
+* Both participants and tracks are uniquely identified by their `sid`/`trackSid` field.
+The `trackId` field no longer exists and should be replaced by `trackSid`.  Commensurate with this change,
+participant views now expect `participantSid` and `videoTrackSid` keys in the `trackIdentity` prop (instead of
+`identity` and `trackId`).
 
 ## Contact
 

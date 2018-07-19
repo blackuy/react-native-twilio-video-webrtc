@@ -18,5 +18,5 @@
 @interface TVIParticipant(RCTTWSerializable)<RCTTWSerializable>
 @end
 
-@interface TVITrack(RCTTWSerializable)<RCTTWSerializable>
+@interface TVITrackPublication(RCTTWSerializable)<RCTTWSerializable>
 @end

@@ -15,13 +15,23 @@ People using a version < 1.0.1 please move to 1.0.1 since the project changed a 
 
 ### iOS
 
-#### CocoaPods
-
 Add node package using yarn/NPM:
 
 ```shell
 yarn add https://github.com/blackuy/react-native-twilio-video-webrtc
 ```
+
+#### If you DO use CocoaPods to manage your react native packages.
+
+Add this package to your Podfile:
+
+```ruby
+pod 'react-native-twilio-video-webrtc', path: '../node_modules/react-native-twilio-video-webrtc'
+```
+
+Note that this will automatically pull in the appropriate version of the underlying `TwilioVideo` pod.
+
+#### If you do NOT use CocoaPods to manage your react native packages.
 
 Add the Twilio dependency to your Podfile:
 
@@ -41,7 +51,11 @@ Add the XCode project to your own XCode project's "Libraries" directory from:
 node_modules/react-native-twilio-video-webrtc/ios/RNTwilioVideoWebRTC.xcodeproj
 ```
 
-Add `libRNTwilioVideoWebRTC.a` to your XCode project target's "Linked Frameworks and Libraries"
+Add `libRNTwilioVideoWebRTC.a` to your XCode project target's "Linked Frameworks and Libraries".
+Update the settings of your project as follows:
+
+1. Under `Build Settings`, find `Search Paths`.
+2. Edit *BOTH* `Framework Search Paths` and `Library Search Paths` by adding `$(SRCROOT)/../node_modules/react-native-twilio-video-webrtc/ios` with `recursive`.
 
 ### Permissions
 

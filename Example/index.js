@@ -139,7 +139,7 @@ export default class Example extends Component {
     this.setState({
       videoTracks: new Map([
         ...this.state.videoTracks,
-        [track.trackId, { ...participant, ...track }]
+        [track.trackSid, { participantSid: participant.sid, videoTrackSid: track.trackSid }]
       ]),
     });
   }
@@ -148,7 +148,7 @@ export default class Example extends Component {
     console.log("onParticipantRemovedVideoTrack: ", participant, track)
 
     const videoTracks = this.state.videoTracks
-    videoTracks.delete(track.trackId)
+    videoTracks.delete(track.trackSid)
 
     this.setState({ videoTracks: new Map([ ...videoTracks ]) });
   }
@@ -189,15 +189,12 @@ export default class Example extends Component {
               this.state.status === 'connected' &&
               <View style={styles.remoteGrid}>
                 {
-                  Array.from(this.state.videoTracks, ([trackId, track]) => {
+                  Array.from(this.state.videoTracks, ([trackSid, trackIdentifier]) => {
                     return (
                       <TwilioVideoParticipantView
                         style={styles.remoteVideo}
-                        key={trackId}
-                        trackIdentifier={{
-                          participantIdentity: track.identity,
-                          videoTrackId: trackId
-                        }}
+                        key={trackSid}
+                        trackIdentifier={trackIdentifier}
                       />
                     )
                   })

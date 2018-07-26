@@ -15,13 +15,23 @@ People using a version < 1.0.1 please move to 1.0.1 since the project changed a 
 
 ### iOS
 
-#### CocoaPods
-
 Add node package using yarn/NPM:
 
 ```shell
 yarn add https://github.com/blackuy/react-native-twilio-video-webrtc
 ```
+
+#### If you DO use CocoaPods to manage your react native packages.
+
+Add this package to your Podfile:
+
+```ruby
+pod 'react-native-twilio-video-webrtc', path: '../node_modules/react-native-twilio-video-webrtc'
+```
+
+Note that this will automatically pull in the appropriate version of the underlying `TwilioVideo` pod.
+
+#### If you do NOT use CocoaPods to manage your react native packages.
 
 Add the Twilio dependency to your Podfile:
 
@@ -41,7 +51,11 @@ Add the XCode project to your own XCode project's "Libraries" directory from:
 node_modules/react-native-twilio-video-webrtc/ios/RNTwilioVideoWebRTC.xcodeproj
 ```
 
-Add `libRNTwilioVideoWebRTC.a` to your XCode project target's "Linked Frameworks and Libraries"
+Add `libRNTwilioVideoWebRTC.a` to your XCode project target's "Linked Frameworks and Libraries".
+Update the settings of your project as follows:
+
+1. Under `Build Settings`, find `Search Paths`.
+2. Edit *BOTH* `Framework Search Paths` and `Library Search Paths` by adding `$(SRCROOT)/../node_modules/react-native-twilio-video-webrtc/ios` with `recursive`.
 
 ### Permissions
 
@@ -214,14 +228,19 @@ export default class Example extends Component {
   _onParticipantAddedVideoTrack = ({participant, track}) => {
     console.log("onParticipantAddedVideoTrack: ", participant, track)
 
-    this.setState({videoTracks: { ...this.state.videoTracks, [track.trackId]: { ...participant, ...track }}})
+    this.setState({
+      videoTracks: new Map([
+        ...this.state.videoTracks,
+        [track.trackSid, { participantSid: participant.sid, videoTrackSid: track.trackSid }]
+      ]),
+    });
   }
 
   _onParticipantRemovedVideoTrack = ({participant, track}) => {
     console.log("onParticipantRemovedVideoTrack: ", participant, track)
 
     const videoTracks = this.state.videoTracks
-    videoTracks.delete(track.trackId)
+    videoTracks.delete(track.trackSid)
 
     this.setState({videoTracks: { ...videoTracks }})
   }
@@ -262,15 +281,12 @@ export default class Example extends Component {
               this.state.status === 'connected' &&
               <View style={styles.remoteGrid}>
                 {
-                  Object.keys(this.state.videoTracks).map(trackId => {
+                  Array.from(this.state.videoTracks, ([trackSid, trackIdentifier]) => {
                     return (
                       <TwilioVideoParticipantView
                         style={styles.remoteVideo}
-                        key={trackId}
-                        trackIdentifier={{
-                          participantIdentity: this.state.videoTracks[trackId].identity,
-                          videoTrackId: trackId
-                        }}
+                        key={trackSid}
+                        trackIdentifier={trackIdentifier}
                       />
                     )
                   })
@@ -326,6 +342,19 @@ To run the example application:
 - Install node dependencies: `yarn install`
 - Install objective-c dependencies: `cd ios && pod install`
 - Open the xcworkspace and run the app: `open Example.xcworkspace`
+
+## Migrating from 1.x to 2.x
+
+* Make sure your pod dependencies are updated.  If you manually specified a pod version, you'll want to update it as follows:
+
+```
+  s.dependency 'TwilioVideo', '~> 2.2.0'
+```
+
+* Both participants and tracks are uniquely identified by their `sid`/`trackSid` field.
+The `trackId` field no longer exists and should be replaced by `trackSid`.  Commensurate with this change,
+participant views now expect `participantSid` and `videoTrackSid` keys in the `trackIdentity` prop (instead of
+`identity` and `trackId`).
 
 ## Contact
 

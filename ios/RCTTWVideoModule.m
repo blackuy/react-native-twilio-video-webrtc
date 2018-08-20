@@ -103,9 +103,11 @@ RCT_EXPORT_MODULE();
 
 RCT_EXPORT_METHOD(setRemoteAudioPlayback:(NSString *)participantSid enabled:(BOOL)enabled) {
     TVIRemoteParticipant *participant = [self.room getRemoteParticipantWithSid:participantSid];
-    NSArray<TVIRemoteAudioTrackPublication *> *trackPublications = participant.remoteAudioTracks;
-    for(TVIRemoteAudioTrackPublication *remoteAudioTrack in trackPublications) {
-        [remoteAudioTrack.remoteTrack setPlaybackEnabled:enabled];
+    if (participant) {
+        NSArray<TVIRemoteAudioTrackPublication *> *trackPublications = participant.remoteAudioTracks;
+        for(TVIRemoteAudioTrackPublication *remoteAudioTrack in trackPublications) {
+            [remoteAudioTrack.remoteTrack setPlaybackEnabled:enabled];
+        }
     }
 }
 

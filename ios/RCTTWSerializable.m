@@ -19,14 +19,14 @@
 @implementation TVILocalAudioTrack(RCTTWSerializable)
 
 - (id)toJSON {
-  return @{ @"trackId": self.trackId };
+  return @{ @"trackId": self.name };
 }
 @end
 
 @implementation TVILocalVideoTrack(RCTTWSerializable)
 
 - (id)toJSON {
-  return @{ @"trackId": self.trackId };
+  return @{ @"trackId": self.name };
 }
 
 @end

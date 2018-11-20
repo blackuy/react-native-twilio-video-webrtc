@@ -161,6 +161,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         audioManager = (AudioManager) themedReactContext.getSystemService(Context.AUDIO_SERVICE);
         myNoisyAudioStreamReceiver = new BecomingNoisyReceiver();
         intentFilter = new IntentFilter(Intent.ACTION_HEADSET_PLUG);
+        createLocalMedia();
     }
 
     // ===== SETUP =================================================================================
@@ -170,7 +171,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
                 .minVideoDimensions(VideoDimensions.CIF_VIDEO_DIMENSIONS)
                 .maxVideoDimensions(VideoDimensions.CIF_VIDEO_DIMENSIONS)
                 .minFps(5)
-                .maxFps(15)
+                .maxFps(60)
                 .build();
     }
 
@@ -298,13 +299,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         this.accessToken = accessToken;
 
         Log.i("CustomTwilioVideoView", "Starting connect flow");
-
-        if (cameraCapturer == null) {
-            createLocalMedia();
-        } else {
-            localAudioTrack = LocalAudioTrack.create(getContext(), true);
-            connectToRoom();
-        }
+        connectToRoom();
     }
 
     public void connectToRoom() {
@@ -366,14 +361,6 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     public void disconnect() {
         if (room != null) {
             room.disconnect();
-        }
-        if (localAudioTrack != null) {
-            localAudioTrack.release();
-            localAudioTrack = null;
-        }
-        if (localVideoTrack != null) {
-            localVideoTrack.release();
-            localVideoTrack = null;
         }
     }
 

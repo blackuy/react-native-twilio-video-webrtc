@@ -209,7 +209,6 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
             }
             setThumbnailMirror();
         }
-        connectToRoom();
     }
 
     // ===== LIFECYCLE EVENTS ======================================================================

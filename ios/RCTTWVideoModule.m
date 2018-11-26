@@ -307,7 +307,7 @@ RCT_EXPORT_METHOD(disconnect) {
 }
 
 -(void)cameraCapturer:(TVICameraCapturer *)capturer didStopRunningWithError:(NSError *)error {
-  [self sendEventWithName:cameraDidStopRunning body:@{ @"error" : @{error.code} }];
+  [self sendEventWithName:cameraDidStopRunning body:@{ @"error" : [NSNumber numberWithDouble:error.code] }];
 }
 
 # pragma mark - TVIRoomDelegate
@@ -331,7 +331,7 @@ RCT_EXPORT_METHOD(disconnect) {
   NSMutableDictionary *body = [@{ @"roomName": room.name } mutableCopy];
 
   if (error) {
-    [body addEntriesFromDictionary:@{ @"error" : @{error.code} }];
+    [body addEntriesFromDictionary:@{ @"error" : [NSNumber numberWithDouble:error.code] }];
   }
 
   [self sendEventWithName:roomDidDisconnect body:body];
@@ -343,7 +343,7 @@ RCT_EXPORT_METHOD(disconnect) {
   NSMutableDictionary *body = [@{ @"roomName": room.name } mutableCopy];
 
   if (error) {
-    [body addEntriesFromDictionary:@{ @"error" : @{error.code} }];
+    [body addEntriesFromDictionary:@{ @"error" : [NSNumber numberWithDouble:error.code] }];
   }
 
   [self sendEventWithName:roomDidFailToConnect body:body];

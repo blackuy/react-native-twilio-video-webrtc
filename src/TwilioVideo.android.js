@@ -52,7 +52,7 @@ const propTypes = {
   /**
    * Called when a new video track has been added
    *
-   * @param {{participant, track}}
+   * @param {{participant, track, enabled}}
    */
   onParticipantAddedVideoTrack: PropTypes.func,
 

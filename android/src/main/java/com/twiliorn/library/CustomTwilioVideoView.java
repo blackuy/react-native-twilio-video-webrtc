@@ -756,7 +756,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         WritableMap trackMap = new WritableNativeMap();
         trackMap.putString("trackSid", publication.getTrackSid());
         trackMap.putString("trackName", publication.getTrackName());
-
+        trackMap.putBoolean("enabled", publication.isTrackEnabled());
 
         WritableMap event = new WritableNativeMap();
         event.putMap("participant", participantMap);

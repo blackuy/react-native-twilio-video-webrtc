@@ -24,9 +24,10 @@ static NSString* participantEnabledTrack      = @"participantEnabledTrack";
 static NSString* participantDisabledTrack     = @"participantDisabledTrack";
 
 static NSString* cameraDidStart               = @"cameraDidStart";
-static NSString* cameraWasInterrupted        = @"cameraWasInterrupted";
+static NSString* cameraWasInterrupted         = @"cameraWasInterrupted";
 static NSString* cameraDidStopRunning         = @"cameraDidStopRunning";
 
+static NSString* statsReceived                = @"statsReceived";
 
 @interface RCTTWVideoModule () <TVIRemoteParticipantDelegate, TVIRoomDelegate, TVICameraCapturerDelegate>
 
@@ -63,7 +64,8 @@ RCT_EXPORT_MODULE();
            participantDisabledTrack,
            cameraDidStopRunning,
            cameraDidStart,
-           cameraWasInterrupted
+           cameraWasInterrupted,
+           statsReceived
            ];
 }
 
@@ -158,6 +160,93 @@ RCT_EXPORT_METHOD(flipCamera) {
         r.mirror = YES;
       }
     }
+  }
+}
+
+-(void)convertBaseTrackStats:(TVIBaseTrackStats *)stats result:(NSMutableDictionary *)result {
+  result[@"trackId"] = stats.trackId;
+  result[@"packetsLost"] = @(stats.packetsLost);
+  result[@"codec"] = stats.codec;
+  result[@"ssrc"] = stats.ssrc;
+  result[@"timestamp"] = @(stats.timestamp);
+}
+ -(void)convertTrackStats:(TVITrackStats *)stats result:(NSMutableDictionary *)result {
+  result[@"bytesReceived"] = @(stats.bytesReceived);
+  result[@"packetsReceived"] = @(stats.packetsReceived);
+}
+ -(void)convertLocalTrackStats:(TVILocalTrackStats *)stats result:(NSMutableDictionary *)result {
+  result[@"bytesSent"] = @(stats.bytesSent);
+  result[@"packetsSent"] = @(stats.packetsSent);
+  result[@"roundTripTime"] = @(stats.roundTripTime);
+}
+ -(NSMutableDictionary*)convertDimensions:(CMVideoDimensions)dimensions {
+  NSMutableDictionary *result = [[NSMutableDictionary alloc] initWithCapacity:2];
+  result[@"width"] = @(dimensions.width);
+  result[@"height"] = @(dimensions.height);
+  return result;
+}
+ -(NSMutableDictionary*)convertAudioTrackStats:(TVIAudioTrackStats *)stats {
+  NSMutableDictionary *result = [[NSMutableDictionary alloc] initWithCapacity:10];
+  [self convertBaseTrackStats:stats result:result];
+  [self convertTrackStats:stats result:result];
+  result[@"audioLevel"] = @(stats.audioLevel);
+  result[@"jitter"] = @(stats.jitter);
+  return result;
+}
+ -(NSMutableDictionary*)convertVideoTrackStats:(TVIVideoTrackStats *)stats {
+  NSMutableDictionary *result = [[NSMutableDictionary alloc] initWithCapacity:10];
+  [self convertBaseTrackStats:stats result:result];
+  [self convertTrackStats:stats result:result];
+  result[@"dimensions"] = [self convertDimensions:stats.dimensions];
+  result[@"frameRate"] = @(stats.frameRate);
+  return result;
+}
+ -(NSMutableDictionary*)convertLocalAudioTrackStats:(TVILocalAudioTrackStats *)stats {
+  NSMutableDictionary *result = [[NSMutableDictionary alloc] initWithCapacity:10];
+  [self convertBaseTrackStats:stats result:result];
+  [self convertLocalTrackStats:stats result:result];
+  result[@"audioLevel"] = @(stats.audioLevel);
+  result[@"jitter"] = @(stats.jitter);
+  return result;
+}
+ -(NSMutableDictionary*)convertLocalVideoTrackStats:(TVILocalVideoTrackStats *)stats {
+  NSMutableDictionary *result = [[NSMutableDictionary alloc] initWithCapacity:10];
+  [self convertBaseTrackStats:stats result:result];
+  [self convertLocalTrackStats:stats result:result];
+  result[@"dimensions"] = [self convertDimensions:stats.dimensions];
+  result[@"frameRate"] = @(stats.frameRate);
+  return result;
+}
+ RCT_EXPORT_METHOD(getStats) {
+  if (self.room) {
+    [self.room getStatsWithBlock:^(NSArray<TVIStatsReport *> * _Nonnull statsReports) {
+      NSMutableDictionary *eventBody = [[NSMutableDictionary alloc] initWithCapacity:10];
+      for (TVIStatsReport *statsReport in statsReports) {
+        NSMutableArray *audioTrackStats = [[NSMutableArray alloc] initWithCapacity:10];
+        NSMutableArray *videoTrackStats = [[NSMutableArray alloc] initWithCapacity:10];
+        NSMutableArray *localAudioTrackStats = [[NSMutableArray alloc] initWithCapacity:10];
+        NSMutableArray *localVideoTrackStats = [[NSMutableArray alloc] initWithCapacity:10];
+        for (TVIAudioTrackStats *stats in statsReport.audioTrackStats) {
+          [audioTrackStats addObject:[self convertAudioTrackStats:stats]];
+        }
+        for (TVIVideoTrackStats *stats in statsReport.videoTrackStats) {
+          [videoTrackStats addObject:[self convertVideoTrackStats:stats]];
+        }
+        for (TVILocalAudioTrackStats *stats in statsReport.localAudioTrackStats) {
+          [localAudioTrackStats addObject:[self convertLocalAudioTrackStats:stats]];
+        }
+        for (TVILocalVideoTrackStats *stats in statsReport.localVideoTrackStats) {
+          [localVideoTrackStats addObject:[self convertLocalVideoTrackStats:stats]];
+        }
+        eventBody[statsReport.peerConnectionId] = @{
+          @"audioTrackStats": audioTrackStats,
+          @"videoTrackStats": videoTrackStats,
+          @"localAudioTrackStats": localAudioTrackStats,
+          @"localVideoTrackStats": localVideoTrackStats
+        };
+      }
+      [self sendEventWithName:statsReceived body:eventBody];
+    }];
   }
 }
 

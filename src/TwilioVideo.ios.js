@@ -104,6 +104,11 @@ export default class extends Component {
      * @param {{error}} The error message description
      */
     onCameraDidStopRunning: PropTypes.func,
+    /**
+     * Called when stats are received (after calling getStats)
+     *
+     */
+    onStatsReceived: PropTypes.func,
     ...View.propTypes
   }
 
@@ -152,6 +157,14 @@ export default class extends Component {
   flipCamera () {
     TWVideoModule.flipCamera()
   }
+
+ /**
+   * Get connection stats
+   */
+  getStats () {
+    TWVideoModule.getStats()
+  }
+
 
   /**
    * Connect to given room name using the JWT access token
@@ -234,6 +247,9 @@ export default class extends Component {
       }),
       this._eventEmitter.addListener('cameraDidStopRunning', (data) => {
         if (this.props.onCameraDidStopRunning) { this.props.onCameraDidStopRunning(data) }
+      }),
+      this._eventEmitter.addListener('statsReceived', (data) => {
+        if (this.props.onStatsReceived) { this.props.onStatsReceived(data) }
       })
     ]
   }

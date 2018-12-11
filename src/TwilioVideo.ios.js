@@ -121,6 +121,7 @@ export default class extends Component {
     this.setLocalVideoEnabled = this.setLocalVideoEnabled.bind(this)
     this.setLocalAudioEnabled = this.setLocalAudioEnabled.bind(this)
     this.flipCamera = this.flipCamera.bind(this)
+    this.getStats = this.getStats.bind(this)
     this.connect = this.connect.bind(this)
     this.disconnect = this.disconnect.bind(this)
   }

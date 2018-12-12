@@ -174,9 +174,9 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
                 .build();
     }
 
-    private void createLocalMedia() {
+    private void createLocalMedia(boolean enableAudio, boolean enableVideo) {
         // Share your microphone
-        localAudioTrack = LocalAudioTrack.create(getContext(), true);
+        localAudioTrack = LocalAudioTrack.create(getContext(), enableAudio);
         Log.i("CustomTwilioVideoView", "Create local media");
 
         // Share your camera
@@ -202,7 +202,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         );
 
         if (cameraCapturer.getSupportedFormats().size() > 0) {
-            localVideoTrack = LocalVideoTrack.create(getContext(), true, cameraCapturer, buildVideoConstraints());
+            localVideoTrack = LocalVideoTrack.create(getContext(), enableVideo, cameraCapturer, buildVideoConstraints());
             if (thumbnailVideoView != null && localVideoTrack != null) {
                 localVideoTrack.addRenderer(thumbnailVideoView);
             }
@@ -220,8 +220,8 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
          */
         if (themedReactContext.getCurrentActivity() != null) {
             /*
-            * If the local video track was released when the app was put in the background, recreate.
-            */
+             * If the local video track was released when the app was put in the background, recreate.
+             */
             if (cameraCapturer != null && localVideoTrack == null) {
                 localVideoTrack = LocalVideoTrack.create(getContext(), true, cameraCapturer, buildVideoConstraints());
             }
@@ -232,8 +232,8 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
                 }
 
                 /*
-                * If connected to a Room then share the local video track.
-                */
+                 * If connected to a Room then share the local video track.
+                 */
                 if (localParticipant != null) {
                     localParticipant.publishTrack(localVideoTrack);
                 }
@@ -293,16 +293,17 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
 
     // ====== CONNECTING ===========================================================================
 
-    public void connectToRoomWrapper(String roomName, String accessToken) {
+    public void connectToRoomWrapper(
+            String roomName, String accessToken, boolean enableAudio, boolean enableVideo) {
         this.roomName = roomName;
         this.accessToken = accessToken;
 
         Log.i("CustomTwilioVideoView", "Starting connect flow");
 
         if (cameraCapturer == null) {
-            createLocalMedia();
+            createLocalMedia(enableAudio, enableVideo);
         } else {
-            localAudioTrack = LocalAudioTrack.create(getContext(), true);
+            localAudioTrack = LocalAudioTrack.create(getContext(), enableAudio);
             connectToRoom();
         }
     }
@@ -374,6 +375,10 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         if (localVideoTrack != null) {
             localVideoTrack.release();
             localVideoTrack = null;
+        }
+        if (cameraCapturer != null) {
+            cameraCapturer.stopCapture();
+            cameraCapturer = null;
         }
     }
 
@@ -522,7 +527,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     }
 
     public void disableOpenSLES() {
-      WebRtcAudioManager.setBlacklistDeviceForOpenSLESUsage(true);
+        WebRtcAudioManager.setBlacklistDeviceForOpenSLESUsage(true);
     }
 
     // ====== ROOM LISTENER ========================================================================
@@ -548,7 +553,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
                 pushEvent(CustomTwilioVideoView.this, ON_CONNECTED, event);
 
                 for (RemoteParticipant participant : participants) {
-                  addParticipant(participant);
+                    addParticipant(participant);
                 }
             }
 

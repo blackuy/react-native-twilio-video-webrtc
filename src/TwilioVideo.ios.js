@@ -109,7 +109,7 @@ export default class extends Component {
      *
      */
     onStatsReceived: PropTypes.func,
-    ...View.propTypes
+    ...View.propTypes 
   }
 
   constructor (props) {

@@ -324,7 +324,7 @@ export default class Example extends Component {
           onRoomDidDisconnect={ this._onRoomDidDisconnect }
           onRoomDidFailToConnect= { this._onRoomDidFailToConnect }
           onParticipantAddedVideoTrack={ this._onParticipantAddedVideoTrack }
-          onParticipantRemovedVideoTrack= { this.onParticipantRemovedVideoTrack }
+          onParticipantRemovedVideoTrack= { this._onParticipantRemovedVideoTrack }
         />
       </View>
     );

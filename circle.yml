@@ -4,6 +4,10 @@ machine:
   environment:
     PATH: "${PATH}:${HOME}/${CIRCLE_PROJECT_REPONAME}/node_modules/.bin"
 
+attach_workspace: &attach_workspace
+  attach_workspace:
+    at: ~/react-native-twilio-video-webrtc
+
 dependencies:
   pre:
     - rm -rf ~/.yarn
@@ -14,6 +18,11 @@ dependencies:
   cache_directories:
     - ~/.cache/yarn
 
-test:
-  override:
-    - yarn run ci
+jobs:
+  test:
+    steps:
+      - checkout
+      - *attach_workspace
+      - run:
+        name: Run tests
+        command: yarn run ci

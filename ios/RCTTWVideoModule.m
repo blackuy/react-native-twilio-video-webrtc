@@ -312,13 +312,13 @@ RCT_EXPORT_METHOD(disconnect) {
   TVILocalParticipant *localParticipant = room.localParticipant;
   [participants addObject:[localParticipant toJSON]];
 
-  [self sendEventWithName:roomDidConnect body:@{ @"roomName" : room.name , @"participants" : participants }];
+  [self sendEventWithName:roomDidConnect body:@{ @"roomName" : room.name , @"roomSid": room.sid, @"participants" : participants }];
 }
 
 - (void)room:(TVIRoom *)room didDisconnectWithError:(nullable NSError *)error {
   self.room = nil;
 
-  NSMutableDictionary *body = [@{ @"roomName": room.name } mutableCopy];
+  NSMutableDictionary *body = [@{ @"roomName": room.name, @"roomSid": room.sid } mutableCopy];
 
   if (error) {
     [body addEntriesFromDictionary:@{ @"error" : error.localizedDescription }];
@@ -330,7 +330,7 @@ RCT_EXPORT_METHOD(disconnect) {
 - (void)room:(TVIRoom *)room didFailToConnectWithError:(nonnull NSError *)error{
   self.room = nil;
 
-  NSMutableDictionary *body = [@{ @"roomName": room.name } mutableCopy];
+  NSMutableDictionary *body = [@{ @"roomName": room.name, @"roomSid": room.sid } mutableCopy];
 
   if (error) {
     [body addEntriesFromDictionary:@{ @"error" : error.localizedDescription }];
@@ -343,11 +343,11 @@ RCT_EXPORT_METHOD(disconnect) {
 - (void)room:(TVIRoom *)room participantDidConnect:(TVIRemoteParticipant *)participant {
   participant.delegate = self;
 
-  [self sendEventWithName:roomParticipantDidConnect body:@{ @"roomName": room.name, @"participant": [participant toJSON] }];
+  [self sendEventWithName:roomParticipantDidConnect body:@{ @"roomName": room.name, @"roomSid": room.sid, @"participant": [participant toJSON] }];
 }
 
 - (void)room:(TVIRoom *)room participantDidDisconnect:(TVIRemoteParticipant *)participant {
-  [self sendEventWithName:roomParticipantDidDisconnect body:@{ @"roomName": room.name, @"participant": [participant toJSON] }];
+  [self sendEventWithName:roomParticipantDidDisconnect body:@{ @"roomName": room.name, @"roomSid": room.sid, @"participant": [participant toJSON] }];
 }
 
 # pragma mark - TVIRemoteParticipantDelegate

@@ -24,6 +24,15 @@ public class TwilioRemotePreviewManager extends SimpleViewManager<TwilioRemotePr
         return REACT_CLASS;
     }
 
+    @ReactProp(name = "scaleType")
+    public void setScaleType(TwilioVideoPreview view, @Nullable String scaleType){
+      if(scaleType.equals('fit'))
+      {
+        view.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FIT);
+      } else {
+        view.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FILL);
+      }
+    }
 
     @ReactProp(name = "trackSid")
     public void setTrackId(TwilioRemotePreview view, @Nullable String trackSid) {

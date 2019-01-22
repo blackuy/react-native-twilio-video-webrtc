@@ -47,7 +47,7 @@
 
 RCT_EXPORT_MODULE()
 
-RCT_CUSTOM_VIEW_PROPERTY(scalesType, NSInteger, TVIVideoView){
+RCT_CUSTOM_VIEW_PROPERTY(scalesType, NSInteger, TVIVideoView) {
   view.subviews[0].contentMode = [RCTConvert NSInteger:json];
 }
 

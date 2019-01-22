@@ -20,7 +20,7 @@ class TwilioVideoLocalView extends Component {
 
   render () {
     scalesType = this.props.scaleType === 'fit' ? 1 : 2
-    return <RCTTWLocalVideoView {...this.props}>{this.props.children}</RCTTWLocalVideoView>
+    return <RCTTWLocalVideoView scalesType={scalesType} {...this.props}>{this.props.children}</RCTTWLocalVideoView>
   }
 }
 

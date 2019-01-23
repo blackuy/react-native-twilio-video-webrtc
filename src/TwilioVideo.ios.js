@@ -55,7 +55,7 @@ export default class extends Component {
     /**
      * Called when a new video track has been added
      *
-     * @param {{participant, track}}
+     * @param {{participant, track, enabled}}
      */
     onParticipantAddedVideoTrack: PropTypes.func,
     /**
@@ -135,6 +135,7 @@ export default class extends Component {
     this.flipCamera = this.flipCamera.bind(this)
     this.connect = this.connect.bind(this)
     this.disconnect = this.disconnect.bind(this)
+    this.setRemoteAudioPlayback = this.setRemoteAudioPlayback.bind(this)
   }
 
   componentWillMount () {
@@ -147,6 +148,13 @@ export default class extends Component {
     this._unregisterEvents()
     this._stopLocalVideo()
     this._stopLocalAudio()
+  }
+
+  /**
+   * Locally mute/ unmute all remote audio tracks from a given participant
+   */
+  setRemoteAudioPlayback ({participantSid, enabled}) {
+    TWVideoModule.setRemoteAudioPlayback(participantSid, enabled)
   }
 
   /**

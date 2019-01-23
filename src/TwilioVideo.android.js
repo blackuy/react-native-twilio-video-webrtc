@@ -64,6 +64,20 @@ const propTypes = {
   onParticipantRemovedVideoTrack: PropTypes.func,
 
   /**
+   * Called when a new audio track has been added
+   *
+   * @param {{participant, track}}
+   */
+  onParticipantAddedAudioTrack: PropTypes.func,
+
+  /**
+   * Called when a audio track has been removed
+   *
+   * @param {{participant, track}}
+   */
+  onParticipantRemovedAudioTrack: PropTypes.func,
+
+  /**
    * Callback called a participant enters a room.
    */
   onRoomParticipantDidConnect: PropTypes.func,
@@ -167,6 +181,8 @@ class CustomTwilioVideoView extends Component {
       'onRoomDidDisconnect',
       'onParticipantAddedVideoTrack',
       'onParticipantRemovedVideoTrack',
+      'onParticipantAddedAudioTrack',
+      'onParticipantRemovedAudioTrack',
       'onRoomParticipantDidConnect',
       'onRoomParticipantDidDisconnect',
       'onParticipantEnabledVideoTrack',

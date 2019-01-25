@@ -215,55 +215,10 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
 
     @Override
     public void onHostResume() {
-        /*
-         * In case it wasn't set.
-         */
-        if (themedReactContext.getCurrentActivity() != null) {
-            /*
-            * If the local video track was released when the app was put in the background, recreate.
-            */
-            if (cameraCapturer != null && localVideoTrack == null) {
-                localVideoTrack = LocalVideoTrack.create(getContext(), true, cameraCapturer, buildVideoConstraints());
-            }
-
-            if (localVideoTrack != null) {
-                if (thumbnailVideoView != null) {
-                    localVideoTrack.addRenderer(thumbnailVideoView);
-                }
-
-                /*
-                * If connected to a Room then share the local video track.
-                */
-                if (localParticipant != null) {
-                    localParticipant.publishTrack(localVideoTrack);
-                }
-            }
-
-            themedReactContext.getCurrentActivity().setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
-
-        }
     }
 
     @Override
     public void onHostPause() {
-        Log.i("CustomTwilioVideoView", "Host pause");
-        /*
-         * Release the local video track before going in the background. This ensures that the
-         * camera can be used by other applications while this app is in the background.
-         */
-        if (localVideoTrack != null) {
-            /*
-             * If this local video track is being shared in a Room, remove from local
-             * participant before releasing the video track. Participants will be notified that
-             * the track has been removed.
-             */
-            if (localParticipant != null) {
-                localParticipant.unpublishTrack(localVideoTrack);
-            }
-
-            localVideoTrack.release();
-            localVideoTrack = null;
-        }
     }
 
     @Override

@@ -359,4 +359,4 @@ participant views now expect `participantSid` and `videoTrackSid` keys in the `t
 ## Contact
 
 - Martín Fernández <fmartin91@gmail.com>
-- Gaston Morixe <gaston@black.uy>
+- Gaston Morixe <gaston@gastonmorixe.com>

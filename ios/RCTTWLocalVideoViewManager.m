@@ -17,10 +17,13 @@
 
 RCT_EXPORT_MODULE()
 
+RCT_CUSTOM_VIEW_PROPERTY(scalesType, NSInteger, TVIVideoView) {
+  view.subviews[0].contentMode = [RCTConvert NSInteger:json];
+}
+
 - (UIView *)view {
   UIView *container = [[UIView alloc] init];
   TVIVideoView *inner = [[TVIVideoView alloc] init];
-  inner.contentMode = UIViewContentModeScaleAspectFill;
   [container addSubview:inner];
   return container;
 }

@@ -14,6 +14,9 @@ import com.facebook.react.uimanager.SimpleViewManager;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.annotations.ReactProp;
 
+import org.webrtc.RendererCommon;
+
+
 public class TwilioRemotePreviewManager extends SimpleViewManager<TwilioRemotePreview> {
 
     public static final String REACT_CLASS = "RNTwilioRemotePreview";

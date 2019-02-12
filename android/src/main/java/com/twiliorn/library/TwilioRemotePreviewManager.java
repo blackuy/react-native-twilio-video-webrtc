@@ -29,6 +29,7 @@ public class TwilioRemotePreviewManager extends SimpleViewManager<TwilioRemotePr
 
     @ReactProp(name = "scaleType")
     public void setScaleType(TwilioVideoPreview view, @Nullable String scaleType) {
+
       if (scaleType.equals("fit")) {
         view.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FIT);
       } else {

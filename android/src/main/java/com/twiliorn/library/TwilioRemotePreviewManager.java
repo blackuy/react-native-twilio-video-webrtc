@@ -14,6 +14,9 @@ import com.facebook.react.uimanager.SimpleViewManager;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.annotations.ReactProp;
 
+import org.webrtc.RendererCommon;
+
+
 public class TwilioRemotePreviewManager extends SimpleViewManager<TwilioRemotePreview> {
 
     public static final String REACT_CLASS = "RNTwilioRemotePreview";
@@ -26,7 +29,8 @@ public class TwilioRemotePreviewManager extends SimpleViewManager<TwilioRemotePr
 
     @ReactProp(name = "scaleType")
     public void setScaleType(TwilioVideoPreview view, @Nullable String scaleType) {
-      if(scaleType.equals('fit')) {
+
+      if (scaleType.equals("fit")) {
         view.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FIT);
       } else {
         view.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FILL);

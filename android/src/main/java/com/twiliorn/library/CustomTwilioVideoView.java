@@ -12,25 +12,28 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.media.AudioAttributes;
+import android.media.AudioFocusRequest;
 import android.media.AudioManager;
+import android.os.Build;
+import android.os.Handler;
 import android.support.annotation.StringDef;
 import android.util.Log;
 import android.view.View;
 
 import com.facebook.react.bridge.LifecycleEventListener;
-import com.facebook.react.bridge.WritableMap;
-import com.facebook.react.bridge.WritableNativeMap;
 import com.facebook.react.bridge.WritableArray;
+import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeArray;
+import com.facebook.react.bridge.WritableNativeMap;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.events.RCTEventEmitter;
-
 import com.twilio.video.BaseTrackStats;
 import com.twilio.video.CameraCapturer;
 import com.twilio.video.ConnectOptions;
-import com.twilio.video.LocalParticipant;
 import com.twilio.video.LocalAudioTrack;
 import com.twilio.video.LocalAudioTrackStats;
+import com.twilio.video.LocalParticipant;
 import com.twilio.video.LocalTrackStats;
 import com.twilio.video.LocalVideoTrack;
 import com.twilio.video.LocalVideoTrackStats;
@@ -52,9 +55,10 @@ import com.twilio.video.StatsReport;
 import com.twilio.video.TrackPublication;
 import com.twilio.video.TwilioException;
 import com.twilio.video.Video;
-import com.twilio.video.VideoView;
 import com.twilio.video.VideoConstraints;
 import com.twilio.video.VideoDimensions;
+import com.twilio.video.VideoView;
+
 import org.webrtc.voiceengine.WebRtcAudioManager;
 
 import java.lang.annotation.Retention;
@@ -67,18 +71,18 @@ import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_CAMERA_SWITCH
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_CONNECTED;
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_CONNECT_FAILURE;
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_DISCONNECTED;
-import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_PARTICIPANT_CONNECTED;
-import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_PARTICIPANT_DISCONNECTED;
-import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_VIDEO_CHANGED;
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_PARTICIPANT_ADDED_VIDEO_TRACK;
-import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_PARTICIPANT_REMOVED_VIDEO_TRACK;
-import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_PARTICIPANT_ENABLED_VIDEO_TRACK;
-import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_PARTICIPANT_DISABLED_VIDEO_TRACK;
-import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_PARTICIPANT_ENABLED_AUDIO_TRACK;
+import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_PARTICIPANT_CONNECTED;
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_PARTICIPANT_DISABLED_AUDIO_TRACK;
+import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_PARTICIPANT_DISABLED_VIDEO_TRACK;
+import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_PARTICIPANT_DISCONNECTED;
+import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_PARTICIPANT_ENABLED_AUDIO_TRACK;
+import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_PARTICIPANT_ENABLED_VIDEO_TRACK;
+import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_PARTICIPANT_REMOVED_VIDEO_TRACK;
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_STATS_RECEIVED;
+import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_VIDEO_CHANGED;
 
-public class CustomTwilioVideoView extends View implements LifecycleEventListener {
+public class CustomTwilioVideoView extends View implements LifecycleEventListener, AudioManager.OnAudioFocusChangeListener {
     private static final String TAG = "CustomTwilioVideoView";
 
     @Retention(RetentionPolicy.SOURCE)
@@ -117,6 +121,10 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
 
     private final ThemedReactContext themedReactContext;
     private final RCTEventEmitter eventEmitter;
+
+    private AudioFocusRequest audioFocusRequest;
+    private AudioAttributes playbackAttributes;
+    private Handler handler = new Handler();
 
     /*
      * A Room represents communication between the client and one or more participants.
@@ -291,6 +299,12 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         }
     }
 
+    @Override
+    public void onAudioFocusChange(int focusChange) {
+        Log.e(TAG, "onAudioFocusChange: focuschange: " + focusChange);
+    }
+
+
     // ====== CONNECTING ===========================================================================
 
     public void connectToRoomWrapper(String roomName, String accessToken) {
@@ -333,8 +347,23 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         if (focus) {
             previousAudioMode = audioManager.getMode();
             // Request audio focus before making any device switch.
-            audioManager.requestAudioFocus(null, AudioManager.STREAM_VOICE_CALL,
-                    AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
+            if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+                audioManager.requestAudioFocus(this,
+                        AudioManager.STREAM_VOICE_CALL,
+                        AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
+            } else {
+                playbackAttributes = new AudioAttributes.Builder()
+                        .setUsage(AudioAttributes.USAGE_VOICE_COMMUNICATION)
+                        .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+                        .build();
+                audioFocusRequest = new AudioFocusRequest
+                        .Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT)
+                        .setAudioAttributes(playbackAttributes)
+                        .setAcceptsDelayedFocusGain(true)
+                        .setOnAudioFocusChangeListener(this, handler)
+                        .build();
+                audioManager.requestAudioFocus(audioFocusRequest);
+            }
             /*
              * Use MODE_IN_COMMUNICATION as the default audio mode. It is required
              * to be in this mode when playout and/or recording starts for the best
@@ -344,11 +373,21 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
             audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
             audioManager.setSpeakerphoneOn(!audioManager.isWiredHeadsetOn());
             getContext().registerReceiver(myNoisyAudioStreamReceiver, intentFilter);
+
         } else {
-            audioManager.setMode(previousAudioMode);
-            audioManager.abandonAudioFocus(null);
+            if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+                audioManager.abandonAudioFocus(this);
+            } else {
+                audioManager.abandonAudioFocusRequest(audioFocusRequest);
+            }
+
             audioManager.setSpeakerphoneOn(false);
-            getContext().unregisterReceiver(myNoisyAudioStreamReceiver);
+            audioManager.setMode(previousAudioMode);
+            try {
+                getContext().unregisterReceiver(myNoisyAudioStreamReceiver);
+            } catch (Exception e) {
+                // already registered
+            }
         }
     }
 
@@ -375,6 +414,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
             localVideoTrack.release();
             localVideoTrack = null;
         }
+        setAudioFocus(false);
     }
 
     // ===== BUTTON LISTENERS ======================================================================
@@ -522,7 +562,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     }
 
     public void disableOpenSLES() {
-      WebRtcAudioManager.setBlacklistDeviceForOpenSLESUsage(true);
+        WebRtcAudioManager.setBlacklistDeviceForOpenSLESUsage(true);
     }
 
     // ====== ROOM LISTENER ========================================================================
@@ -548,7 +588,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
                 pushEvent(CustomTwilioVideoView.this, ON_CONNECTED, event);
 
                 for (RemoteParticipant participant : participants) {
-                  addParticipant(participant);
+                    addParticipant(participant);
                 }
             }
 

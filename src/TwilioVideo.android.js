@@ -125,6 +125,10 @@ class CustomTwilioVideoView extends Component {
     this.runCommand(nativeEvents.switchCamera, [])
   }
 
+  toggleSoundSetup (speaker) {
+    this.runCommand(nativeEvents.toggleSoundSetup, [speaker])
+  }
+
   setLocalVideoEnabled (enabled) {
     this.runCommand(nativeEvents.toggleVideo, [enabled])
     return Promise.resolve(enabled)

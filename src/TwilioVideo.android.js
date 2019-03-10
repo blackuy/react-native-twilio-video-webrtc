@@ -110,7 +110,7 @@ const nativeEvents = {
   toggleSound: 5,
   getStats: 6,
   disableOpenSLES: 7,
-  toggleSoundSetup: 8,
+  toggleSoundSetup: 8
 }
 
 class CustomTwilioVideoView extends Component {

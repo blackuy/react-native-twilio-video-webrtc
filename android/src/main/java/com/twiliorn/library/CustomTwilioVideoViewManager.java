@@ -45,6 +45,7 @@ public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilio
     private static final int TOGGLE_SOUND = 5;
     private static final int GET_STATS = 6;
     private static final int DISABLE_OPENSL_ES = 7;
+    private static final int TOGGLE_SOUND_SETUP = 8;
 
     @Override
     public String getName() {
@@ -70,10 +71,6 @@ public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilio
             case SWITCH_CAMERA:
                 view.switchCamera();
                 break;
-            case TOGGLE_SOUND_SETUP:
-                Boolean speaker = args.getBoolean(0);
-                view.toggleSoundSetup(speaker);
-                break;
             case TOGGLE_VIDEO:
                 Boolean videoEnabled = args.getBoolean(0);
                 view.toggleVideo(videoEnabled);
@@ -87,6 +84,10 @@ public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilio
                 break;
             case DISABLE_OPENSL_ES:
                 view.disableOpenSLES();
+                break;
+            case TOGGLE_SOUND_SETUP:
+                Boolean speaker = args.getBoolean(0);
+                view.toggleSoundSetup(speaker);
                 break;
         }
     }

@@ -450,6 +450,15 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         }
     }
 
+    public void toggleSoundSetup(boolean speaker){
+      AudioManager audioManager = (AudioManager) getContext().getSystemService(Context.AUDIO_SERVICE);
+      if(speaker){
+        audioManager.setSpeakerphoneOn(true);
+      } else {
+        audioManager.setSpeakerphoneOn(false);
+      }
+    }
+
     public void toggleAudio(boolean enabled) {
         if (localAudioTrack != null) {
             localAudioTrack.enable(enabled);

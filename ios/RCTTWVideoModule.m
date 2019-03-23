@@ -171,6 +171,36 @@ RCT_EXPORT_METHOD(flipCamera) {
   }
 }
 
+RCT_EXPORT_METHOD(toggleSoundSetup:(BOOL)speaker) {
+  if(speaker){
+      kDefaultAVAudioSessionConfigurationBlock();
+
+      // Overwrite the audio route
+      AVAudioSession *session = [AVAudioSession sharedInstance];
+      NSError *error = nil;
+      if (![session setMode:AVAudioSessionModeVideoChat error:&error]) {
+          NSLog(@"AVAudiosession setMode %@",error);
+      }
+
+      if (![session overrideOutputAudioPort:AVAudioSessionPortOverrideNone error:&error]) {
+          NSLog(@"AVAudiosession overrideOutputAudioPort %@",error);
+      }
+    } else {
+      kDefaultAVAudioSessionConfigurationBlock();
+
+      // Overwrite the audio route
+      AVAudioSession *session = [AVAudioSession sharedInstance];
+      NSError *error = nil;
+      if (![session setMode:AVAudioSessionModeVoiceChat error:&error]) {
+          NSLog(@"AVAudiosession setMode %@",error);
+      }
+
+      if (![session overrideOutputAudioPort:AVAudioSessionPortOverrideNone error:&error]) {
+          NSLog(@"AVAudiosession overrideOutputAudioPort %@",error);
+      }
+    }
+  }
+
 -(void)convertBaseTrackStats:(TVIBaseTrackStats *)stats result:(NSMutableDictionary *)result {
   result[@"trackSid"] = stats.trackSid;
   result[@"packetsLost"] = @(stats.packetsLost);

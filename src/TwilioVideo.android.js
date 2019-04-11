@@ -110,12 +110,16 @@ const nativeEvents = {
   toggleSound: 5,
   getStats: 6,
   disableOpenSLES: 7,
+<<<<<<< HEAD
   toggleSoundSetup: 8
+=======
+  toggleRemoteSound: 8,
+>>>>>>> initialize with/without audio
 }
 
 class CustomTwilioVideoView extends Component {
-  connect ({roomName, accessToken, enableAudio=true, enableVideo=true}) {
-    this.runCommand(nativeEvents.connectToRoom, [roomName, accessToken, enableAudio, enableVideo])
+  connect ({roomName, accessToken, enableAudio=true, enableVideo=true, enableRemoteAudio=true}) {
+    this.runCommand(nativeEvents.connectToRoom, [roomName, accessToken, enableAudio, enableVideo, enableRemoteAudio])
   }
 
   disconnect () {
@@ -133,6 +137,11 @@ class CustomTwilioVideoView extends Component {
 
   setLocalAudioEnabled (enabled) {
     this.runCommand(nativeEvents.toggleSound, [enabled])
+    return Promise.resolve(enabled)
+  }
+
+  setRemoteAudioEnabled (enabled) {
+    this.runCommand(nativeEvents.toggleRemoteSound, [enabled])
     return Promise.resolve(enabled)
   }
 

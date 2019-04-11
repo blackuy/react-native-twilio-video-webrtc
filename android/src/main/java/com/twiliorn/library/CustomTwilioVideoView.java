@@ -15,8 +15,12 @@ import android.content.IntentFilter;
 import android.media.AudioAttributes;
 import android.media.AudioFocusRequest;
 import android.media.AudioManager;
+<<<<<<< HEAD
 import android.os.Build;
 import android.os.Handler;
+=======
+import android.support.annotation.NonNull;
+>>>>>>> initialize with/without audio
 import android.support.annotation.StringDef;
 import android.util.Log;
 import android.view.View;
@@ -28,6 +32,11 @@ import com.facebook.react.bridge.WritableNativeArray;
 import com.facebook.react.bridge.WritableNativeMap;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.events.RCTEventEmitter;
+<<<<<<< HEAD
+=======
+
+import com.twilio.video.AudioTrackPublication;
+>>>>>>> initialize with/without audio
 import com.twilio.video.BaseTrackStats;
 import com.twilio.video.CameraCapturer;
 import com.twilio.video.ConnectOptions;
@@ -49,7 +58,10 @@ import com.twilio.video.RemoteVideoTrack;
 import com.twilio.video.RemoteVideoTrackPublication;
 import com.twilio.video.RemoteVideoTrackStats;
 import com.twilio.video.Room;
+<<<<<<< HEAD
 import com.twilio.video.Room.State;
+=======
+>>>>>>> initialize with/without audio
 import com.twilio.video.StatsListener;
 import com.twilio.video.StatsReport;
 import com.twilio.video.TrackPublication;
@@ -84,6 +96,7 @@ import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_VIDEO_CHANGED
 
 public class CustomTwilioVideoView extends View implements LifecycleEventListener, AudioManager.OnAudioFocusChangeListener {
     private static final String TAG = "CustomTwilioVideoView";
+    private boolean enableRemoteAudio = false;
 
     @Retention(RetentionPolicy.SOURCE)
     @StringDef({Events.ON_CAMERA_SWITCHED,
@@ -216,7 +229,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
             }
             setThumbnailMirror();
         }
-        connectToRoom();
+        connectToRoom(enableAudio);
     }
 
     // ===== LIFECYCLE EVENTS ======================================================================
@@ -308,25 +321,26 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     // ====== CONNECTING ===========================================================================
 
     public void connectToRoomWrapper(
-            String roomName, String accessToken, boolean enableAudio, boolean enableVideo) {
+            String roomName, String accessToken, boolean enableAudio, boolean enableVideo, boolean enableRemoteAudio) {
         this.roomName = roomName;
         this.accessToken = accessToken;
+        this.enableRemoteAudio = enableAudio;
 
-        Log.i("CustomTwilioVideoView", "Starting connect flow");
+        Log.i("CustomTwilioVideoView", "Starting connect flow " + enableAudio);
 
         if (cameraCapturer == null) {
             createLocalMedia(enableAudio, enableVideo);
         } else {
             localAudioTrack = LocalAudioTrack.create(getContext(), enableAudio);
-            connectToRoom();
+            connectToRoom(enableAudio);
         }
     }
 
-    public void connectToRoom() {
+    public void connectToRoom(boolean enableAudio) {
         /*
          * Create a VideoClient allowing you to connect to a Room
          */
-        setAudioFocus(true);
+        setAudioFocus(enableAudio);
         ConnectOptions.Builder connectOptionsBuilder = new ConnectOptions.Builder(this.accessToken);
 
         if (this.roomName != null) {
@@ -383,11 +397,18 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
             }
 
             audioManager.setSpeakerphoneOn(false);
+<<<<<<< HEAD
             audioManager.setMode(previousAudioMode);
             try {
                 getContext().unregisterReceiver(myNoisyAudioStreamReceiver);
             } catch (Exception e) {
                 // already registered
+=======
+            try {
+                getContext().unregisterReceiver(myNoisyAudioStreamReceiver);
+            } catch (Exception e) {
+                e.printStackTrace();
+>>>>>>> initialize with/without audio
             }
         }
     }
@@ -395,6 +416,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     private class BecomingNoisyReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
+//            audioManager.setSpeakerphoneOn(true);
             if (Intent.ACTION_HEADSET_PLUG.equals(intent.getAction())) {
                 audioManager.setSpeakerphoneOn(!audioManager.isWiredHeadsetOn());
             }
@@ -471,6 +493,18 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
             WritableMap event = new WritableNativeMap();
             event.putBoolean("audioEnabled", enabled);
             pushEvent(CustomTwilioVideoView.this, ON_AUDIO_CHANGED, event);
+        }
+    }
+
+    public void toggleRemoteAudio(boolean enabled) {
+        if (room != null) {
+            for (RemoteParticipant rp : room.getRemoteParticipants()) {
+                for(AudioTrackPublication at : rp.getAudioTracks()) {
+                    if(at.getAudioTrack() != null) {
+                        ((RemoteAudioTrack)at.getAudioTrack()).enablePlayback(enabled);
+                    }
+                }
+            }
         }
     }
 
@@ -614,9 +648,21 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
             }
 
             @Override
+            public void onReconnecting(@NonNull Room room, @NonNull TwilioException twilioException) {
+
+            }
+
+            @Override
+            public void onReconnected(@NonNull Room room) {
+
+            }
+
+            @Override
             public void onDisconnected(Room room, TwilioException e) {
                 WritableMap event = new WritableNativeMap();
-                event.putString("participant", localParticipant.getIdentity());
+                if(localParticipant!= null) {
+                    event.putString("participant", localParticipant.getIdentity());
+                }
                 pushEvent(CustomTwilioVideoView.this, ON_DISCONNECTED, event);
 
                 localParticipant = null;
@@ -695,7 +741,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         return new RemoteParticipant.Listener() {
             @Override
             public void onAudioTrackSubscribed(RemoteParticipant participant, RemoteAudioTrackPublication publication, RemoteAudioTrack audioTrack) {
-
+                audioTrack.enablePlayback(enableRemoteAudio);
             }
 
             @Override
@@ -710,7 +756,6 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
 
             @Override
             public void onAudioTrackPublished(RemoteParticipant participant, RemoteAudioTrackPublication publication) {
-
             }
 
             @Override
@@ -746,7 +791,6 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
             @Override
             public void onVideoTrackSubscribed(RemoteParticipant participant, RemoteVideoTrackPublication publication, RemoteVideoTrack videoTrack) {
                 Log.i("CustomTwilioVideoView", "Participant ADDED TRACK");
-
                 addParticipantVideo(participant, publication);
             }
 
@@ -773,6 +817,8 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
 
             @Override
             public void onAudioTrackEnabled(RemoteParticipant participant, RemoteAudioTrackPublication publication) {
+//                Log.i(TAG, "onAudioTrackEnabled");
+//                publication.getRemoteAudioTrack().enablePlayback(false);
                 WritableMap event = buildParticipantVideoEvent(participant, publication);
                 pushEvent(CustomTwilioVideoView.this, ON_PARTICIPANT_ENABLED_AUDIO_TRACK, event);
             }

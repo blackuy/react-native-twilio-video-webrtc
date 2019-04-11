@@ -45,7 +45,7 @@ dependencies {
     
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "com.android.support:appcompat-v7:$androidSupportVersion"
-    implementation "com.twilio:video-android:2.1.0"
+    implementation "com.twilio:video-android:4.1.0"
 
     implementation "com.facebook.react:react-native:+"  // From node_modules
 }

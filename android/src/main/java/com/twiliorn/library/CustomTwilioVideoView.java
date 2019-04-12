@@ -382,7 +382,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         } else {
             if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
                 audioManager.abandonAudioFocus(this);
-            } else {
+            } else if (audioFocusRequest != null){
                 audioManager.abandonAudioFocusRequest(audioFocusRequest);
             }
 
@@ -392,9 +392,6 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
                 getContext().unregisterReceiver(myNoisyAudioStreamReceiver);
             } catch (Exception e) {
                 // already registered
-            try {
-                getContext().unregisterReceiver(myNoisyAudioStreamReceiver);
-            } catch (Exception e) {
                 e.printStackTrace();
             }
         }

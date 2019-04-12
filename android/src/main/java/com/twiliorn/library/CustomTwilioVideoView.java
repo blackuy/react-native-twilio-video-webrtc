@@ -15,12 +15,9 @@ import android.content.IntentFilter;
 import android.media.AudioAttributes;
 import android.media.AudioFocusRequest;
 import android.media.AudioManager;
-<<<<<<< HEAD
 import android.os.Build;
 import android.os.Handler;
-=======
 import android.support.annotation.NonNull;
->>>>>>> initialize with/without audio
 import android.support.annotation.StringDef;
 import android.util.Log;
 import android.view.View;
@@ -32,11 +29,7 @@ import com.facebook.react.bridge.WritableNativeArray;
 import com.facebook.react.bridge.WritableNativeMap;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.events.RCTEventEmitter;
-<<<<<<< HEAD
-=======
-
 import com.twilio.video.AudioTrackPublication;
->>>>>>> initialize with/without audio
 import com.twilio.video.BaseTrackStats;
 import com.twilio.video.CameraCapturer;
 import com.twilio.video.ConnectOptions;
@@ -58,10 +51,7 @@ import com.twilio.video.RemoteVideoTrack;
 import com.twilio.video.RemoteVideoTrackPublication;
 import com.twilio.video.RemoteVideoTrackStats;
 import com.twilio.video.Room;
-<<<<<<< HEAD
 import com.twilio.video.Room.State;
-=======
->>>>>>> initialize with/without audio
 import com.twilio.video.StatsListener;
 import com.twilio.video.StatsReport;
 import com.twilio.video.TrackPublication;
@@ -397,18 +387,15 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
             }
 
             audioManager.setSpeakerphoneOn(false);
-<<<<<<< HEAD
             audioManager.setMode(previousAudioMode);
             try {
                 getContext().unregisterReceiver(myNoisyAudioStreamReceiver);
             } catch (Exception e) {
                 // already registered
-=======
             try {
                 getContext().unregisterReceiver(myNoisyAudioStreamReceiver);
             } catch (Exception e) {
                 e.printStackTrace();
->>>>>>> initialize with/without audio
             }
         }
     }

@@ -13,9 +13,9 @@ import {
   Platform,
   UIManager,
   findNodeHandle
-} from 'react-native'
-import React, { Component } from 'react'
-import PropTypes from 'prop-types'
+} from "react-native";
+import React, { Component } from "react";
+import PropTypes from "prop-types";
 
 const propTypes = {
   ...View.propTypes,
@@ -73,10 +73,10 @@ const propTypes = {
    */
   onRoomParticipantDidDisconnect: PropTypes.func,
   /**
-    * Called when a video track has been enabled.
-    *
-    * @param {{participant, track}}
-    */
+   * Called when a video track has been enabled.
+   *
+   * @param {{participant, track}}
+   */
   onParticipantEnabledVideoTrack: PropTypes.func,
   /**
    * Called when a video track has been disabled.
@@ -85,10 +85,10 @@ const propTypes = {
    */
   onParticipantDisabledVideoTrack: PropTypes.func,
   /**
-    * Called when an audio track has been enabled.
-    *
-    * @param {{participant, track}}
-    */
+   * Called when an audio track has been enabled.
+   *
+   * @param {{participant, track}}
+   */
   onParticipantEnabledAudioTrack: PropTypes.func,
   /**
    * Called when an audio track has been disabled.
@@ -100,7 +100,7 @@ const propTypes = {
    * Callback that is called when stats are received (after calling getStats)
    */
   onStatsReceived: PropTypes.func
-}
+};
 
 const nativeEvents = {
   connectToRoom: 1,
@@ -110,108 +110,120 @@ const nativeEvents = {
   toggleSound: 5,
   getStats: 6,
   disableOpenSLES: 7,
-<<<<<<< HEAD
-  toggleSoundSetup: 8
-=======
-  toggleRemoteSound: 8,
->>>>>>> initialize with/without audio
-}
+  toggleSoundSetup: 8,
+  toggleRemoteSound: 9
+};
 
 class CustomTwilioVideoView extends Component {
-  connect ({roomName, accessToken, enableAudio=true, enableVideo=true, enableRemoteAudio=true}) {
-    this.runCommand(nativeEvents.connectToRoom, [roomName, accessToken, enableAudio, enableVideo, enableRemoteAudio])
+  connect({
+    roomName,
+    accessToken,
+    enableAudio = true,
+    enableVideo = true,
+    enableRemoteAudio = true
+  }) {
+    this.runCommand(nativeEvents.connectToRoom, [
+      roomName,
+      accessToken,
+      enableAudio,
+      enableVideo,
+      enableRemoteAudio
+    ]);
   }
 
-  disconnect () {
-    this.runCommand(nativeEvents.disconnect, [])
+  disconnect() {
+    this.runCommand(nativeEvents.disconnect, []);
   }
 
-  flipCamera () {
-    this.runCommand(nativeEvents.switchCamera, [])
+  flipCamera() {
+    this.runCommand(nativeEvents.switchCamera, []);
   }
 
-  setLocalVideoEnabled (enabled) {
-    this.runCommand(nativeEvents.toggleVideo, [enabled])
-    return Promise.resolve(enabled)
+  setLocalVideoEnabled(enabled) {
+    this.runCommand(nativeEvents.toggleVideo, [enabled]);
+    return Promise.resolve(enabled);
   }
 
-  setLocalAudioEnabled (enabled) {
-    this.runCommand(nativeEvents.toggleSound, [enabled])
-    return Promise.resolve(enabled)
+  setLocalAudioEnabled(enabled) {
+    this.runCommand(nativeEvents.toggleSound, [enabled]);
+    return Promise.resolve(enabled);
   }
 
-  setRemoteAudioEnabled (enabled) {
-    this.runCommand(nativeEvents.toggleRemoteSound, [enabled])
-    return Promise.resolve(enabled)
+  setRemoteAudioEnabled(enabled) {
+    this.runCommand(nativeEvents.toggleRemoteSound, [enabled]);
+    return Promise.resolve(enabled);
   }
 
-  getStats () {
-    this.runCommand(nativeEvents.getStats, [])
+  getStats() {
+    this.runCommand(nativeEvents.getStats, []);
   }
 
-  disableOpenSLES () {
-    this.runCommand(nativeEvents.disableOpenSLES, [])
+  disableOpenSLES() {
+    this.runCommand(nativeEvents.disableOpenSLES, []);
   }
 
-  toggleSoundSetup (speaker) {
-    this.runCommand(nativeEvents.toggleSoundSetup, [speaker])
+  toggleSoundSetup(speaker) {
+    this.runCommand(nativeEvents.toggleSoundSetup, [speaker]);
   }
 
-  runCommand (event, args) {
+  runCommand(event, args) {
     switch (Platform.OS) {
-      case 'android':
+      case "android":
         UIManager.dispatchViewManagerCommand(
           findNodeHandle(this.refs.videoView),
           event,
           args
-        )
-        break
+        );
+        break;
       default:
-        break
+        break;
     }
   }
 
-  buildNativeEventWrappers () {
+  buildNativeEventWrappers() {
     return [
-      'onCameraSwitched',
-      'onVideoChanged',
-      'onAudioChanged',
-      'onRoomDidConnect',
-      'onRoomDidFailToConnect',
-      'onRoomDidDisconnect',
-      'onParticipantAddedVideoTrack',
-      'onParticipantRemovedVideoTrack',
-      'onRoomParticipantDidConnect',
-      'onRoomParticipantDidDisconnect',
-      'onParticipantEnabledVideoTrack',
-      'onParticipantDisabledVideoTrack',
-      'onParticipantEnabledAudioTrack',
-      'onParticipantDisabledAudioTrack',
-      'onStatsReceived'
+      "onCameraSwitched",
+      "onVideoChanged",
+      "onAudioChanged",
+      "onRoomDidConnect",
+      "onRoomDidFailToConnect",
+      "onRoomDidDisconnect",
+      "onParticipantAddedVideoTrack",
+      "onParticipantRemovedVideoTrack",
+      "onRoomParticipantDidConnect",
+      "onRoomParticipantDidDisconnect",
+      "onParticipantEnabledVideoTrack",
+      "onParticipantDisabledVideoTrack",
+      "onParticipantEnabledAudioTrack",
+      "onParticipantDisabledAudioTrack",
+      "onStatsReceived"
     ].reduce((wrappedEvents, eventName) => {
       if (this.props[eventName]) {
         return {
           ...wrappedEvents,
-          [eventName]: (data) => this.props[eventName](data.nativeEvent)
-        }
+          [eventName]: data => this.props[eventName](data.nativeEvent)
+        };
       }
-      return wrappedEvents
-    }, {})
+      return wrappedEvents;
+    }, {});
   }
 
-  render () {
+  render() {
     return (
       <NativeCustomTwilioVideoView
-        ref='videoView'
+        ref="videoView"
         {...this.props}
         {...this.buildNativeEventWrappers()}
       />
-    )
+    );
   }
 }
 
-CustomTwilioVideoView.propTypes = propTypes
+CustomTwilioVideoView.propTypes = propTypes;
 
-const NativeCustomTwilioVideoView = requireNativeComponent('RNCustomTwilioVideoView', CustomTwilioVideoView)
+const NativeCustomTwilioVideoView = requireNativeComponent(
+  "RNCustomTwilioVideoView",
+  CustomTwilioVideoView
+);
 
-module.exports = CustomTwilioVideoView
+module.exports = CustomTwilioVideoView;

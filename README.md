@@ -367,6 +367,8 @@ The `trackId` field no longer exists and should be replaced by `trackSid`.  Comm
 participant views now expect `participantSid` and `videoTrackSid` keys in the `trackIdentity` prop (instead of
 `identity` and `trackId`).
 
+* Make sure you're listening to participant events via `onParticipant{Added/Removed}VideoTrack` rather than `onParticipant{Enabled/Disabled}Track`.
+
 ## Contact
 
 - Martín Fernández <fmartin91@gmail.com>

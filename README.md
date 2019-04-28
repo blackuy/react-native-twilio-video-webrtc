@@ -101,6 +101,17 @@ dependencies {
 }
 ```
 
+You will also need to update this file so that you compile with java 8 features:
+
+```
+android {
+    compileOptions {
+        sourceCompatibility 1.8
+        targetCompatibility 1.8
+    }
+}
+```
+
 Now you're ready to load the package in `MainApplication.java`.  In the imports section, add this:
 
 ```java

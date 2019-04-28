@@ -133,6 +133,7 @@ export default class extends Component {
     this.setLocalVideoEnabled = this.setLocalVideoEnabled.bind(this)
     this.setLocalAudioEnabled = this.setLocalAudioEnabled.bind(this)
     this.flipCamera = this.flipCamera.bind(this)
+    this.toggleSoundSetup = this.toggleSoundSetup.bind(this)
     this.connect = this.connect.bind(this)
     this.disconnect = this.disconnect.bind(this)
     this.setRemoteAudioPlayback = this.setRemoteAudioPlayback.bind(this)
@@ -176,6 +177,13 @@ export default class extends Component {
    */
   flipCamera () {
     TWVideoModule.flipCamera()
+  }
+
+  /**
+   * Toggle audio setup from speaker (default) and headset
+   */
+  toggleSoundSetup (speaker) {
+    TWVideoModule.toggleSoundSetup(speaker)
   }
 
   /**

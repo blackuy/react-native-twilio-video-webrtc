@@ -25,7 +25,8 @@ class TwilioVideoParticipantView extends Component {
   }
 
   render () {
-    return <RCTTWRemoteVideoView {...this.props}>{this.props.children}</RCTTWRemoteVideoView>
+    let scalesType = this.props.scaleType === 'fit' ? 1 : 2
+    return <RCTTWRemoteVideoView scalesType={scalesType} {...this.props}>{this.props.children}</RCTTWRemoteVideoView>
   }
 }
 

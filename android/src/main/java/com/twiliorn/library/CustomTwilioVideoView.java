@@ -384,7 +384,9 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
             if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
                 audioManager.abandonAudioFocus(this);
             } else {
-                audioManager.abandonAudioFocusRequest(audioFocusRequest);
+                if (audioFocusRequest != null) {
+                    audioManager.abandonAudioFocusRequest(audioFocusRequest);
+                }
             }
 
             audioManager.setSpeakerphoneOn(false);
@@ -620,9 +622,11 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
             @Override
             public void onDisconnected(Room room, TwilioException e) {
                 WritableMap event = new WritableNativeMap();
+                if (localParticipant != null) {
+                  event.putString("participant", localParticipant.getIdentity());
+                }
                 event.putString("roomName", room.getName());
                 event.putString("roomSid", room.getSid());
-                event.putString("participant", localParticipant.getIdentity());
                 pushEvent(CustomTwilioVideoView.this, ON_DISCONNECTED, event);
 
                 localParticipant = null;

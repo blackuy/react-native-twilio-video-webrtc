@@ -585,7 +585,8 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
             public void onConnected(Room room) {
                 localParticipant = room.getLocalParticipant();
                 WritableMap event = new WritableNativeMap();
-                event.putString("room", room.getName());
+                event.putString("roomName", room.getName());
+                event.putString("roomSid", room.getSid());
                 List<RemoteParticipant> participants = room.getRemoteParticipants();
 
                 WritableArray participantsArray = new WritableNativeArray();
@@ -597,13 +598,15 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
                 pushEvent(CustomTwilioVideoView.this, ON_CONNECTED, event);
 
                 for (RemoteParticipant participant : participants) {
-                    addParticipant(participant);
+                    addParticipant(room, participant);
                 }
             }
 
             @Override
             public void onConnectFailure(Room room, TwilioException e) {
                 WritableMap event = new WritableNativeMap();
+                event.putString("roomName", room.getName());
+                event.putString("roomSid", room.getSid());
                 event.putString("reason", e.getExplanation());
                 pushEvent(CustomTwilioVideoView.this, ON_CONNECT_FAILURE, event);
             }
@@ -611,6 +614,8 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
             @Override
             public void onDisconnected(Room room, TwilioException e) {
                 WritableMap event = new WritableNativeMap();
+                event.putString("roomName", room.getName());
+                event.putString("roomSid", room.getSid());
                 event.putString("participant", localParticipant.getIdentity());
                 pushEvent(CustomTwilioVideoView.this, ON_DISCONNECTED, event);
 
@@ -628,12 +633,12 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
 
             @Override
             public void onParticipantConnected(Room room, RemoteParticipant participant) {
-                addParticipant(participant);
+                addParticipant(room, participant);
             }
 
             @Override
             public void onParticipantDisconnected(Room room, RemoteParticipant participant) {
-                removeParticipant(participant);
+                removeParticipant(room, participant);
             }
 
             @Override
@@ -649,10 +654,12 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     /*
      * Called when participant joins the room
      */
-    private void addParticipant(RemoteParticipant participant) {
+    private void addParticipant(Room room, RemoteParticipant participant) {
         Log.i("CustomTwilioVideoView", "ADD PARTICIPANT ");
 
         WritableMap event = new WritableNativeMap();
+        event.putString("roomName", room.getName());
+        event.putString("roomSid", room.getSid());
         event.putMap("participant", buildParticipant(participant));
 
         pushEvent(this, ON_PARTICIPANT_CONNECTED, event);
@@ -675,8 +682,10 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     /*
      * Called when participant leaves the room
      */
-    private void removeParticipant(RemoteParticipant participant) {
+    private void removeParticipant(Room room, RemoteParticipant participant) {
         WritableMap event = new WritableNativeMap();
+        event.putString("roomName", room.getName());
+        event.putString("roomSid", room.getSid());
         event.putMap("participant", buildParticipant(participant));
         pushEvent(this, ON_PARTICIPANT_DISCONNECTED, event);
         //something about this breaking.

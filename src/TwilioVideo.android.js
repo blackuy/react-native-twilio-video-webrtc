@@ -64,6 +64,20 @@ const propTypes = {
   onParticipantRemovedVideoTrack: PropTypes.func,
 
   /**
+   * Called when a new audio track has been added
+   *
+   * @param {{participant, track}}
+   */
+  onParticipantAddedAudioTrack: PropTypes.func,
+
+  /**
+   * Called when a audio track has been removed
+   *
+   * @param {{participant, track}}
+   */
+  onParticipantRemovedAudioTrack: PropTypes.func,
+
+  /**
    * Callback called a participant enters a room.
    */
   onRoomParticipantDidConnect: PropTypes.func,
@@ -182,21 +196,23 @@ class CustomTwilioVideoView extends Component {
 
   buildNativeEventWrappers() {
     return [
-      "onCameraSwitched",
-      "onVideoChanged",
-      "onAudioChanged",
-      "onRoomDidConnect",
-      "onRoomDidFailToConnect",
-      "onRoomDidDisconnect",
-      "onParticipantAddedVideoTrack",
-      "onParticipantRemovedVideoTrack",
-      "onRoomParticipantDidConnect",
-      "onRoomParticipantDidDisconnect",
-      "onParticipantEnabledVideoTrack",
-      "onParticipantDisabledVideoTrack",
-      "onParticipantEnabledAudioTrack",
-      "onParticipantDisabledAudioTrack",
-      "onStatsReceived"
+      'onCameraSwitched',
+      'onVideoChanged',
+      'onAudioChanged',
+      'onRoomDidConnect',
+      'onRoomDidFailToConnect',
+      'onRoomDidDisconnect',
+      'onParticipantAddedVideoTrack',
+      'onParticipantRemovedVideoTrack',
+      'onParticipantAddedAudioTrack',
+      'onParticipantRemovedAudioTrack',
+      'onRoomParticipantDidConnect',
+      'onRoomParticipantDidDisconnect',
+      'onParticipantEnabledVideoTrack',
+      'onParticipantDisabledVideoTrack',
+      'onParticipantEnabledAudioTrack',
+      'onParticipantDisabledAudioTrack',
+      'onStatsReceived'
     ].reduce((wrappedEvents, eventName) => {
       if (this.props[eventName]) {
         return {

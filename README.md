@@ -101,6 +101,17 @@ dependencies {
 }
 ```
 
+You will also need to update this file so that you compile with java 8 features:
+
+```
+android {
+    compileOptions {
+        sourceCompatibility 1.8
+        targetCompatibility 1.8
+    }
+}
+```
+
 Now you're ready to load the package in `MainApplication.java`.  In the imports section, add this:
 
 ```java
@@ -355,6 +366,8 @@ To run the example application:
 The `trackId` field no longer exists and should be replaced by `trackSid`.  Commensurate with this change,
 participant views now expect `participantSid` and `videoTrackSid` keys in the `trackIdentity` prop (instead of
 `identity` and `trackId`).
+
+* Make sure you're listening to participant events via `onParticipant{Added/Removed}VideoTrack` rather than `onParticipant{Enabled/Disabled}Track`.
 
 ## Contact
 

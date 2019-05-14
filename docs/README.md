@@ -58,23 +58,43 @@ Called when a new video track has been added
 
 @param {{participant, track, enabled}}
 
-#### onParticipantDisabledTrack
+#### onParticipantDisabledVideoTrack
 
 ```js
-onParticipantDisabledTrack: Function
+onParticipantDisabledVideoTrack: Function
 ```
 
-Called when a track has been disabled. This can be audio or video tracks
+Called when a video track has been disabled.
 
 @param {{participant, track}}
 
-#### onParticipantEnabledTrack
+#### onParticipantDisabledAudioTrack
 
 ```js
-onParticipantEnabledTrack: Function
+onParticipantDisabledAudioTrack: Function
 ```
 
-Called when a track has been enabled. This can be audio or video tracks
+Called when an audio track has been disabled.
+
+@param {{participant, track}}
+
+#### onParticipantEnabledVideoTrack
+
+```js
+onParticipantEnabledVideoTrack: Function
+```
+
+Called when a video track has been enabled.
+
+@param {{participant, track}}
+
+#### onParticipantEnabledAudioTrack
+
+```js
+onParticipantEnabledVideoTrack: Function
+```
+
+Called when an audio track has been enabled.
 
 @param {{participant, track}}
 

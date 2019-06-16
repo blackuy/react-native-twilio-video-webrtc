@@ -168,6 +168,45 @@ Called when a participant has disconnected
 
 @param {{roomName, participant}}
 
+#### setLocalVideoEnabled
+
+```js
+setLocalVideoEnabled: Function
+```
+
+Called when a local video is disable / enabled, how to use it below
+
+```js
+_onDisableCameraButtonPress = () => {
+  this.twilioVideo
+    .setLocalVideoEnabled(!this.state.cameraDisabled)
+    .then(cameraDisabled => {
+      this.setState({ cameraDisabled });
+    });
+};
+
+```
+
+#### setLocalAudioEnabled
+
+```js
+setLocalAudioEnabled: Function
+```
+
+Called when a local audio is disable / enabled, how to use it below
+
+```js
+_onMuteButtonPress = () => {
+  this.twilioVideo
+    .setLocalAudioEnabled(!this.state.isAudioEnabled)
+    .then(isAudioEnabled => {
+      this.setState({ isAudioEnabled });
+    });
+};
+
+
+```
+
 <br><br>
 
 ## TwilioVideoLocalView

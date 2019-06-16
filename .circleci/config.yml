@@ -41,8 +41,8 @@ jobs:
       - checkout
       - *attach_workspace
       - run:
-        name: Run tests
-        command: yarn run ci
+          name: Run tests
+          command: yarn run ci
 
 workflows:
   version: 2

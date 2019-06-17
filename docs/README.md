@@ -178,7 +178,7 @@ Called when a local video is disable / enabled, how to use it below
 
 ```js
 _onDisableCameraButtonPress = () => {
-  this.twilioVideo
+  this.refs.twilioVideo
     .setLocalVideoEnabled(!this.state.cameraDisabled)
     .then(cameraDisabled => {
       this.setState({ cameraDisabled });
@@ -197,7 +197,7 @@ Called when a local audio is disable / enabled, how to use it below
 
 ```js
 _onMuteButtonPress = () => {
-  this.twilioVideo
+  this.refs.twilioVideo
     .setLocalAudioEnabled(!this.state.isAudioEnabled)
     .then(isAudioEnabled => {
       this.setState({ isAudioEnabled });

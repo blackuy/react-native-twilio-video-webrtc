@@ -190,32 +190,51 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
                 .build();
     }
 
+    private CameraCapturer createCameraCaputer(Context context, CameraCapturer.CameraSource cameraSource) {
+        CameraCapturer newCameraCapturer = null;
+        try {
+            newCameraCapturer = new CameraCapturer(
+                    context,
+                    cameraSource,
+                    new CameraCapturer.Listener() {
+                        @Override
+                        public void onFirstFrameAvailable() {
+                            Log.i("CustomTwilioVideoView", "Got a local camera track");
+                        }
+
+                        @Override
+                        public void onCameraSwitched() {
+
+                        }
+
+                        @Override
+                        public void onError(int i) {
+                            Log.i("CustomTwilioVideoView", "Error getting camera");
+                        }
+                    }
+            );
+            return newCameraCapturer;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     private void createLocalMedia() {
         // Share your microphone
         localAudioTrack = LocalAudioTrack.create(getContext(), true);
         Log.i("CustomTwilioVideoView", "Create local media");
 
         // Share your camera
-        cameraCapturer = new CameraCapturer(
-                getContext(),
-                CameraCapturer.CameraSource.FRONT_CAMERA,
-                new CameraCapturer.Listener() {
-                    @Override
-                    public void onFirstFrameAvailable() {
-                        Log.i("CustomTwilioVideoView", "Got a local camera track");
-                    }
-
-                    @Override
-                    public void onCameraSwitched() {
-
-                    }
-
-                    @Override
-                    public void onError(int i) {
-                        Log.i("CustomTwilioVideoView", "Error getting camera");
-                    }
-                }
-        );
+        cameraCapturer = this.createCameraCaputer(getContext(), CameraCapturer.CameraSource.FRONT_CAMERA);
+        if (cameraCapturer == null){
+            cameraCapturer = this.createCameraCaputer(getContext(), CameraCapturer.CameraSource.BACK_CAMERA);
+        }
+        if (cameraCapturer == null){
+            WritableMap event = new WritableNativeMap();
+            event.putString("reason", "No camera is supported on this device");
+            pushEvent(CustomTwilioVideoView.this, ON_CONNECT_FAILURE, event);
+            return;
+        }
 
         if (cameraCapturer.getSupportedFormats().size() > 0) {
             localVideoTrack = LocalVideoTrack.create(getContext(), true, cameraCapturer, buildVideoConstraints());

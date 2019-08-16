@@ -140,12 +140,14 @@ export default class extends Component {
   }
 
   componentWillMount () {
+    TWVideoModule.changeListenerStatus(false);
     this._registerEvents()
     this._startLocalVideo()
     this._startLocalAudio()
   }
 
   componentWillUnmount () {
+    TWVideoModule.changeListenerStatus(true);
     this._unregisterEvents()
     this._stopLocalVideo()
     this._stopLocalAudio()

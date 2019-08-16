@@ -334,7 +334,7 @@ RCT_EXPORT_METHOD(disconnect) {
 # pragma mark - TVICameraCapturerDelegate
 
 -(void)sendEventCheckingListenerWithName:(NSString *)event body:(NSMutableDictionary *)body {
-    if (!_listening) {
+    if (_listening) {
         [self sendEventWithName:event body:body];
     }
 }

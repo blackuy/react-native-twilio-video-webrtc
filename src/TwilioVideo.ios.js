@@ -154,7 +154,7 @@ export default class extends Component {
   /**
    * Locally mute/ unmute all remote audio tracks from a given participant
    */
-  setRemoteAudioPlayback ({participantSid, enabled}) {
+  setRemoteAudioPlayback ({ participantSid, enabled }) {
     TWVideoModule.setRemoteAudioPlayback(participantSid, enabled)
   }
 
@@ -198,7 +198,7 @@ export default class extends Component {
    * @param  {String} roomName    The connecting room name
    * @param  {String} accessToken The Twilio's JWT access token
    */
-  connect ({roomName, accessToken}) {
+  connect ({ roomName, accessToken }) {
     TWVideoModule.connect(accessToken, roomName)
   }
 

@@ -140,14 +140,12 @@ export default class extends Component {
   }
 
   componentWillMount () {
-    TWVideoModule.changeListenerStatus(true)
     this._registerEvents()
     this._startLocalVideo()
     this._startLocalAudio()
   }
 
   componentWillUnmount () {
-    TWVideoModule.changeListenerStatus(false)
     this._unregisterEvents()
     this._stopLocalVideo()
     this._stopLocalAudio()
@@ -229,11 +227,13 @@ export default class extends Component {
   }
 
   _unregisterEvents () {
+    TWVideoModule.changeListenerStatus(false)
     this._subscriptions.forEach(e => e.remove())
     this._subscriptions = []
   }
 
   _registerEvents () {
+    TWVideoModule.changeListenerStatus(true)
     this._subscriptions = [
       this._eventEmitter.addListener('roomDidConnect', (data) => {
         if (this.props.onRoomDidConnect) { this.props.onRoomDidConnect(data) }

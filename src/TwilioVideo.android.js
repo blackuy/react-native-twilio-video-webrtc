@@ -133,7 +133,7 @@ class CustomTwilioVideoView extends Component {
     this.runCommand(nativeEvents.releaseResource, [])
   }
 
-  connect ({roomName, accessToken}) {
+  connect ({ roomName, accessToken }) {
     this.runCommand(nativeEvents.connectToRoom, [roomName, accessToken])
   }
 

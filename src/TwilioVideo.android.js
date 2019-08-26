@@ -125,7 +125,8 @@ const nativeEvents = {
   getStats: 6,
   disableOpenSLES: 7,
   toggleSoundSetup: 8,
-  toggleRemoteSound: 9
+  toggleRemoteSound: 9,
+  releaseResource: 10
 };
 
 class CustomTwilioVideoView extends Component {
@@ -147,6 +148,14 @@ class CustomTwilioVideoView extends Component {
 
   disconnect() {
     this.runCommand(nativeEvents.disconnect, []);
+  }
+
+  componentWillUnmount() {
+    this.runCommand(nativeEvents.releaseResource, []);
+  }
+
+  connect({ roomName, accessToken }) {
+    this.runCommand(nativeEvents.connectToRoom, [roomName, accessToken]);
   }
 
   flipCamera() {
@@ -196,23 +205,23 @@ class CustomTwilioVideoView extends Component {
 
   buildNativeEventWrappers() {
     return [
-      'onCameraSwitched',
-      'onVideoChanged',
-      'onAudioChanged',
-      'onRoomDidConnect',
-      'onRoomDidFailToConnect',
-      'onRoomDidDisconnect',
-      'onParticipantAddedVideoTrack',
-      'onParticipantRemovedVideoTrack',
-      'onParticipantAddedAudioTrack',
-      'onParticipantRemovedAudioTrack',
-      'onRoomParticipantDidConnect',
-      'onRoomParticipantDidDisconnect',
-      'onParticipantEnabledVideoTrack',
-      'onParticipantDisabledVideoTrack',
-      'onParticipantEnabledAudioTrack',
-      'onParticipantDisabledAudioTrack',
-      'onStatsReceived'
+      "onCameraSwitched",
+      "onVideoChanged",
+      "onAudioChanged",
+      "onRoomDidConnect",
+      "onRoomDidFailToConnect",
+      "onRoomDidDisconnect",
+      "onParticipantAddedVideoTrack",
+      "onParticipantRemovedVideoTrack",
+      "onParticipantAddedAudioTrack",
+      "onParticipantRemovedAudioTrack",
+      "onRoomParticipantDidConnect",
+      "onRoomParticipantDidDisconnect",
+      "onParticipantEnabledVideoTrack",
+      "onParticipantDisabledVideoTrack",
+      "onParticipantEnabledAudioTrack",
+      "onParticipantDisabledAudioTrack",
+      "onStatsReceived"
     ].reduce((wrappedEvents, eventName) => {
       if (this.props[eventName]) {
         return {

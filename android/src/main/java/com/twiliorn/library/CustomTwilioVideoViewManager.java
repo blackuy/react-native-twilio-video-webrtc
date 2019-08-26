@@ -49,6 +49,7 @@ public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilio
     private static final int DISABLE_OPENSL_ES = 7;
     private static final int TOGGLE_SOUND_SETUP = 8;
     private static final int TOGGLE_REMOTE_SOUND = 9;
+    private static final int RELEASE_RESOURCE = 10;
 
     @Override
     public String getName() {
@@ -98,6 +99,9 @@ public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilio
             case TOGGLE_REMOTE_SOUND:
                 Boolean remoteAudioEnabled = args.getBoolean(0);
                 view.toggleRemoteAudio(remoteAudioEnabled);
+            case RELEASE_RESOURCE:
+                view.releaseResource();
+                break;
         }
     }
 

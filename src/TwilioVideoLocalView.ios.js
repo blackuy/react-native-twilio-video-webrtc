@@ -20,10 +20,17 @@ class TwilioVideoLocalView extends Component {
 
   render () {
     const scalesType = this.props.scaleType === 'fit' ? 1 : 2
-    return <RCTTWLocalVideoView scalesType={scalesType} {...this.props}>{this.props.children}</RCTTWLocalVideoView>
+    return (
+      <RCTTWLocalVideoView scalesType={scalesType} {...this.props}>
+        {this.props.children}
+      </RCTTWLocalVideoView>
+    )
   }
 }
 
-const RCTTWLocalVideoView = requireNativeComponent('RCTTWLocalVideoView', TwilioVideoLocalView)
+const RCTTWLocalVideoView = requireNativeComponent(
+  'RCTTWLocalVideoView',
+  TwilioVideoLocalView
+)
 
 module.exports = TwilioVideoLocalView

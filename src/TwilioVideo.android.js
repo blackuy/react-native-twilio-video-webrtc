@@ -87,10 +87,10 @@ const propTypes = {
    */
   onRoomParticipantDidDisconnect: PropTypes.func,
   /**
-    * Called when a video track has been enabled.
-    *
-    * @param {{participant, track}}
-    */
+   * Called when a video track has been enabled.
+   *
+   * @param {{participant, track}}
+   */
   onParticipantEnabledVideoTrack: PropTypes.func,
   /**
    * Called when a video track has been disabled.
@@ -99,10 +99,10 @@ const propTypes = {
    */
   onParticipantDisabledVideoTrack: PropTypes.func,
   /**
-    * Called when an audio track has been enabled.
-    *
-    * @param {{participant, track}}
-    */
+   * Called when an audio track has been enabled.
+   *
+   * @param {{participant, track}}
+   */
   onParticipantEnabledAudioTrack: PropTypes.func,
   /**
    * Called when an audio track has been disabled.
@@ -125,20 +125,33 @@ const nativeEvents = {
   getStats: 6,
   disableOpenSLES: 7,
   toggleSoundSetup: 8,
-  releaseResource: 9
+  toggleRemoteSound: 9,
+  releaseResource: 10
 }
 
 class CustomTwilioVideoView extends Component {
-  componentWillUnmount () {
-    this.runCommand(nativeEvents.releaseResource, [])
-  }
-
-  connect ({ roomName, accessToken }) {
-    this.runCommand(nativeEvents.connectToRoom, [roomName, accessToken])
+  connect ({
+    roomName,
+    accessToken,
+    enableAudio = true,
+    enableVideo = true,
+    enableRemoteAudio = true
+  }) {
+    this.runCommand(nativeEvents.connectToRoom, [
+      roomName,
+      accessToken,
+      enableAudio,
+      enableVideo,
+      enableRemoteAudio
+    ])
   }
 
   disconnect () {
     this.runCommand(nativeEvents.disconnect, [])
+  }
+
+  componentWillUnmount () {
+    this.runCommand(nativeEvents.releaseResource, [])
   }
 
   flipCamera () {
@@ -152,6 +165,11 @@ class CustomTwilioVideoView extends Component {
 
   setLocalAudioEnabled (enabled) {
     this.runCommand(nativeEvents.toggleSound, [enabled])
+    return Promise.resolve(enabled)
+  }
+
+  setRemoteAudioEnabled (enabled) {
+    this.runCommand(nativeEvents.toggleRemoteSound, [enabled])
     return Promise.resolve(enabled)
   }
 
@@ -204,7 +222,7 @@ class CustomTwilioVideoView extends Component {
       if (this.props[eventName]) {
         return {
           ...wrappedEvents,
-          [eventName]: (data) => this.props[eventName](data.nativeEvent)
+          [eventName]: data => this.props[eventName](data.nativeEvent)
         }
       }
       return wrappedEvents
@@ -224,6 +242,9 @@ class CustomTwilioVideoView extends Component {
 
 CustomTwilioVideoView.propTypes = propTypes
 
-const NativeCustomTwilioVideoView = requireNativeComponent('RNCustomTwilioVideoView', CustomTwilioVideoView)
+const NativeCustomTwilioVideoView = requireNativeComponent(
+  'RNCustomTwilioVideoView',
+  CustomTwilioVideoView
+)
 
 module.exports = CustomTwilioVideoView

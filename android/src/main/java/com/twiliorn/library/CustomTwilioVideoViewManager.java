@@ -48,7 +48,8 @@ public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilio
     private static final int GET_STATS = 6;
     private static final int DISABLE_OPENSL_ES = 7;
     private static final int TOGGLE_SOUND_SETUP = 8;
-    private static final int RELEASE_RESOURCE = 9;
+    private static final int TOGGLE_REMOTE_SOUND = 9;
+    private static final int RELEASE_RESOURCE = 10;
 
     @Override
     public String getName() {
@@ -66,7 +67,10 @@ public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilio
             case CONNECT_TO_ROOM:
                 String roomName = args.getString(0);
                 String accessToken = args.getString(1);
-                view.connectToRoomWrapper(roomName, accessToken);
+                boolean enableAudio = args.getBoolean(2);
+                boolean enableVideo = args.getBoolean(3);
+                boolean enableRemoteAudio = args.getBoolean(4);
+                view.connectToRoomWrapper(roomName, accessToken, enableAudio, enableVideo, enableRemoteAudio);
                 break;
             case DISCONNECT:
                 view.disconnect();
@@ -92,6 +96,9 @@ public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilio
                 Boolean speaker = args.getBoolean(0);
                 view.toggleSoundSetup(speaker);
                 break;
+            case TOGGLE_REMOTE_SOUND:
+                Boolean remoteAudioEnabled = args.getBoolean(0);
+                view.toggleRemoteAudio(remoteAudioEnabled);
             case RELEASE_RESOURCE:
                 view.releaseResource();
                 break;
@@ -132,14 +139,15 @@ public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilio
     @Override
     @Nullable
     public Map<String, Integer> getCommandsMap() {
-        return MapBuilder.of(
-                "connectToRoom", CONNECT_TO_ROOM,
-                "disconnect", DISCONNECT,
-                "switchCamera", SWITCH_CAMERA,
-                "toggleVideo", TOGGLE_VIDEO,
-                "toggleSound", TOGGLE_SOUND,
-                "getStats", GET_STATS,
-                "disableOpenSLES", DISABLE_OPENSL_ES
-        );
+        return MapBuilder.<String, Integer>builder()
+                .put("connectToRoom", CONNECT_TO_ROOM)
+                .put("disconnect", DISCONNECT)
+                .put("switchCamera", SWITCH_CAMERA)
+                .put("toggleVideo", TOGGLE_VIDEO)
+                .put("toggleSound", TOGGLE_SOUND)
+                .put("getStats", GET_STATS)
+                .put("disableOpenSLES", DISABLE_OPENSL_ES)
+                .put("toggleRemoteSound", TOGGLE_REMOTE_SOUND)
+                .build();
     }
 }

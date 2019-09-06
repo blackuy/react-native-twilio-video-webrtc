@@ -428,6 +428,11 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
             }
         }
     }
+    
+    @Override
+    public void onAudioFocusChange(int focusChange) {
+        Log.e(TAG, "onAudioFocusChange: focuschange: " + focusChange);
+    }
 
     // ====== DISCONNECTING ========================================================================
 

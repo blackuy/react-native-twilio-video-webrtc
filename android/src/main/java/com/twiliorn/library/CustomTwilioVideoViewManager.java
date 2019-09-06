@@ -99,6 +99,7 @@ public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilio
             case TOGGLE_REMOTE_SOUND:
                 Boolean remoteAudioEnabled = args.getBoolean(0);
                 view.toggleRemoteAudio(remoteAudioEnabled);
+                break;
             case RELEASE_RESOURCE:
                 view.releaseResource();
                 break;

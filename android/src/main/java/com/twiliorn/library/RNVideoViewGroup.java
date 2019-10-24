@@ -8,6 +8,8 @@ package com.twiliorn.library;
 
 import android.content.Context;
 import android.graphics.Point;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.ViewGroup;
 
 import com.twilio.video.VideoRenderer;
@@ -44,6 +46,13 @@ public class RNVideoViewGroup extends ViewGroup {
                             videoWidth = vw;
                             RNVideoViewGroup.this.forceLayout();
                         }
+                        new Handler(Looper.getMainLooper()).post(new Runnable(){
+                            @Override
+                            public void run() {
+                                RNVideoViewGroup me = RNVideoViewGroup.this;
+                                me.onLayout(true, me.getLeft(), me.getTop(), me.getRight(), me.getBottom());
+                            }
+                        });
                     }
                 }
         );

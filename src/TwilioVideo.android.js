@@ -174,10 +174,10 @@ class CustomTwilioVideoView extends Component {
     return Promise.resolve(enabled)
   }
 
-  setBluetoothHeadsetConnected(enabled) {
-    this.runCommand(nativeEvents.toggleBluetoothHeadset, [enabled]);
-    return Promise.resolve(enabled);
-}
+  setBluetoothHeadsetConnected (enabled) {
+    this.runCommand(nativeEvents.toggleBluetoothHeadset, [enabled])
+    return Promise.resolve(enabled)
+  }
 
   getStats () {
     this.runCommand(nativeEvents.getStats, [])

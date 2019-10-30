@@ -126,7 +126,8 @@ const nativeEvents = {
   disableOpenSLES: 7,
   toggleSoundSetup: 8,
   toggleRemoteSound: 9,
-  releaseResource: 10
+  releaseResource: 10,
+  toggleBluetoothHeadset: 11
 }
 
 class CustomTwilioVideoView extends Component {
@@ -172,6 +173,11 @@ class CustomTwilioVideoView extends Component {
     this.runCommand(nativeEvents.toggleRemoteSound, [enabled])
     return Promise.resolve(enabled)
   }
+
+  setBluetoothHeadsetConnected(enabled) {
+    this.runCommand(nativeEvents.toggleBluetoothHeadset, [enabled]);
+    return Promise.resolve(enabled);
+}
 
   getStats () {
     this.runCommand(nativeEvents.getStats, [])

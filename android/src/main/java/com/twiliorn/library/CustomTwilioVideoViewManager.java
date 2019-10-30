@@ -50,6 +50,7 @@ public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilio
     private static final int TOGGLE_SOUND_SETUP = 8;
     private static final int TOGGLE_REMOTE_SOUND = 9;
     private static final int RELEASE_RESOURCE = 10;
+    private static final int TOGGLE_BLUETOOTH_HEADSET = 11;
 
     @Override
     public String getName() {
@@ -103,6 +104,10 @@ public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilio
             case RELEASE_RESOURCE:
                 view.releaseResource();
                 break;
+            case TOGGLE_BLUETOOTH_HEADSET:
+                Boolean headsetEnabled = args.getBoolean(0);
+                view.toggleBluetoothHeadset(headsetEnabled);
+                break;
         }
     }
 
@@ -149,6 +154,7 @@ public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilio
                 .put("getStats", GET_STATS)
                 .put("disableOpenSLES", DISABLE_OPENSL_ES)
                 .put("toggleRemoteSound", TOGGLE_REMOTE_SOUND)
+                .put("toggleBluetoothHeadset", TOGGLE_BLUETOOTH_HEADSET)
                 .build();
     }
 }

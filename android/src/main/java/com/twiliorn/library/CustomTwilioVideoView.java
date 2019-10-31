@@ -428,7 +428,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
             }
         }
     }
-    
+
     @Override
     public void onAudioFocusChange(int focusChange) {
         Log.e(TAG, "onAudioFocusChange: focuschange: " + focusChange);
@@ -504,6 +504,15 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
             WritableMap event = new WritableNativeMap();
             event.putBoolean("audioEnabled", enabled);
             pushEvent(CustomTwilioVideoView.this, ON_AUDIO_CHANGED, event);
+        }
+    }
+
+    public void toggleBluetoothHeadset(boolean enabled) {
+        AudioManager audioManager = (AudioManager) getContext().getSystemService(Context.AUDIO_SERVICE);
+        if(enabled){
+            audioManager.startBluetoothSco();
+        } else {
+            audioManager.stopBluetoothSco();
         }
     }
 

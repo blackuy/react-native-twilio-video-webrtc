@@ -157,6 +157,10 @@ export default class extends Component {
     return Promise.resolve(enabled)
   }
 
+  setBluetoothHeadsetConnected (enabled) {
+    return Promise.resolve(enabled)
+  }
+
   /**
    * Enable or disable local video
    */

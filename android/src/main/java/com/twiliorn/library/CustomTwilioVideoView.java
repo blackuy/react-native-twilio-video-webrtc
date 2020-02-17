@@ -283,6 +283,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
 
     // ===== LIFECYCLE EVENTS ======================================================================
 
+
     @Override
     public void onHostResume() {
         /*
@@ -358,6 +359,9 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
             localAudioTrack.release();
             localAudioTrack = null;
         }
+
+        // Quit the data track message thread
+        dataTrackMessageThread.quit();
 
 
     }
@@ -865,7 +869,6 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
             public void onDataTrackSubscribed(RemoteParticipant remoteParticipant, RemoteDataTrackPublication remoteDataTrackPublication, RemoteDataTrack remoteDataTrack) {
                  WritableMap event = buildParticipantDataEvent(remoteParticipant);
                  pushEvent(CustomTwilioVideoView.this, ON_PARTICIPANT_ADDED_DATA_TRACK, event);
-                 //Log.d(TAG, "ON_PARTICIPANT_ADDED_DATA_TRACK: ");
                  dataTrackMessageThreadHandler.post(() -> addRemoteDataTrack(remoteParticipant, remoteDataTrack));
             }
 
@@ -873,7 +876,6 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
             public void onDataTrackUnsubscribed(RemoteParticipant remoteParticipant, RemoteDataTrackPublication publication, RemoteDataTrack remoteDataTrack) {
                  WritableMap event = buildParticipantDataEvent(remoteParticipant);
                  pushEvent(CustomTwilioVideoView.this, ON_PARTICIPANT_REMOVED_DATA_TRACK, event);
-                 //Log.d(TAG, "ON_PARTICIPANT_REMOVED_DATA_TRACK: ");
             }
 
             @Override
@@ -1033,7 +1035,6 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
 
             @Override
             public void onMessage(RemoteDataTrack remoteDataTrack, String message) {
-                //Log.d(TAG, "ON_DATATRACK_MESSAGE_RECEIVED: " + message);
                 WritableMap event = buildDataTrackEvent(message);
                 pushEvent(CustomTwilioVideoView.this, ON_DATATRACK_MESSAGE_RECEIVED, event);
             }

@@ -332,8 +332,6 @@ RCT_EXPORT_METHOD(connect:(NSString *)accessToken roomName:(NSString *)roomName)
 }
 
 RCT_EXPORT_METHOD(sendString:(nonnull NSString *)message) {
-    NSLog(@"Send String!");
-    NSLog(@"%@", message);
     [self.localDataTrack sendString:message];
     //NSData *data = [message dataUsingEncoding:NSUTF8StringEncoding];
     //[self.localDataTrack sendString:message];
@@ -383,7 +381,6 @@ RCT_EXPORT_METHOD(disconnect) {
     [participants addObject:[p toJSON]];
   }
   TVILocalParticipant *localParticipant = room.localParticipant;
-  //localParticipant.publishDataTrack(localDataTrack)
   [participants addObject:[localParticipant toJSON]];
     [self sendEventCheckingListenerWithName:roomDidConnect body:@{ @"roomName" : room.name , @"roomSid": room.sid, @"participants" : participants }];
 
@@ -473,6 +470,8 @@ RCT_EXPORT_METHOD(disconnect) {
 }
 
 - (void)remoteDataTrack:(nonnull TVIRemoteDataTrack *)remoteDataTrack didReceiveData:(nonnull NSData *)message {
+    // TODO: Handle didReceiveData
+    NSLog(@"DataTrack didReceiveData");
 }
 
 

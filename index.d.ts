@@ -15,39 +15,59 @@ declare module "react-native-twilio-video-webrtc" {
     ref?: React.Ref<any>;
   }
 
-  export interface TwilioVideoTrackCbArgs {
-    participant: any;
-    track: any;
+  interface Participant {
+    sid: string;
+    identity: string;
   }
 
-  type TwilioVideoTrackEventCb = (t: TwilioVideoTrackCbArgs) => void;
+  interface Track {
+    enabled: boolean;
+    trackName: string;
+    trackSid: string;
+  }
 
-  export interface TwilioVideoRoomErrorEventArgs {
+  export interface TrackEventCbArgs {
+    participant: Participant;
+    track: Track;
+  }
+
+  export type TrackEventCb = (t: TrackEventCbArgs) => void;
+
+  interface RoomEventCommonArgs {
     roomName: string;
-    error: any;
+    roomSid: string;
   }
-  type RoomErrorEventCb = (t: TwilioVideoRoomErrorEventArgs) => void;
 
-  type TwilioVideoParticipantEventCb = (roomName: string, participant: any) => void;
+  export type RoomErrorEventArgs = RoomEventCommonArgs & {
+    error: any;
+  };
+
+  export type RoomEventArgs = RoomEventCommonArgs & {
+    participants: Participant[];
+  };
+
+  type RoomEventCb = (p: RoomEventArgs) => void;
+  type RoomErrorEventCb = (t: RoomErrorEventArgs) => void;
+
+  type ParticipantEventCb = (roomName: string, participant: Participant) => void;
 
   type TwilioVideoProps = ViewProps & {
     onCameraDidStart?: () => void;
     onCameraDidStopRunning?: (err: any) => void;
     onCameraWasInterrupted?: () => void;
-    onParticipantAddedAudioTrack?: TwilioVideoTrackEventCb;
-    onParticipantAddedVideoTrack?: (participant: any, track: any, enabled: boolean) => void;
-    onParticipantDisabledVideoTrack?: TwilioVideoTrackEventCb;
-    onParticipantDisabledAudioTrack?: TwilioVideoTrackEventCb;
-    onParticipantEnabledVideoTrack?: TwilioVideoTrackEventCb;
-    onParticipantEnabledAudioTrack?: TwilioVideoTrackEventCb;
-    onParticipantRemovedAudioTrack?: TwilioVideoTrackEventCb;
-    onParticipantRemovedVideoTrack?: TwilioVideoTrackEventCb;
-    onRoomDidConnect?: (roomName: string, participants: any[]) => void;
+    onParticipantAddedAudioTrack?: TrackEventCb;
+    onParticipantAddedVideoTrack?: TrackEventCb;
+    onParticipantDisabledVideoTrack?: TrackEventCb;
+    onParticipantDisabledAudioTrack?: TrackEventCb;
+    onParticipantEnabledVideoTrack?: TrackEventCb;
+    onParticipantEnabledAudioTrack?: TrackEventCb;
+    onParticipantRemovedAudioTrack?: TrackEventCb;
+    onParticipantRemovedVideoTrack?: TrackEventCb;
+    onRoomDidConnect?: RoomEventCb;
     onRoomDidDisconnect?: RoomErrorEventCb;
     onRoomDidFailToConnect?: RoomErrorEventCb;
-    onRoomParticipantDidConnect?: TwilioVideoParticipantEventCb;
-    onRoomParticipantDidDisconnect?: TwilioVideoParticipantEventCb;
-
+    onRoomParticipantDidConnect?: ParticipantEventCb;
+    onRoomParticipantDidDisconnect?: ParticipantEventCb;
     ref?: React.Ref<any>;
   };
 

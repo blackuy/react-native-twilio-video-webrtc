@@ -38,18 +38,22 @@ declare module "react-native-twilio-video-webrtc" {
     roomSid: string;
   }
 
-  export type RoomErrorEventArgs = RoomEventCommonArgs & {
+  type RoomErrorEventArgs = RoomEventCommonArgs & {
     error: any;
   };
 
-  export type RoomEventArgs = RoomEventCommonArgs & {
+  type RoomEventArgs = RoomEventCommonArgs & {
     participants: Participant[];
   };
 
-  type RoomEventCb = (p: RoomEventArgs) => void;
-  type RoomErrorEventCb = (t: RoomErrorEventArgs) => void;
+  type ParticipantEventArgs = RoomEventCommonArgs & {
+    participant: Participant;
+  };
 
-  type ParticipantEventCb = (roomName: string, participant: Participant) => void;
+  export type RoomEventCb = (p: RoomEventArgs) => void;
+  export type RoomErrorEventCb = (t: RoomErrorEventArgs) => void;
+
+  export type ParticipantEventCb = (p: ParticipantEventArgs) => void;
 
   type TwilioVideoProps = ViewProps & {
     onCameraDidStart?: () => void;

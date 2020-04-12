@@ -231,11 +231,11 @@ export default class extends Component {
     TWVideoModule.disconnect()
   }
 
-    /**
+  /**
    * SendString to datatrack
    * @param  {String} message    The message string to send
    */
-  sendString ( message ) {
+  sendString (message) {
     TWVideoModule.sendString(message)
   }
 

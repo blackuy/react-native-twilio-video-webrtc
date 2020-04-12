@@ -56,13 +56,12 @@ const propTypes = {
    */
   onParticipantAddedDataTrack: PropTypes.func,
 
-    /**
+  /**
    * Called when a data track has been removed
    *
    * @param {{participant, track}}
    */
   onParticipantRemovedDataTrack: PropTypes.func,
-
 
   /**
    * Called when an dataTrack receives a message
@@ -170,7 +169,7 @@ class CustomTwilioVideoView extends Component {
     ])
   }
 
-  sendString( message ){
+  sendString (message) {
     this.runCommand(nativeEvents.sendString, [
       message
     ])

@@ -23,6 +23,8 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
+    "@types/react": "^16.9.32",
+    "@types/react-native": "^0.62.1",
     "babel-eslint": "^7.2.3",
     "del": "^3.0.0",
     "doctoc": "^1.3.0",

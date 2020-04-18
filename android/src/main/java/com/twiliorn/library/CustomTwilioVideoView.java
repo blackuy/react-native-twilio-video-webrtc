@@ -516,7 +516,11 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
             CameraCapturer.CameraSource cameraSource = cameraCapturer.getCameraSource();
             final boolean isBackCamera = (cameraSource == CameraCapturer.CameraSource.BACK_CAMERA);
             if (thumbnailVideoView != null && thumbnailVideoView.getVisibility() == View.VISIBLE) {
-                thumbnailVideoView.setMirror(true);
+                if (isBackCamera) {
+                    thumbnailVideoView.setMirror(true);
+                } else {
+                    thumbnailVideoView.setMirror(false);
+                }
             }
         }
     }

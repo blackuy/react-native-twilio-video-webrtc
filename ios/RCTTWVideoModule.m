@@ -344,7 +344,7 @@ RCT_EXPORT_METHOD(connect:(NSString *)accessToken roomName:(NSString *)roomName)
     builder.roomName = roomName;
   }];
 
-  self.room = [TwilioVideo connectWithOptions:connectOptions delegate:self];
+  self.room = [TwilioVideoSDK connectWithOptions:connectOptions delegate:self];
 }
 
 RCT_EXPORT_METHOD(disconnect) {

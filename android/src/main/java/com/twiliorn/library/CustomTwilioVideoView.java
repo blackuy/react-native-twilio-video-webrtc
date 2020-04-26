@@ -59,7 +59,6 @@ import com.twilio.video.TwilioException;
 import com.twilio.video.Video;
 import com.twilio.video.VideoConstraints;
 import com.twilio.video.VideoDimensions;
-import com.twilio.video.VideoView;
 
 import org.webrtc.voiceengine.WebRtcAudioManager;
 
@@ -147,7 +146,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
      * A VideoView receives frames from a local or remote video track and renders them
      * to an associated view.
      */
-    private static VideoView thumbnailVideoView;
+    private static PatchedVideoView thumbnailVideoView;
     private static LocalVideoTrack localVideoTrack;
 
     private static CameraCapturer cameraCapturer;
@@ -898,7 +897,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         eventEmitter.receiveEvent(view.getId(), name, data);
     }
 
-    public static void registerPrimaryVideoView(VideoView v, String trackSid) {
+    public static void registerPrimaryVideoView(PatchedVideoView v, String trackSid) {
         if (room != null) {
 
             for (RemoteParticipant participant : room.getRemoteParticipants()) {
@@ -917,7 +916,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         }
     }
 
-    public static void registerThumbnailVideoView(VideoView v) {
+    public static void registerThumbnailVideoView(PatchedVideoView v) {
         thumbnailVideoView = v;
         if (localVideoTrack != null) {
             localVideoTrack.addRenderer(v);

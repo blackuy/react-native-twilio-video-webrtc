@@ -61,6 +61,18 @@ export default class extends Component {
      */
     onParticipantRemovedVideoTrack: PropTypes.func,
     /**
+     * Called when a new data track has been added
+     *
+     * @param {{participant, track}}
+     */
+    onParticipantAddedDataTrack: PropTypes.func,
+    /**
+     * Called when a data track has been removed
+     *
+     * @param {{participant, track}}
+     */
+    onParticipantRemovedDataTrack: PropTypes.func,
+    /**
      * Called when a new audio track has been added
      *
      * @param {{participant, track}}
@@ -96,6 +108,12 @@ export default class extends Component {
      * @param {{participant, track}}
      */
     onParticipantDisabledAudioTrack: PropTypes.func,
+    /**
+     * Called when an dataTrack receives a message
+     *
+     * @param {{message}}
+     */
+    onDataTrackMessageReceived: PropTypes.func,
     /**
      * Called when the camera has started
      *
@@ -136,6 +154,7 @@ export default class extends Component {
     this.flipCamera = this.flipCamera.bind(this)
     this.connect = this.connect.bind(this)
     this.disconnect = this.disconnect.bind(this)
+    this.sendString = this.sendString.bind(this)
     this.setRemoteAudioPlayback = this.setRemoteAudioPlayback.bind(this)
   }
 
@@ -217,6 +236,14 @@ export default class extends Component {
     TWVideoModule.disconnect()
   }
 
+  /**
+   * SendString to datatrack
+   * @param  {String} message    The message string to send
+   */
+  sendString (message) {
+    TWVideoModule.sendString(message)
+  }
+
   _startLocalVideo () {
     TWVideoModule.startLocalVideo()
   }
@@ -272,6 +299,16 @@ export default class extends Component {
           this.props.onParticipantAddedVideoTrack(data)
         }
       }),
+      this._eventEmitter.addListener('participantAddedDataTrack', data => {
+        if (this.props.onParticipantAddedDataTrack) {
+          this.props.onParticipantAddedDataTrack(data)
+        }
+      }),
+      this._eventEmitter.addListener('participantRemovedDataTrack', data => {
+        if (this.props.onParticipantRemovedDataTrack) {
+          this.props.onParticipantRemovedDataTrack(data)
+        }
+      }),
       this._eventEmitter.addListener('participantRemovedVideoTrack', data => {
         if (this.props.onParticipantRemovedVideoTrack) {
           this.props.onParticipantRemovedVideoTrack(data)
@@ -305,6 +342,11 @@ export default class extends Component {
       this._eventEmitter.addListener('participantDisabledAudioTrack', data => {
         if (this.props.onParticipantDisabledAudioTrack) {
           this.props.onParticipantDisabledAudioTrack(data)
+        }
+      }),
+      this._eventEmitter.addListener('dataTrackMessageReceived', data => {
+        if (this.props.onDataTrackMessageReceived) {
+          this.props.onDataTrackMessageReceived(data)
         }
       }),
       this._eventEmitter.addListener('cameraDidStart', data => {

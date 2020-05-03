@@ -125,6 +125,11 @@ export default class extends Component {
      */
     onCameraWasInterrupted: PropTypes.func,
     /**
+     * Called when the camera interruption has ended
+     *
+     */
+    onCameraInterruptionEnded: PropTypes.func,
+    /**
      * Called when the camera has stopped runing with an error
      *
      * @param {{error}} The error message description
@@ -240,8 +245,7 @@ export default class extends Component {
   }
 
   _startLocalVideo () {
-    const screenShare = this.props.screenShare || false
-    TWVideoModule.startLocalVideo(screenShare)
+    TWVideoModule.startLocalVideo()
   }
 
   _stopLocalVideo () {
@@ -353,6 +357,11 @@ export default class extends Component {
       this._eventEmitter.addListener('cameraWasInterrupted', data => {
         if (this.props.onCameraWasInterrupted) {
           this.props.onCameraWasInterrupted(data)
+        }
+      }),
+      this._eventEmitter.addListener('cameraInterruptionEnded', data => {
+        if (this.props.onCameraInterruptionEnded) {
+          this.props.onCameraInterruptionEnded(data)
         }
       }),
       this._eventEmitter.addListener('cameraDidStopRunning', data => {

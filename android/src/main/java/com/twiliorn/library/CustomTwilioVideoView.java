@@ -458,7 +458,10 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
             audioManager.setSpeakerphoneOn(false);
             audioManager.setMode(previousAudioMode);
             try {
-                getContext().unregisterReceiver(myNoisyAudioStreamReceiver);
+                if (myNoisyAudioStreamReceiver != null) {
+                    getContext().unregisterReceiver(myNoisyAudioStreamReceiver);
+                }
+                myNoisyAudioStreamReceiver = null;
             } catch (Exception e) {
                 // already registered
                 e.printStackTrace();

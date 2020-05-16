@@ -73,7 +73,11 @@ Find `Search Paths` and add `$(SRCROOT)/../node_modules/react-native-twilio-vide
 
 #### Post install
 
-Be sure to increment your iOS Deployment Target to at least iOS 11 through XCode.
+Be sure to increment your iOS Deployment Target to at least iOS 11 through XCode and your `Podfile` contains
+
+```
+platform :ios, '11.0'
+```
 
 #### Permissions
 

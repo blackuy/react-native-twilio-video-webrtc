@@ -71,6 +71,14 @@ node_modules/react-native-twilio-video-webrtc/ios/RNTwilioVideoWebRTC.xcodeproj
 
 Find `Search Paths` and add `$(SRCROOT)/../node_modules/react-native-twilio-video-webrtc/ios` with `recursive` to `Framework Search Paths` and `Library Search Paths`
 
+#### Post install
+
+Be sure to increment your iOS Deployment Target to at least iOS 11 through XCode and your `Podfile` contains
+
+```
+platform :ios, '11.0'
+```
+
 #### Permissions
 
 To enable camera usage and microphone usage you will need to add the following entries to your `Info.plist` file:

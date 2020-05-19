@@ -254,10 +254,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         }
     }
 
-    private void createLocalMedia(boolean enableAudio, boolean enableVideo) {
-        // Share your microphone
-        localAudioTrack = LocalAudioTrack.create(getContext(), enableAudio);
-
+    private boolean createLocalVideo(boolean enableVideo) {
         // Share your camera
         cameraCapturer = this.createCameraCaputer(getContext(), CameraCapturer.CameraSource.FRONT_CAMERA);
         if (cameraCapturer == null){
@@ -267,7 +264,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
             WritableMap event = new WritableNativeMap();
             event.putString("error", "No camera is supported on this device");
             pushEvent(CustomTwilioVideoView.this, ON_CONNECT_FAILURE, event);
-            return;
+            return false;
         }
 
         if (cameraCapturer.getSupportedFormats().size() > 0) {
@@ -277,7 +274,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
             }
             setThumbnailMirror();
         }
-        connectToRoom(enableAudio);
+        return true;
     }
 
     // ===== LIFECYCLE EVENTS ======================================================================
@@ -381,12 +378,17 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         this.accessToken = accessToken;
         this.enableRemoteAudio = enableAudio;
 
-        if (cameraCapturer == null) {
-            createLocalMedia(enableAudio, enableVideo);
-        } else {
+        // Share your microphone
             localAudioTrack = LocalAudioTrack.create(getContext(), enableAudio);
-            connectToRoom(enableAudio);
+
+        if (cameraCapturer == null) {
+            boolean createVideoStatus = createLocalVideo(enableVideo);
+            if (!createVideoStatus) {
+                // No need to connect to room if video creation failed
+                return;
         }
+    }
+        connectToRoom(enableAudio);
     }
 
     public void connectToRoom(boolean enableAudio) {
@@ -536,14 +538,39 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     }
 
     public void toggleVideo(boolean enabled) {
+        WritableMap event = new WritableNativeMap();
+        event.putBoolean("videoEnabled", enabled);
+
         if (localVideoTrack != null) {
             localVideoTrack.enable(enabled);
+        }
+        if (room == null) {
+            // No room to publish/unpublish from
+            return;
+        } else {
+            if (enabled) {
+                 if (localVideoTrack != null) {
+                     // Already enabled
+                 } else {
+                     boolean createVideoStatus = createLocalVideo(true);
+                     if (createVideoStatus) {
+                        localParticipant.publishTrack(localVideoTrack);
+                     }
+                 }
+            } else {
+                if (localVideoTrack == null) {
+                    // Already disabled
+                } else {
+                    localParticipant.unpublishTrack(localVideoTrack);
+                    cameraCapturer.stopCapture();
+                    localVideoTrack = null;
+                    cameraCapturer = null;
+                }
+            }
+        }
 
-            WritableMap event = new WritableNativeMap();
-            event.putBoolean("videoEnabled", enabled);
             pushEvent(CustomTwilioVideoView.this, ON_VIDEO_CHANGED, event);
         }
-    }
 
     public void toggleSoundSetup(boolean speaker){
       AudioManager audioManager = (AudioManager) getContext().getSystemService(Context.AUDIO_SERVICE);

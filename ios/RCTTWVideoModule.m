@@ -188,7 +188,33 @@ RCT_REMAP_METHOD(setLocalAudioEnabled, enabled:(BOOL)enabled setLocalAudioEnable
 
 RCT_REMAP_METHOD(setLocalVideoEnabled, enabled:(BOOL)enabled setLocalVideoEnabledWithResolver:(RCTPromiseResolveBlock)resolve
                  rejecter:(RCTPromiseRejectBlock)reject) {
-  [self.localVideoTrack setEnabled:enabled];
+  if (self.localVideoTrack != nil) {
+    [self.localVideoTrack setEnabled:enabled];
+  }
+  if (self.room == nil) {
+    // No room to add/remove tracks from, so ignore.
+    return;
+  }
+
+  if (enabled) {
+    if (self.localVideoTrack != nil) {
+      // Already enabled
+      return;
+    }
+    [self startLocalVideo];
+    if (self.localVideoTrack != nil) {
+      [[self.room localParticipant] publishVideoTrack:self.localVideoTrack];
+    }
+  } else {
+    if (self.localVideoTrack == nil) {
+      // Already disabled;
+      return;
+    }
+    [[self.room localParticipant] unpublishVideoTrack:self.localVideoTrack];
+    [self.camera stopCapture];
+    self.localVideoTrack = nil;
+    self.camera = nil;
+  }
 
   resolve(@(enabled));
 }

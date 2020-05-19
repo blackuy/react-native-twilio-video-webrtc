@@ -379,7 +379,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         this.enableRemoteAudio = enableAudio;
 
         // Share your microphone
-            localAudioTrack = LocalAudioTrack.create(getContext(), enableAudio);
+        localAudioTrack = LocalAudioTrack.create(getContext(), enableAudio);
 
         if (cameraCapturer == null) {
             boolean createVideoStatus = createLocalVideo(enableVideo);
@@ -546,7 +546,6 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         }
         if (room == null) {
             // No room to publish/unpublish from
-            return;
         } else {
             if (enabled) {
                  if (localVideoTrack != null) {

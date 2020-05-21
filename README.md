@@ -186,6 +186,7 @@ this library are not stripped. To do that, add these two lines to `proguard-rule
 ```
   -keep class org.webrtc.** { *; }
   -keep class com.twilio.** { *; }
+  -keep class tvi.webrtc.** { *; }
 ```
 
 ## Docs

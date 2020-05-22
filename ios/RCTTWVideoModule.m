@@ -108,9 +108,6 @@ RCT_EXPORT_MODULE();
 
 - (void)addLocalView:(TVIVideoView *)view {
   [self.localVideoTrack addRenderer:view];
-  if (self.camera && self.camera.device.position == AVCaptureDevicePositionFront) {
-    view.mirror = true;
-  }
 }
 
 - (void)removeLocalView:(TVIVideoView *)view {
@@ -161,6 +158,11 @@ RCT_EXPORT_METHOD(startLocalVideo) {
           TVIVideoFormat *startFormat,
           NSError *error) {
       if (!error) {
+          if (self.camera && self.camera.device.position == AVCaptureDevicePositionFront) {
+              for (TVIVideoView *renderer in self.localVideoTrack.renderers) {
+                  renderer.mirror = mirror;
+              }
+          }
           [self sendEventCheckingListenerWithName:cameraDidStart body:nil];
       }
   }];

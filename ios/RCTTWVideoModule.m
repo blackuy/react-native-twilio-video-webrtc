@@ -108,6 +108,9 @@ RCT_EXPORT_MODULE();
 
 - (void)addLocalView:(TVIVideoView *)view {
   [self.localVideoTrack addRenderer:view];
+  if (self.camera && self.camera.device.position == AVCaptureDevicePositionFront) {
+    view.mirror = true;
+  }
 }
 
 - (void)removeLocalView:(TVIVideoView *)view {

@@ -108,6 +108,10 @@ RCT_EXPORT_MODULE();
 
 - (void)addLocalView:(TVIVideoView *)view {
   [self.localVideoTrack addRenderer:view];
+  [self updateLocalViewMirroring:view];
+}
+
+- (void)updateLocalViewMirroring:(TVIVideoView *)view {
   if (self.camera && self.camera.device.position == AVCaptureDevicePositionFront) {
     view.mirror = true;
   }
@@ -161,6 +165,9 @@ RCT_EXPORT_METHOD(startLocalVideo) {
           TVIVideoFormat *startFormat,
           NSError *error) {
       if (!error) {
+          for (TVIVideoView *renderer in self.localVideoTrack.renderers) {
+            [self updateLocalViewMirroring:renderer];
+          }
           [self sendEventCheckingListenerWithName:cameraDidStart body:nil];
       }
   }];

@@ -116,6 +116,10 @@ RCT_EXPORT_MODULE();
 
 - (void)addLocalView:(TVIVideoView *)view {
   [self.localVideoTrack addRenderer:view];
+  [self updateLocalViewMirroring:view];
+}
+
+- (void)updateLocalViewMirroring:(TVIVideoView *)view {
   if (self.camera && self.camera.device.position == AVCaptureDevicePositionFront) {
     view.mirror = true;
   }
@@ -169,6 +173,9 @@ RCT_EXPORT_METHOD(startLocalVideo) {
           TVIVideoFormat *startFormat,
           NSError *error) {
       if (!error) {
+          for (TVIVideoView *renderer in self.localVideoTrack.renderers) {
+            [self updateLocalViewMirroring:renderer];
+          }
           [self sendEventCheckingListenerWithName:cameraDidStart body:nil];
       }
   }];
@@ -196,7 +203,33 @@ RCT_REMAP_METHOD(setLocalAudioEnabled, enabled:(BOOL)enabled setLocalAudioEnable
 
 RCT_REMAP_METHOD(setLocalVideoEnabled, enabled:(BOOL)enabled setLocalVideoEnabledWithResolver:(RCTPromiseResolveBlock)resolve
                  rejecter:(RCTPromiseRejectBlock)reject) {
-  [self.localVideoTrack setEnabled:enabled];
+  if (self.localVideoTrack != nil) {
+    [self.localVideoTrack setEnabled:enabled];
+  }
+
+  if (self.room == nil) {
+    // No room to add/remove tracks from, so ignore.
+  } else {
+    if (enabled) {
+      if (self.localVideoTrack != nil) {
+        // Already enabled
+      } else {
+        [self startLocalVideo];
+        if (self.localVideoTrack != nil) {
+          [[self.room localParticipant] publishVideoTrack:self.localVideoTrack];
+        }
+      }
+    } else {
+      if (self.localVideoTrack == nil) {
+        // Already disabled;
+      } else {
+        [[self.room localParticipant] unpublishVideoTrack:self.localVideoTrack];
+        [self.camera stopCapture];
+        self.localVideoTrack = nil;
+        self.camera = nil;
+      }
+    }
+  }
 
   resolve(@(enabled));
 }
@@ -332,6 +365,11 @@ RCT_EXPORT_METHOD(getStats) {
 }
 
 RCT_EXPORT_METHOD(connect:(NSString *)accessToken roomName:(NSString *)roomName) {
+  if (self.localVideoTrack == nil) {
+    // We disabled video in a previous call, attempt to re-enable
+    [self startLocalVideo];
+  }
+
   TVIConnectOptions *connectOptions = [TVIConnectOptions optionsWithToken:accessToken block:^(TVIConnectOptionsBuilder * _Nonnull builder) {
     if (self.localVideoTrack) {
       builder.videoTracks = @[self.localVideoTrack];

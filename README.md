@@ -225,12 +225,11 @@ export default class Example extends Component {
     status: 'disconnected',
     participants: new Map(),
     videoTracks: new Map(),
-    roomName: '',
     token: ''
   }
 
   _onConnectButtonPress = () => {
-    this.refs.twilioVideo.connect({ roomName: this.state.roomName, accessToken: this.state.token })
+    this.refs.twilioVideo.connect({ accessToken: this.state.token })
     this.setState({status: 'connecting'})
   }
 
@@ -288,12 +287,6 @@ export default class Example extends Component {
             <Text style={styles.welcome}>
               React Native Twilio Video
             </Text>
-            <TextInput
-              style={styles.input}
-              autoCapitalize='none'
-              value={this.state.roomName}
-              onChangeText={(text) => this.setState({roomName: text})}>
-            </TextInput>
             <TextInput
               style={styles.input}
               autoCapitalize='none'

@@ -232,7 +232,7 @@ From [`../src/TwilioVideoParticipantView.js`](../src/TwilioVideoParticipantView.
 
 ```js
 trackIdentifier: {
-    participantIdentity: String
+    participantSid: String
     videoTrackId: String
 }
 ```

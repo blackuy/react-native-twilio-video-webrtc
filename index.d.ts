@@ -10,7 +10,7 @@ declare module "react-native-twilio-video-webrtc" {
   interface TwilioVideoParticipantViewProps extends ViewProps {
     trackIdentifier: {
       participantSid: string;
-      videoTrackId: string;
+      videoTrackSid: string;
     };
     ref?: React.Ref<any>;
   }

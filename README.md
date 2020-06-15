@@ -246,6 +246,12 @@ export default class Example extends Component {
     this.refs.twilioVideo.flipCamera()
   }
 
+  _onRoomDidConnect = ({ roomName, error }) => {
+    console.log('onRoomDidConnect: ', roomName);
+
+    this.setState({ status: 'connected' });
+  };
+
   _onRoomDidDisconnect = ({roomName, error}) => {
     console.log("ERROR: ", error)
 

@@ -387,6 +387,9 @@ RCT_EXPORT_METHOD(connect:(NSString *)accessToken roomName:(NSString *)roomName)
     }
 
     builder.roomName = roomName;
+    builder.preferredVideoCodecs = @[ [TVIH264Codec new] ];
+    builder.preferredAudioCodecs = @[ [TVIIsacCodec new] ];
+    builder.encodingParameters = [[TVIEncodingParameters alloc] initWithAudioBitrate:16 videoBitrate:1200];
   }];
 
   self.room = [TwilioVideoSDK connectWithOptions:connectOptions delegate:self];

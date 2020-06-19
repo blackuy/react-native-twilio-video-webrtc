@@ -364,7 +364,7 @@ RCT_EXPORT_METHOD(getStats) {
   }
 }
 
-RCT_EXPORT_METHOD(connect:(NSString *)accessToken roomName:(NSString *)roomName) {
+RCT_EXPORT_METHOD(connect:(NSString *)accessToken roomName:(NSString *)roomName encodingParameters:(NSDictionary *)encodingParameters) {
   if (self.localVideoTrack == nil) {
     // We disabled video in a previous call, attempt to re-enable
     [self startLocalVideo];
@@ -387,9 +387,17 @@ RCT_EXPORT_METHOD(connect:(NSString *)accessToken roomName:(NSString *)roomName)
     }
 
     builder.roomName = roomName;
-    builder.preferredVideoCodecs = @[ [TVIH264Codec new] ];
-    builder.preferredAudioCodecs = @[ [TVIIsacCodec new] ];
-    builder.encodingParameters = [[TVIEncodingParameters alloc] initWithAudioBitrate:16 videoBitrate:1200];
+    
+    if(encodingParameters[@"enableH264Codec"]){
+      builder.preferredVideoCodecs = @[ [TVIH264Codec new] ];
+    }
+      
+    if(encodingParameters[@"audioBitrate"] || encodingParameters[@"videoBitrate"]){
+      NSInteger audioBitrate = [encodingParameters[@"audioBitrate"] integerValue];
+      NSInteger videoBitrate = [encodingParameters[@"videoBitrate"] integerValue];
+      builder.encodingParameters = [[TVIEncodingParameters alloc] initWithAudioBitrate:(audioBitrate) ? audioBitrate : 40 videoBitrate:(videoBitrate) ? videoBitrate : 1500];
+    }
+      
   }];
 
   self.room = [TwilioVideoSDK connectWithOptions:connectOptions delegate:self];

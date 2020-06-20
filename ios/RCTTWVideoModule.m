@@ -205,33 +205,8 @@ RCT_REMAP_METHOD(setLocalVideoEnabled, enabled:(BOOL)enabled setLocalVideoEnable
                  rejecter:(RCTPromiseRejectBlock)reject) {
   if (self.localVideoTrack != nil) {
     [self.localVideoTrack setEnabled:enabled];
+    resolve(@(enabled));
   }
-
-  if (self.room == nil) {
-    // No room to add/remove tracks from, so ignore.
-  } else {
-    if (enabled) {
-      if (self.localVideoTrack != nil) {
-        // Already enabled
-      } else {
-        [self startLocalVideo];
-        if (self.localVideoTrack != nil) {
-          [[self.room localParticipant] publishVideoTrack:self.localVideoTrack];
-        }
-      }
-    } else {
-      if (self.localVideoTrack == nil) {
-        // Already disabled;
-      } else {
-        [[self.room localParticipant] unpublishVideoTrack:self.localVideoTrack];
-        [self.camera stopCapture];
-        self.localVideoTrack = nil;
-        self.camera = nil;
-      }
-    }
-  }
-
-  resolve(@(enabled));
 }
 
 

@@ -1,4 +1,4 @@
-declare module "react-native-twilio-video-webrtc" {
+declare module "react-native-twilio-video-webrtc"{
   import { ViewProps } from "react-native";
   import React from "react";
 
@@ -78,7 +78,7 @@ declare module "react-native-twilio-video-webrtc" {
   class TwilioVideo extends React.Component<TwilioVideoProps> {
     setLocalVideoEnabled: (enabled: boolean) => Promise<boolean>;
     setLocalAudioEnabled: (enabled: boolean) => Promise<boolean>;
-    connect: (t: { roomName: string; accessToken: string }) => void;
+    connect: (t: { roomName: string; accessToken: string; encodingParameters: object }) => void;
     disconnect: () => void;
     flipCamera: () => void;
   }

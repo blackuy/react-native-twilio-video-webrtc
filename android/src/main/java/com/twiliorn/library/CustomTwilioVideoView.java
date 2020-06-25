@@ -752,6 +752,9 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
                 }
                 event.putString("roomName", room.getName());
                 event.putString("roomSid", room.getSid());
+                if (e != null) {
+                  event.putString("error", e.getMessage());
+                }
                 pushEvent(CustomTwilioVideoView.this, ON_DISCONNECTED, event);
 
                 localParticipant = null;

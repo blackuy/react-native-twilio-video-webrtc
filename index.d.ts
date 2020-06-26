@@ -75,7 +75,7 @@ declare module "react-native-twilio-video-webrtc"{
     ref?: React.Ref<any>;
   };
 
-  type connectParams = {
+  type iOSConnectParams = {
     accessToken: string;
     roomName?: string;
     encodingParameters?: {
@@ -86,10 +86,18 @@ declare module "react-native-twilio-video-webrtc"{
     }
   }
 
+  type androidConnectParams = {
+    roomName?: string;
+    accessToken: string;
+    enableAudio?: boolean;
+    enableVideo?: boolean;
+    enableRemoteAudio?: boolean;
+  }
+
   class TwilioVideo extends React.Component<TwilioVideoProps> {
     setLocalVideoEnabled: (enabled: boolean) => Promise<boolean>;
     setLocalAudioEnabled: (enabled: boolean) => Promise<boolean>;
-    connect: (options: connectParams) => void;
+    connect: (options: iOSConnectParams | androidConnectParams) => void;
     disconnect: () => void;
     flipCamera: () => void;
   }

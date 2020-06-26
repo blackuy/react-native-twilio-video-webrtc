@@ -6,6 +6,7 @@ import {
   TextInput,
   View,
   Button,
+  PermissionsAndroid,
   TouchableOpacity,
   Dimensions
 } from 'react-native';
@@ -98,7 +99,10 @@ export default class Example extends Component {
     token: ''
   }
 
-  _onConnectButtonPress = () => {
+  _onConnectButtonPress = async () => {
+    await this._requestAudioPermission()
+    await this._requestCameraPermission()
+
     this.refs.twilioVideo.connect({ accessToken: this.state.token })
     this.setState({status: 'connecting'})
   }
@@ -150,6 +154,32 @@ export default class Example extends Component {
     videoTracks.delete(track.trackSid)
 
     this.setState({ videoTracks: new Map([ ...videoTracks ]) });
+  }
+
+  _requestAudioPermission =  () => {
+    return PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
+      {
+        title: "Need permission to access microphone",
+        message:
+          "To run this demo we need permission to access your microphone",
+        buttonNegative: "Cancel",
+        buttonPositive: "OK"
+      }
+    );
+  }
+
+  _requestCameraPermission =  () => {
+    return PermissionsAndroid.request(
+     PermissionsAndroid.PERMISSIONS.CAMERA,
+      {
+        title: "Need permission to access camera",
+        message:
+          "To run this demo we need permission to access your camera",
+        buttonNegative: "Cancel",
+        buttonPositive: "OK"
+      }
+    );
   }
 
   render() {

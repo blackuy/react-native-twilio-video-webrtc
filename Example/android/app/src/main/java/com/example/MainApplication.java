@@ -27,6 +27,11 @@ public class MainApplication extends Application implements ReactApplication {
           new TwilioPackage()
       );
     }
+
+    @Override
+    protected String getJSMainModuleName() {
+      return "index";
+    }
   };
 
   @Override

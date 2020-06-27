@@ -7,6 +7,7 @@ import {
   View,
   Button,
   PermissionsAndroid,
+  Platform,
   TouchableOpacity,
   Dimensions
 } from 'react-native';
@@ -100,9 +101,10 @@ export default class Example extends Component {
   }
 
   _onConnectButtonPress = async () => {
-    await this._requestAudioPermission()
-    await this._requestCameraPermission()
-
+    if (Platform.OS == 'android') {
+      await this._requestAudioPermission()
+      await this._requestCameraPermission()
+    }
     this.refs.twilioVideo.connect({ accessToken: this.state.token })
     this.setState({status: 'connecting'})
   }

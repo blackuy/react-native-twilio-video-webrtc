@@ -101,7 +101,7 @@ export default class Example extends Component {
   }
 
   _onConnectButtonPress = async () => {
-    if (Platform.OS == 'android') {
+    if (Platform.OS === 'android') {
       await this._requestAudioPermission()
       await this._requestCameraPermission()
     }

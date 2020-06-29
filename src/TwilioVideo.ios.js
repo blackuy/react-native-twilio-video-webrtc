@@ -125,6 +125,11 @@ export default class extends Component {
      */
     onCameraWasInterrupted: PropTypes.func,
     /**
+     * Called when the camera interruption has ended
+     *
+     */
+    onCameraInterruptionEnded: PropTypes.func,
+    /**
      * Called when the camera has stopped runing with an error
      *
      * @param {{error}} The error message description
@@ -219,9 +224,10 @@ export default class extends Component {
    * Connect to given room name using the JWT access token
    * @param  {String} roomName    The connecting room name
    * @param  {String} accessToken The Twilio's JWT access token
+   * @param  {String} encodingParameters Control Encoding config
    */
-  connect ({ roomName, accessToken }) {
-    TWVideoModule.connect(accessToken, roomName)
+  connect ({ roomName, accessToken, encodingParameters }) {
+    TWVideoModule.connect(accessToken, roomName, encodingParameters)
   }
 
   /**
@@ -240,8 +246,7 @@ export default class extends Component {
   }
 
   _startLocalVideo () {
-    const screenShare = this.props.screenShare || false
-    TWVideoModule.startLocalVideo(screenShare)
+    TWVideoModule.startLocalVideo()
   }
 
   _stopLocalVideo () {
@@ -353,6 +358,11 @@ export default class extends Component {
       this._eventEmitter.addListener('cameraWasInterrupted', data => {
         if (this.props.onCameraWasInterrupted) {
           this.props.onCameraWasInterrupted(data)
+        }
+      }),
+      this._eventEmitter.addListener('cameraInterruptionEnded', data => {
+        if (this.props.onCameraInterruptionEnded) {
+          this.props.onCameraInterruptionEnded(data)
         }
       }),
       this._eventEmitter.addListener('cameraDidStopRunning', data => {

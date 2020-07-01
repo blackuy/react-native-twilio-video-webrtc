@@ -1,37 +1,77 @@
 PODS:
-  - React (0.44.0):
-    - React/Core (= 0.44.0)
-  - react-native-twilio-video-webrtc (1.0.2):
+  - boost-for-react-native (1.63.0)
+  - DoubleConversion (1.1.5)
+  - Folly (2018.10.22.00):
+    - boost-for-react-native
+    - DoubleConversion
+    - glog
+  - glog (0.3.4)
+  - React (0.59.9):
+    - React/Core (= 0.59.9)
+  - react-native-twilio-video-webrtc (1.0.2-1):
     - React
-    - TwilioVideo (~> 2.2.0)
-  - React/Core (0.44.0):
+    - TwilioVideo (~> 3.2.3)
+  - React/Core (0.59.9):
+    - yoga (= 0.59.9.React)
+  - React/CxxBridge (0.59.9):
+    - Folly (= 2018.10.22.00)
+    - React/Core
     - React/cxxreact
-    - Yoga (= 0.44.0.React)
-  - React/cxxreact (0.44.0):
-    - React/jschelpers
-  - React/jschelpers (0.44.0)
-  - TwilioVideo (2.2.2)
-  - Yoga (0.44.0.React)
+    - React/jsiexecutor
+  - React/cxxreact (0.59.9):
+    - boost-for-react-native (= 1.63.0)
+    - DoubleConversion
+    - Folly (= 2018.10.22.00)
+    - glog
+    - React/jsinspector
+  - React/jsi (0.59.9):
+    - DoubleConversion
+    - Folly (= 2018.10.22.00)
+    - glog
+  - React/jsiexecutor (0.59.9):
+    - DoubleConversion
+    - Folly (= 2018.10.22.00)
+    - glog
+    - React/cxxreact
+    - React/jsi
+  - React/jsinspector (0.59.9)
+  - TwilioVideo (3.2.5)
+  - yoga (0.59.9.React)
 
 DEPENDENCIES:
-  - React (from `../node_modules/react-native`)
+  - Folly (from `../node_modules/react-native/third-party-podspecs/Folly.podspec`)
   - react-native-twilio-video-webrtc (from `../../`)
-  - Yoga (from `../node_modules/react-native/ReactCommon/yoga/Yoga.podspec`)
+  - React/Core (from `../node_modules/react-native`)
+  - React/CxxBridge (from `../node_modules/react-native`)
+  - yoga (from `../node_modules/react-native/ReactCommon/yoga`)
+
+SPEC REPOS:
+  https://github.com/CocoaPods/Specs.git:
+    - boost-for-react-native
+    - DoubleConversion
+    - glog
+    - TwilioVideo
 
 EXTERNAL SOURCES:
+  Folly:
+    :podspec: "../node_modules/react-native/third-party-podspecs/Folly.podspec"
   React:
-    :path: ../node_modules/react-native
+    :path: "../node_modules/react-native"
   react-native-twilio-video-webrtc:
-    :path: ../../
-  Yoga:
-    :path: ../node_modules/react-native/ReactCommon/yoga/Yoga.podspec
+    :path: "../../"
+  yoga:
+    :path: "../node_modules/react-native/ReactCommon/yoga"
 
 SPEC CHECKSUMS:
-  React: e53535491f7b382b8cd681428dd853159bf25545
-  react-native-twilio-video-webrtc: 0f7ae3d9eb47e86c9b176f1faec23d98104a058d
-  TwilioVideo: d99d92643bed85702ee007bb6a3f107f6b0eba15
-  Yoga: f2b1f5b59fadb774a3dd9932a7cf813c6e284d71
+  boost-for-react-native: 39c7adb57c4e60d6c5479dd8623128eb5b3f0f2c
+  DoubleConversion: e22e0762848812a87afd67ffda3998d9ef29170c
+  Folly: de497beb10f102453a1afa9edbf8cf8a251890de
+  glog: 1de0bb937dccdc981596d3b5825ebfb765017ded
+  React: a86b92f00edbe1873a63e4a212c29b7a7ad5224f
+  react-native-twilio-video-webrtc: 5a1dc979bfe98c0f8dba110e9b5655d52278f862
+  TwilioVideo: dec31712aab578a783703c8f699c838bea4adf06
+  yoga: 03ff42a6f223fb88deeaed60249020d80c3091ee
 
-PODFILE CHECKSUM: 7de9b5c58c19538b30544a079a9f6bfc33fe7dcf
+PODFILE CHECKSUM: a22eec28b45c6a20b9c752a17cdef0f608e13c10
 
-COCOAPODS: 1.4.0
+COCOAPODS: 1.9.2

@@ -76,6 +76,14 @@ TVIVideoFormat *RCTTWVideoModuleCameraSourceSelectVideoFormatBySize(AVCaptureDev
 
 RCT_EXPORT_MODULE();
 
+- (void)dealloc {
+  // We are done with camera
+  if (self.camera) {
+      [self.camera stopCapture];
+      self.camera = nil;
+  }
+}
+
 - (dispatch_queue_t)methodQueue {
   return dispatch_get_main_queue();
 }
@@ -108,6 +116,10 @@ RCT_EXPORT_MODULE();
 
 - (void)addLocalView:(TVIVideoView *)view {
   [self.localVideoTrack addRenderer:view];
+  [self updateLocalViewMirroring:view];
+}
+
+- (void)updateLocalViewMirroring:(TVIVideoView *)view {
   if (self.camera && self.camera.device.position == AVCaptureDevicePositionFront) {
     view.mirror = true;
   }
@@ -161,6 +173,9 @@ RCT_EXPORT_METHOD(startLocalVideo) {
           TVIVideoFormat *startFormat,
           NSError *error) {
       if (!error) {
+          for (TVIVideoView *renderer in self.localVideoTrack.renderers) {
+            [self updateLocalViewMirroring:renderer];
+          }
           [self sendEventCheckingListenerWithName:cameraDidStart body:nil];
       }
   }];
@@ -188,9 +203,13 @@ RCT_REMAP_METHOD(setLocalAudioEnabled, enabled:(BOOL)enabled setLocalAudioEnable
 
 RCT_REMAP_METHOD(setLocalVideoEnabled, enabled:(BOOL)enabled setLocalVideoEnabledWithResolver:(RCTPromiseResolveBlock)resolve
                  rejecter:(RCTPromiseRejectBlock)reject) {
-  [self.localVideoTrack setEnabled:enabled];
-
-  resolve(@(enabled));
+  if (self.localVideoTrack != nil) {
+    [self.localVideoTrack setEnabled:enabled];
+    resolve(@(enabled));
+  } else {
+    [self.localVideoTrack setEnabled:false];
+    resolve(@false);
+  }
 }
 
 
@@ -323,7 +342,12 @@ RCT_EXPORT_METHOD(getStats) {
   }
 }
 
-RCT_EXPORT_METHOD(connect:(NSString *)accessToken roomName:(NSString *)roomName) {
+RCT_EXPORT_METHOD(connect:(NSString *)accessToken roomName:(NSString *)roomName encodingParameters:(NSDictionary *)encodingParameters) {
+  if (self.localVideoTrack == nil) {
+    // We disabled video in a previous call, attempt to re-enable
+    [self startLocalVideo];
+  }
+
   TVIConnectOptions *connectOptions = [TVIConnectOptions optionsWithToken:accessToken block:^(TVIConnectOptionsBuilder * _Nonnull builder) {
     if (self.localVideoTrack) {
       builder.videoTracks = @[self.localVideoTrack];
@@ -341,6 +365,17 @@ RCT_EXPORT_METHOD(connect:(NSString *)accessToken roomName:(NSString *)roomName)
     }
 
     builder.roomName = roomName;
+    
+    if(encodingParameters[@"enableH264Codec"]){
+      builder.preferredVideoCodecs = @[ [TVIH264Codec new] ];
+    }
+      
+    if(encodingParameters[@"audioBitrate"] || encodingParameters[@"videoBitrate"]){
+      NSInteger audioBitrate = [encodingParameters[@"audioBitrate"] integerValue];
+      NSInteger videoBitrate = [encodingParameters[@"videoBitrate"] integerValue];
+      builder.encodingParameters = [[TVIEncodingParameters alloc] initWithAudioBitrate:(audioBitrate) ? audioBitrate : 40 videoBitrate:(videoBitrate) ? videoBitrate : 1500];
+    }
+      
   }];
 
   self.room = [TwilioVideoSDK connectWithOptions:connectOptions delegate:self];

@@ -186,6 +186,7 @@ this library are not stripped. To do that, add these two lines to `proguard-rule
 ```
   -keep class org.webrtc.** { *; }
   -keep class com.twilio.** { *; }
+  -keep class tvi.webrtc.** { *; }
 ```
 
 ## Docs
@@ -224,12 +225,11 @@ export default class Example extends Component {
     status: 'disconnected',
     participants: new Map(),
     videoTracks: new Map(),
-    roomName: '',
     token: ''
   }
 
   _onConnectButtonPress = () => {
-    this.refs.twilioVideo.connect({ roomName: this.state.roomName, accessToken: this.state.token })
+    this.refs.twilioVideo.connect({ accessToken: this.state.token })
     this.setState({status: 'connecting'})
   }
 
@@ -245,6 +245,12 @@ export default class Example extends Component {
   _onFlipButtonPress = () => {
     this.refs.twilioVideo.flipCamera()
   }
+
+  _onRoomDidConnect = ({ roomName, error }) => {
+    console.log('onRoomDidConnect: ', roomName);
+
+    this.setState({ status: 'connected' });
+  };
 
   _onRoomDidDisconnect = ({roomName, error}) => {
     console.log("ERROR: ", error)
@@ -287,12 +293,6 @@ export default class Example extends Component {
             <Text style={styles.welcome}>
               React Native Twilio Video
             </Text>
-            <TextInput
-              style={styles.input}
-              autoCapitalize='none'
-              value={this.state.roomName}
-              onChangeText={(text) => this.setState({roomName: text})}>
-            </TextInput>
             <TextInput
               style={styles.input}
               autoCapitalize='none'

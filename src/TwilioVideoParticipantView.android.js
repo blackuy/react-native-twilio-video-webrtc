@@ -31,7 +31,7 @@ class TwilioRemotePreview extends React.Component {
 
   buildNativeEventWrappers () {
     return [
-      'onFrameDimensionsChanged',
+      'onFrameDimensionsChanged'
     ].reduce((wrappedEvents, eventName) => {
       if (this.props[eventName]) {
         return {

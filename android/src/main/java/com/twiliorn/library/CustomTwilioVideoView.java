@@ -412,9 +412,12 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
 
         //LocalDataTrack localDataTrack = LocalDataTrack.create(getContext());
 
-         if (localDataTrack != null) {
+        if (localDataTrack != null) {
             connectOptionsBuilder.dataTracks(Collections.singletonList(localDataTrack));
         }
+
+        // TODO: provide this via a parameter
+        connectOptionsBuilder.enableAutomaticSubscription(false)
 
         room = Video.connect(getContext(), connectOptionsBuilder.build(), roomListener());
     }

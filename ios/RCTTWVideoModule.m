@@ -362,6 +362,9 @@ RCT_EXPORT_METHOD(connect:(NSString *)accessToken roomName:(NSString *)roomName 
     }
 
     builder.roomName = roomName;
+
+    // TODO: provide this via a parameter
+    builder.isAutomaticSubscriptionEnabled = false;
     
     if(encodingParameters[@"enableH264Codec"]){
       builder.preferredVideoCodecs = @[ [TVIH264Codec new] ];

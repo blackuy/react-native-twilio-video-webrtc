@@ -17,7 +17,6 @@ public class TwilioVideoPreview extends RNVideoViewGroup {
     public TwilioVideoPreview(Context context) {
         super(context);
         CustomTwilioVideoView.registerThumbnailVideoView(this.getSurfaceViewRenderer());
-        this.getSurfaceViewRenderer().setMirror(true);
         this.getSurfaceViewRenderer().applyZOrder(true);
     }
 }

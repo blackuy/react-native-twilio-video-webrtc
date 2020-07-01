@@ -1,3 +1,6 @@
 rootProject.name = 'Example'
 
+include ':react-native-twilio-video-webrtc'
+project(':react-native-twilio-video-webrtc').projectDir = new File(rootProject.projectDir, '../../android')
+
 include ':app'

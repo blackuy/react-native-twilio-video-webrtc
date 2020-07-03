@@ -78,6 +78,8 @@ declare module "react-native-twilio-video-webrtc"{
   type iOSConnectParams = {
     accessToken: string;
     roomName?: string;
+    enableAudio?: boolean;
+    enableVideo?: boolean;
     encodingParameters?: {
       enableH264Codec?: boolean;
       // if audioBitrate OR videoBitrate is provided, you must provide both

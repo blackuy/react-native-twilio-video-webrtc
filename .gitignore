@@ -41,3 +41,13 @@ project.xcworkspace
 # https://guides.cocoapods.org/using/using-cocoapods.html#should-i-check-the-pods-directory-into-source-control
 #
 Pods/
+
+# Android/IJ
+#
+*.iml
+.idea
+.gradle
+local.properties
+
+# vscode
+.vscode/

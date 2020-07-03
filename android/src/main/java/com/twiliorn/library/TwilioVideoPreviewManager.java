@@ -17,6 +17,7 @@ import com.facebook.react.uimanager.annotations.ReactProp;
 
 import java.util.Map;
 
+import org.webrtc.RendererCommon;
 
 public class TwilioVideoPreviewManager extends SimpleViewManager<TwilioVideoPreview> {
 
@@ -25,6 +26,15 @@ public class TwilioVideoPreviewManager extends SimpleViewManager<TwilioVideoPrev
     @Override
     public String getName() {
         return REACT_CLASS;
+    }
+
+    @ReactProp(name = "scaleType")
+    public void setScaleType(TwilioVideoPreview view, @Nullable String scaleType) {
+      if (scaleType.equals("fit")) {
+        view.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FIT);
+      } else {
+        view.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FILL);
+      }
     }
 
     @Override

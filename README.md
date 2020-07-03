@@ -13,17 +13,25 @@ People using a version < 1.0.1 please move to 1.0.1 since the project changed a 
 - react-native >= 0.40.0: install react-native-twilio-video-webrtc@1.0.1
 - react-native < 0.40.0: install react-native-twilio-video-webrtc@1.0.0
 
-### iOS
+### Install Node Package
 
-Add node package using yarn/NPM:
+#### Option A: yarn
 
 ```shell
 yarn add https://github.com/blackuy/react-native-twilio-video-webrtc
 ```
 
-#### If you DO use CocoaPods to manage your react native packages.
+#### Option B: npm
 
-Add this package to your Podfile:
+```shell
+npm install https://github.com/blackuy/react-native-twilio-video-webrtc --save
+```
+
+### iOS
+
+#### Option A: Install with CocoaPods (recommended)
+
+1. Add this package to your Podfile
 
 ```ruby
 pod 'react-native-twilio-video-webrtc', path: '../node_modules/react-native-twilio-video-webrtc'
@@ -31,33 +39,47 @@ pod 'react-native-twilio-video-webrtc', path: '../node_modules/react-native-twil
 
 Note that this will automatically pull in the appropriate version of the underlying `TwilioVideo` pod.
 
-#### If you do NOT use CocoaPods to manage your react native packages.
-
-Add the Twilio dependency to your Podfile:
-
-```ruby
-pod 'TwilioVideo'
-```
-
-Install Pods:
+2. Install Pods with
 
 ```shell
 pod install
 ```
 
-Add the XCode project to your own XCode project's "Libraries" directory from:
+#### Option B: Install without CocoaPods (manual approach)
+
+1. Add the Twilio dependency to your Podfile
+
+```ruby
+pod 'TwilioVideo'
+```
+
+2. Install Pods with
+
+```shell
+pod install
+```
+
+3. Add the XCode project to your own XCode project's `Libraries` directory from
 
 ```
 node_modules/react-native-twilio-video-webrtc/ios/RNTwilioVideoWebRTC.xcodeproj
 ```
 
-Add `libRNTwilioVideoWebRTC.a` to your XCode project target's "Linked Frameworks and Libraries".
-Update the settings of your project as follows:
+4. Add `libRNTwilioVideoWebRTC.a` to your XCode project target's `Linked Frameworks and Libraries`
 
-1. Under `Build Settings`, find `Search Paths`.
-2. Edit *BOTH* `Framework Search Paths` and `Library Search Paths` by adding `$(SRCROOT)/../node_modules/react-native-twilio-video-webrtc/ios` with `recursive`.
+5. Update `Build Settings`
 
-### Permissions
+Find `Search Paths` and add `$(SRCROOT)/../node_modules/react-native-twilio-video-webrtc/ios` with `recursive` to `Framework Search Paths` and `Library Search Paths`
+
+#### Post install
+
+Be sure to increment your iOS Deployment Target to at least iOS 11 through XCode and your `Podfile` contains
+
+```
+platform :ios, '11.0'
+```
+
+#### Permissions
 
 To enable camera usage and microphone usage you will need to add the following entries to your `Info.plist` file:
 
@@ -68,7 +90,7 @@ To enable camera usage and microphone usage you will need to add the following e
 <string>Your message to user when the microphone is accessed for the first time</string>
 ```
 
-### Known Issues
+#### Known Issues
 
 TwilioVideo version 1.3.8 (latest) has the following know issues.
 
@@ -98,6 +120,17 @@ dependencies {
     .....
     .....
     compile project(':react-native-twilio-video-webrtc')
+}
+```
+
+You will also need to update this file so that you compile with java 8 features:
+
+```
+android {
+    compileOptions {
+        sourceCompatibility 1.8
+        targetCompatibility 1.8
+    }
 }
 ```
 
@@ -153,6 +186,7 @@ this library are not stripped. To do that, add these two lines to `proguard-rule
 ```
   -keep class org.webrtc.** { *; }
   -keep class com.twilio.** { *; }
+  -keep class tvi.webrtc.** { *; }
 ```
 
 ## Docs
@@ -191,12 +225,11 @@ export default class Example extends Component {
     status: 'disconnected',
     participants: new Map(),
     videoTracks: new Map(),
-    roomName: '',
     token: ''
   }
 
   _onConnectButtonPress = () => {
-    this.refs.twilioVideo.connect({ roomName: this.state.roomName, accessToken: this.state.token })
+    this.refs.twilioVideo.connect({ accessToken: this.state.token })
     this.setState({status: 'connecting'})
   }
 
@@ -212,6 +245,12 @@ export default class Example extends Component {
   _onFlipButtonPress = () => {
     this.refs.twilioVideo.flipCamera()
   }
+
+  _onRoomDidConnect = ({ roomName, error }) => {
+    console.log('onRoomDidConnect: ', roomName);
+
+    this.setState({ status: 'connected' });
+  };
 
   _onRoomDidDisconnect = ({roomName, error}) => {
     console.log("ERROR: ", error)
@@ -254,12 +293,6 @@ export default class Example extends Component {
             <Text style={styles.welcome}>
               React Native Twilio Video
             </Text>
-            <TextInput
-              style={styles.input}
-              autoCapitalize='none'
-              value={this.state.roomName}
-              onChangeText={(text) => this.setState({roomName: text})}>
-            </TextInput>
             <TextInput
               style={styles.input}
               autoCapitalize='none'
@@ -356,7 +389,9 @@ The `trackId` field no longer exists and should be replaced by `trackSid`.  Comm
 participant views now expect `participantSid` and `videoTrackSid` keys in the `trackIdentity` prop (instead of
 `identity` and `trackId`).
 
+* Make sure you're listening to participant events via `onParticipant{Added/Removed}VideoTrack` rather than `onParticipant{Enabled/Disabled}Track`.
+
 ## Contact
 
 - Martín Fernández <fmartin91@gmail.com>
-- Gaston Morixe <gaston@black.uy>
+- Gaston Morixe <gaston@gastonmorixe.com>

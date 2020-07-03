@@ -6,6 +6,8 @@ import {
   TextInput,
   View,
   Button,
+  PermissionsAndroid,
+  Platform,
   TouchableOpacity,
   Dimensions
 } from 'react-native';
@@ -95,12 +97,15 @@ export default class Example extends Component {
     status: 'disconnected',
     participants: new Map(),
     videoTracks: new Map(),
-    roomName: '',
     token: ''
   }
 
-  _onConnectButtonPress = () => {
-    this.refs.twilioVideo.connect({ roomName: this.state.roomName, accessToken: this.state.token })
+  _onConnectButtonPress = async () => {
+    if (Platform.OS === 'android') {
+      await this._requestAudioPermission()
+      await this._requestCameraPermission()
+    }
+    this.refs.twilioVideo.connect({ accessToken: this.state.token })
     this.setState({status: 'connecting'})
   }
 
@@ -121,7 +126,7 @@ export default class Example extends Component {
     this.setState({status: 'connected'})
   }
 
-  _onRoomDidDisconnect = ({roomName, error}) => {
+  _onRoomDidDisconnect = ({error}) => {
     console.log("ERROR: ", error)
 
     this.setState({status: 'disconnected'})
@@ -153,6 +158,32 @@ export default class Example extends Component {
     this.setState({ videoTracks: new Map([ ...videoTracks ]) });
   }
 
+  _requestAudioPermission =  () => {
+    return PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
+      {
+        title: "Need permission to access microphone",
+        message:
+          "To run this demo we need permission to access your microphone",
+        buttonNegative: "Cancel",
+        buttonPositive: "OK"
+      }
+    );
+  }
+
+  _requestCameraPermission =  () => {
+    return PermissionsAndroid.request(
+     PermissionsAndroid.PERMISSIONS.CAMERA,
+      {
+        title: "Need permission to access camera",
+        message:
+          "To run this demo we need permission to access your camera",
+        buttonNegative: "Cancel",
+        buttonPositive: "OK"
+      }
+    );
+  }
+
   render() {
     return (
       <View style={styles.container}>
@@ -162,12 +193,6 @@ export default class Example extends Component {
             <Text style={styles.welcome}>
               React Native Twilio Video
             </Text>
-            <TextInput
-              style={styles.input}
-              autoCapitalize='none'
-              value={this.state.roomName}
-              onChangeText={(text) => this.setState({roomName: text})}>
-            </TextInput>
             <TextInput
               style={styles.input}
               autoCapitalize='none'

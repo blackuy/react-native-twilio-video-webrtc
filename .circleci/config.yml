@@ -1,0 +1,50 @@
+version: 2.0
+
+attach_workspace: &attach_workspace
+  attach_workspace:
+    at: ~/react-native-twilio-video-webrtc
+
+docker_defaults: &docker_defaults
+  docker:
+    - image: circleci/python:3.6.4-stretch-node-browsers
+  working_directory: ~/react-native-twilio-video-webrtc
+
+jobs:
+  build:
+    <<: *docker_defaults
+    steps:
+      - checkout
+      - restore_cache:
+          name: Restore node_modules cache
+          keys:
+            - v1-npm-deps-{{ checksum "yarn.lock" }}
+      - run:
+          name: Node Dependencies
+          command: yarn install
+      - save_cache:
+          name: Save node_modules cache
+          key: v1-npm-deps-{{ checksum "yarn.lock" }}
+          paths:
+            - node_modules
+            - ~/.cache/yarn
+      - persist_to_workspace:
+          root: ~/react-native-twilio-video-webrtc
+          paths:
+            - node_modules
+  test:
+    <<: *docker_defaults
+    steps:
+      - checkout
+      - *attach_workspace
+      - run:
+          name: Run tests
+          command: yarn run ci
+
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - build
+      - test:
+          requires:
+            - build

@@ -56,25 +56,45 @@ onParticipantAddedVideoTrack: Function
 
 Called when a new video track has been added
 
-@param {{participant, track}}
+@param {{participant, track, enabled}}
 
-#### onParticipantDisabledTrack
-
-```js
-onParticipantDisabledTrack: Function
-```
-
-Called when a track has been disabled. This can be audio or video tracks
-
-@param {{participant, track}}
-
-#### onParticipantEnabledTrack
+#### onParticipantDisabledVideoTrack
 
 ```js
-onParticipantEnabledTrack: Function
+onParticipantDisabledVideoTrack: Function
 ```
 
-Called when a track has been enabled. This can be audio or video tracks
+Called when a video track has been disabled.
+
+@param {{participant, track}}
+
+#### onParticipantDisabledAudioTrack
+
+```js
+onParticipantDisabledAudioTrack: Function
+```
+
+Called when an audio track has been disabled.
+
+@param {{participant, track}}
+
+#### onParticipantEnabledVideoTrack
+
+```js
+onParticipantEnabledVideoTrack: Function
+```
+
+Called when a video track has been enabled.
+
+@param {{participant, track}}
+
+#### onParticipantEnabledAudioTrack
+
+```js
+onParticipantEnabledVideoTrack: Function
+```
+
+Called when an audio track has been enabled.
 
 @param {{participant, track}}
 
@@ -148,6 +168,45 @@ Called when a participant has disconnected
 
 @param {{roomName, participant}}
 
+#### setLocalVideoEnabled
+
+```js
+setLocalVideoEnabled: Function
+```
+
+Called when a local video is disable / enabled, how to use it below
+
+```js
+_onDisableCameraButtonPress = () => {
+  this.refs.twilioVideo
+    .setLocalVideoEnabled(!this.state.cameraDisabled)
+    .then(cameraDisabled => {
+      this.setState({ cameraDisabled });
+    });
+};
+
+```
+
+#### setLocalAudioEnabled
+
+```js
+setLocalAudioEnabled: Function
+```
+
+Called when a local audio is disable / enabled, how to use it below
+
+```js
+_onMuteButtonPress = () => {
+  this.refs.twilioVideo
+    .setLocalAudioEnabled(!this.state.isAudioEnabled)
+    .then(isAudioEnabled => {
+      this.setState({ isAudioEnabled });
+    });
+};
+
+
+```
+
 <br><br>
 
 ## TwilioVideoLocalView
@@ -173,8 +232,8 @@ From [`../src/TwilioVideoParticipantView.js`](../src/TwilioVideoParticipantView.
 
 ```js
 trackIdentifier: {
-    participantIdentity: String
-    videoTrackId: String
+    participantSid: String
+    videoTrackSid: String
 }
 ```
 

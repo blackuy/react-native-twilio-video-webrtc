@@ -50,9 +50,30 @@ const propTypes = {
   onRoomDidDisconnect: PropTypes.func,
 
   /**
-   * Called when a new video track has been added
+   * Called when a new data track has been added
    *
    * @param {{participant, track}}
+   */
+  onParticipantAddedDataTrack: PropTypes.func,
+
+  /**
+   * Called when a data track has been removed
+   *
+   * @param {{participant, track}}
+   */
+  onParticipantRemovedDataTrack: PropTypes.func,
+
+  /**
+   * Called when an dataTrack receives a message
+   *
+   * @param {{message}}
+   */
+  onDataTrackMessageReceived: PropTypes.func,
+
+  /**
+   * Called when a new video track has been added
+   *
+   * @param {{participant, track, enabled}}
    */
   onParticipantAddedVideoTrack: PropTypes.func,
 
@@ -64,6 +85,20 @@ const propTypes = {
   onParticipantRemovedVideoTrack: PropTypes.func,
 
   /**
+   * Called when a new audio track has been added
+   *
+   * @param {{participant, track}}
+   */
+  onParticipantAddedAudioTrack: PropTypes.func,
+
+  /**
+   * Called when a audio track has been removed
+   *
+   * @param {{participant, track}}
+   */
+  onParticipantRemovedAudioTrack: PropTypes.func,
+
+  /**
    * Callback called a participant enters a room.
    */
   onRoomParticipantDidConnect: PropTypes.func,
@@ -73,10 +108,10 @@ const propTypes = {
    */
   onRoomParticipantDidDisconnect: PropTypes.func,
   /**
-    * Called when a video track has been enabled.
-    *
-    * @param {{participant, track}}
-    */
+   * Called when a video track has been enabled.
+   *
+   * @param {{participant, track}}
+   */
   onParticipantEnabledVideoTrack: PropTypes.func,
   /**
    * Called when a video track has been disabled.
@@ -85,10 +120,10 @@ const propTypes = {
    */
   onParticipantDisabledVideoTrack: PropTypes.func,
   /**
-    * Called when an audio track has been enabled.
-    *
-    * @param {{participant, track}}
-    */
+   * Called when an audio track has been enabled.
+   *
+   * @param {{participant, track}}
+   */
   onParticipantEnabledAudioTrack: PropTypes.func,
   /**
    * Called when an audio track has been disabled.
@@ -109,16 +144,43 @@ const nativeEvents = {
   toggleVideo: 4,
   toggleSound: 5,
   getStats: 6,
-  disableOpenSLES: 7
+  disableOpenSLES: 7,
+  toggleSoundSetup: 8,
+  toggleRemoteSound: 9,
+  releaseResource: 10,
+  toggleBluetoothHeadset: 11,
+  sendString: 12
 }
 
 class CustomTwilioVideoView extends Component {
-  connect ({roomName, accessToken}) {
-    this.runCommand(nativeEvents.connectToRoom, [roomName, accessToken])
+  connect ({
+    roomName,
+    accessToken,
+    enableAudio = true,
+    enableVideo = true,
+    enableRemoteAudio = true
+  }) {
+    this.runCommand(nativeEvents.connectToRoom, [
+      roomName,
+      accessToken,
+      enableAudio,
+      enableVideo,
+      enableRemoteAudio
+    ])
+  }
+
+  sendString (message) {
+    this.runCommand(nativeEvents.sendString, [
+      message
+    ])
   }
 
   disconnect () {
     this.runCommand(nativeEvents.disconnect, [])
+  }
+
+  componentWillUnmount () {
+    this.runCommand(nativeEvents.releaseResource, [])
   }
 
   flipCamera () {
@@ -135,12 +197,26 @@ class CustomTwilioVideoView extends Component {
     return Promise.resolve(enabled)
   }
 
+  setRemoteAudioEnabled (enabled) {
+    this.runCommand(nativeEvents.toggleRemoteSound, [enabled])
+    return Promise.resolve(enabled)
+  }
+
+  setBluetoothHeadsetConnected (enabled) {
+    this.runCommand(nativeEvents.toggleBluetoothHeadset, [enabled])
+    return Promise.resolve(enabled)
+  }
+
   getStats () {
     this.runCommand(nativeEvents.getStats, [])
   }
 
   disableOpenSLES () {
     this.runCommand(nativeEvents.disableOpenSLES, [])
+  }
+
+  toggleSoundSetup (speaker) {
+    this.runCommand(nativeEvents.toggleSoundSetup, [speaker])
   }
 
   runCommand (event, args) {
@@ -165,8 +241,13 @@ class CustomTwilioVideoView extends Component {
       'onRoomDidConnect',
       'onRoomDidFailToConnect',
       'onRoomDidDisconnect',
+      'onParticipantAddedDataTrack',
+      'onParticipantRemovedDataTrack',
+      'onDataTrackMessageReceived',
       'onParticipantAddedVideoTrack',
       'onParticipantRemovedVideoTrack',
+      'onParticipantAddedAudioTrack',
+      'onParticipantRemovedAudioTrack',
       'onRoomParticipantDidConnect',
       'onRoomParticipantDidDisconnect',
       'onParticipantEnabledVideoTrack',
@@ -178,7 +259,7 @@ class CustomTwilioVideoView extends Component {
       if (this.props[eventName]) {
         return {
           ...wrappedEvents,
-          [eventName]: (data) => this.props[eventName](data.nativeEvent)
+          [eventName]: data => this.props[eventName](data.nativeEvent)
         }
       }
       return wrappedEvents
@@ -198,6 +279,9 @@ class CustomTwilioVideoView extends Component {
 
 CustomTwilioVideoView.propTypes = propTypes
 
-const NativeCustomTwilioVideoView = requireNativeComponent('RNCustomTwilioVideoView', CustomTwilioVideoView)
+const NativeCustomTwilioVideoView = requireNativeComponent(
+  'RNCustomTwilioVideoView',
+  CustomTwilioVideoView
+)
 
 module.exports = CustomTwilioVideoView

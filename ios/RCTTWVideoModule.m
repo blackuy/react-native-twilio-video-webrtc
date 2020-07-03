@@ -206,11 +206,12 @@ RCT_REMAP_METHOD(setLocalVideoEnabled, enabled:(BOOL)enabled setLocalVideoEnable
                  rejecter:(RCTPromiseRejectBlock)reject) {
   if (self.localVideoTrack != nil) {
     [self.localVideoTrack setEnabled:enabled];
+    resolve(@(enabled));
   }
   else{
     [self createLocalVideoTrack];
+    resolve(@true);
   }
-  resolve(@(enabled));
 }
 
 RCT_EXPORT_METHOD(createLocalVideoTrack) {

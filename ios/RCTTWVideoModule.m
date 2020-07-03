@@ -65,6 +65,7 @@ TVIVideoFormat *RCTTWVideoModuleCameraSourceSelectVideoFormatBySize(AVCaptureDev
 @property (strong, nonatomic) TVILocalVideoTrack* localVideoTrack;
 @property (strong, nonatomic) TVILocalAudioTrack* localAudioTrack;
 @property (strong, nonatomic) TVILocalDataTrack* localDataTrack;
+@property (strong, nonatomic) TVILocalParticipant* localParticipant;
 @property (strong, nonatomic) TVIRoom *room;
 @property (nonatomic) BOOL listening;
 
@@ -205,8 +206,17 @@ RCT_REMAP_METHOD(setLocalVideoEnabled, enabled:(BOOL)enabled setLocalVideoEnable
                  rejecter:(RCTPromiseRejectBlock)reject) {
   if (self.localVideoTrack != nil) {
     [self.localVideoTrack setEnabled:enabled];
-    resolve(@(enabled));
   }
+  else{
+    [self createLocalVideoTrack];
+  }
+  resolve(@(enabled));
+}
+
+RCT_EXPORT_METHOD(createLocalVideoTrack) {
+  [self startLocalVideo];
+  // Publish video so other Room Participants can subscribe
+  [self.localParticipant publishVideoTrack:self.localVideoTrack];
 }
 
 
@@ -339,11 +349,21 @@ RCT_EXPORT_METHOD(getStats) {
   }
 }
 
-RCT_EXPORT_METHOD(connect:(NSString *)accessToken roomName:(NSString *)roomName encodingParameters:(NSDictionary *)encodingParameters) {
-  if (self.localVideoTrack == nil) {
-    // We disabled video in a previous call, attempt to re-enable
-    [self startLocalVideo];
-  }
+-(void)enableLocalVideoAtCreationTime:(BOOL *)enableVideo {
+    if(enableVideo){
+      if (self.localVideoTrack == nil) {
+        // We disabled video in a previous call, attempt to re-enable
+        [self startLocalVideo];
+      }
+    }
+    else {
+      [self stopLocalVideo];
+    }
+}
+
+RCT_EXPORT_METHOD(connect:(NSString *)accessToken roomName:(NSString *)roomName enableVideo:(NSString *)enableVideo encodingParameters:(NSDictionary *)encodingParameters) {
+
+  [self enableLocalVideoAtCreationTime: enableVideo];
 
   TVIConnectOptions *connectOptions = [TVIConnectOptions optionsWithToken:accessToken block:^(TVIConnectOptionsBuilder * _Nonnull builder) {
     if (self.localVideoTrack) {
@@ -438,9 +458,9 @@ RCT_EXPORT_METHOD(disconnect) {
     p.delegate = self;
     [participants addObject:[p toJSON]];
   }
-  TVILocalParticipant *localParticipant = room.localParticipant;
-  [participants addObject:[localParticipant toJSON]];
-    [self sendEventCheckingListenerWithName:roomDidConnect body:@{ @"roomName" : room.name , @"roomSid": room.sid, @"participants" : participants }];
+  self.localParticipant = room.localParticipant;
+  [participants addObject:[self.localParticipant toJSON]];
+  [self sendEventCheckingListenerWithName:roomDidConnect body:@{ @"roomName" : room.name , @"roomSid": room.sid, @"participants" : participants }];
 
 }
 

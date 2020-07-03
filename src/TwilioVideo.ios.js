@@ -160,7 +160,6 @@ export default class extends Component {
 
   componentWillMount () {
     this._registerEvents()
-    this._startLocalVideo()
     this._startLocalAudio()
   }
 

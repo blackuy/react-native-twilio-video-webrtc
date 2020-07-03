@@ -537,38 +537,14 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     }
 
     public void toggleVideo(boolean enabled) {
-        WritableMap event = new WritableNativeMap();
-        event.putBoolean("videoEnabled", enabled);
-
         if (localVideoTrack != null) {
             localVideoTrack.enable(enabled);
-        }
-        if (room == null) {
-            // No room to publish/unpublish from
-        } else {
-            if (enabled) {
-                 if (localVideoTrack != null) {
-                     // Already enabled
-                 } else {
-                     boolean createVideoStatus = createLocalVideo(true);
-                     if (createVideoStatus) {
-                        localParticipant.publishTrack(localVideoTrack);
-                     }
-                 }
-            } else {
-                if (localVideoTrack == null) {
-                    // Already disabled
-                } else {
-                    localParticipant.unpublishTrack(localVideoTrack);
-                    cameraCapturer.stopCapture();
-                    localVideoTrack = null;
-                    cameraCapturer = null;
-                }
-            }
-        }
 
+            WritableMap event = new WritableNativeMap();
+            event.putBoolean("videoEnabled", enabled);
             pushEvent(CustomTwilioVideoView.this, ON_VIDEO_CHANGED, event);
         }
+    }
 
     public void toggleSoundSetup(boolean speaker){
       AudioManager audioManager = (AudioManager) getContext().getSystemService(Context.AUDIO_SERVICE);
@@ -776,6 +752,9 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
                 }
                 event.putString("roomName", room.getName());
                 event.putString("roomSid", room.getSid());
+                if (e != null) {
+                  event.putString("error", e.getMessage());
+                }
                 pushEvent(CustomTwilioVideoView.this, ON_DISCONNECTED, event);
 
                 localParticipant = null;

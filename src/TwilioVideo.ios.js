@@ -225,8 +225,8 @@ export default class extends Component {
    * @param  {String} accessToken The Twilio's JWT access token
    * @param  {String} encodingParameters Control Encoding config
    */
-  connect ({ roomName, accessToken, encodingParameters }) {
-    TWVideoModule.connect(accessToken, roomName, encodingParameters)
+  connect ({ roomName, accessToken, enableVideo = true, encodingParameters }) {
+    TWVideoModule.connect(accessToken, roomName, enableVideo, encodingParameters)
   }
 
   /**

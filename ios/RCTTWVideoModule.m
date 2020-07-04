@@ -362,7 +362,7 @@ RCT_EXPORT_METHOD(getStats) {
     }
 }
 
-RCT_EXPORT_METHOD(connect:(NSString *)accessToken roomName:(NSString *)roomName enableVideo:(NSString *)enableVideo encodingParameters:(NSDictionary *)encodingParameters) {
+RCT_EXPORT_METHOD(connect:(NSString *)accessToken roomName:(NSString *)roomName enableVideo:(BOOL *)enableVideo encodingParameters:(NSDictionary *)encodingParameters) {
 
   [self enableLocalVideoAtCreationTime: enableVideo];
 

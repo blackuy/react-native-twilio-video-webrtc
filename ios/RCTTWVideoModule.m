@@ -204,20 +204,26 @@ RCT_REMAP_METHOD(setLocalAudioEnabled, enabled:(BOOL)enabled setLocalAudioEnable
 
 RCT_REMAP_METHOD(setLocalVideoEnabled, enabled:(BOOL)enabled setLocalVideoEnabledWithResolver:(RCTPromiseResolveBlock)resolve
                  rejecter:(RCTPromiseRejectBlock)reject) {
-  if (self.localVideoTrack != nil) {
-    [self.localVideoTrack setEnabled:enabled];
-    resolve(@(enabled));
+  if(self.localVideoTrack != nil){
+      [self.localVideoTrack setEnabled:enabled];
+      resolve(@(enabled));
   }
-  else{
-    [self createLocalVideoTrack];
-    resolve(@true);
+  else if (enabled){
+      [self createLocalVideoTrack];
+      resolve(@true);
+  }
+  else {
+      resolve(@false);
   }
 }
 
 RCT_EXPORT_METHOD(createLocalVideoTrack) {
   [self startLocalVideo];
   // Publish video so other Room Participants can subscribe
-  [self.localParticipant publishVideoTrack:self.localVideoTrack];
+  // This check is required when TVICameraSource return nil Eg: simulator
+  if(self.localVideoTrack != nil){
+    [self.localParticipant publishVideoTrack:self.localVideoTrack];
+  }
 }
 
 
@@ -353,12 +359,13 @@ RCT_EXPORT_METHOD(getStats) {
 -(void)enableLocalVideoAtCreationTime:(BOOL *)enableVideo {
     if(enableVideo){
       if (self.localVideoTrack == nil) {
-        // We disabled video in a previous call, attempt to re-enable
-        [self startLocalVideo];
+          // We disabled video in a previous call, attempt to re-enable
+          [self startLocalVideo];
+      } else {
+          [self.localVideoTrack setEnabled:true];
       }
-    }
-    else {
-      [self stopLocalVideo];
+    } else {
+        [self stopLocalVideo];
     }
 }
 

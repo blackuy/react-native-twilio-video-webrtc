@@ -217,7 +217,7 @@ RCT_REMAP_METHOD(setLocalVideoEnabled, enabled:(BOOL)enabled setLocalVideoEnable
   }
 }
 
-RCT_EXPORT_METHOD(createLocalVideoTrack) {
+-(void)createLocalVideoTrack {
   [self startLocalVideo];
   // Publish video so other Room Participants can subscribe
   // This check is required when TVICameraSource return nil Eg: simulator

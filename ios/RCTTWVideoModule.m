@@ -207,12 +207,10 @@ RCT_REMAP_METHOD(setLocalVideoEnabled, enabled:(BOOL)enabled setLocalVideoEnable
   if(self.localVideoTrack != nil){
       [self.localVideoTrack setEnabled:enabled];
       resolve(@(enabled));
-  }
-  else if (enabled){
+  } else if(enabled) {
       [self createLocalVideoTrack];
       resolve(@true);
-  }
-  else {
+  } else {
       resolve(@false);
   }
 }

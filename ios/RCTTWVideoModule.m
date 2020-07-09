@@ -195,6 +195,26 @@ RCT_EXPORT_METHOD(stopLocalAudio) {
   self.localAudioTrack = nil;
 }
 
+RCT_EXPORT_METHOD(publishLocalVideo) {
+  TVILocalParticipant *localParticipant = self.room.localParticipant;
+  [localParticipant publishVideoTrack:self.localVideoTrack];
+}
+
+RCT_EXPORT_METHOD(publishLocalAudio) {
+  TVILocalParticipant *localParticipant = self.room.localParticipant;
+  [localParticipant publishAudioTrack:self.localAudioTrack];
+}
+
+RCT_EXPORT_METHOD(unpublishLocalVideo) {
+  TVILocalParticipant *localParticipant = self.room.localParticipant;
+  [localParticipant unpublishVideoTrack:self.localVideoTrack];
+}
+
+RCT_EXPORT_METHOD(unpublishLocalAudio) {
+  TVILocalParticipant *localParticipant = self.room.localParticipant;
+  [localParticipant unpublishAudioTrack:self.localAudioTrack];
+}
+
 RCT_REMAP_METHOD(setLocalAudioEnabled, enabled:(BOOL)enabled setLocalAudioEnabledWithResolver:(RCTPromiseResolveBlock)resolve
     rejecter:(RCTPromiseRejectBlock)reject) {
   [self.localAudioTrack setEnabled:enabled];

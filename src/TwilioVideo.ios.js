@@ -148,19 +148,6 @@ export default class extends Component {
 
     this._subscriptions = []
     this._eventEmitter = new NativeEventEmitter(TWVideoModule)
-
-    this.setLocalVideoEnabled = this.setLocalVideoEnabled.bind(this)
-    this.setLocalAudioEnabled = this.setLocalAudioEnabled.bind(this)
-    this.flipCamera = this.flipCamera.bind(this)
-    this.connect = this.connect.bind(this)
-    this.disconnect = this.disconnect.bind(this)
-    this.sendString = this.sendString.bind(this)
-    this.setRemoteAudioPlayback = this.setRemoteAudioPlayback.bind(this)
-    this.unpublishLocalAudio = this.unpublishLocalAudio.bind(this)
-    this.unpublishLocalVideo = this.unpublishLocalVideo.bind(this)
-
-    this.publishLocalAudio = this.publishLocalAudio.bind(this)
-    this.publishLocalVideo = this.publishLocalVideo.bind(this)
   }
 
   componentWillMount () {

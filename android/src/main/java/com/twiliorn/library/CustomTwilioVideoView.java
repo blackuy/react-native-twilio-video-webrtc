@@ -586,6 +586,26 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         }
     }
 
+    public void publishLocalVideo(boolean enabled) {
+        if (localParticipant != null && localVideoTrack != null) {
+            if (enabled) {
+                localParticipant.publishTrack(localVideoTrack);
+            } else {
+                localParticipant.unpublishTrack(localVideoTrack);
+            }
+        }
+    }
+
+    public void publishLocalAudio(boolean enabled) {
+        if (localParticipant != null && localAudioTrack != null) {
+            if (enabled) {
+                localParticipant.publishTrack(localAudioTrack);
+            } else {
+                localParticipant.unpublishTrack(localAudioTrack);
+            }
+        }
+    }
+
 
     private void convertBaseTrackStats(BaseTrackStats bs, WritableMap result) {
         result.putString("codec", bs.codec);

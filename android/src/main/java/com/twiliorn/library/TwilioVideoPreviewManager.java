@@ -19,8 +19,6 @@ import java.util.Map;
 
 import org.webrtc.RendererCommon;
 
-import static com.twiliorn.library.RNVideoViewGroup.Events.ON_FRAME_DIMENSIONS_CHANGED;
-
 public class TwilioVideoPreviewManager extends SimpleViewManager<TwilioVideoPreview> {
 
     public static final String REACT_CLASS = "RNTwilioVideoPreview";
@@ -37,16 +35,6 @@ public class TwilioVideoPreviewManager extends SimpleViewManager<TwilioVideoPrev
       } else {
         view.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FILL);
       }
-    }
-
-    @Override
-    @Nullable
-    public Map getExportedCustomDirectEventTypeConstants() {
-        Map<String, Map<String, String>> map = MapBuilder.of(
-                ON_FRAME_DIMENSIONS_CHANGED, MapBuilder.of("registrationName", ON_FRAME_DIMENSIONS_CHANGED)
-        );
-
-        return map;
     }
 
     @Override

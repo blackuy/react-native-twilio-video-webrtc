@@ -6,15 +6,16 @@
  */
 
 package com.twiliorn.library;
-import com.facebook.react.bridge.WritableMap;
-import com.facebook.react.uimanager.ThemedReactContext;
+
+import android.content.Context;
+
 
 public class TwilioVideoPreview extends RNVideoViewGroup {
 
     private static final String TAG = "TwilioVideoPreview";
 
-    public TwilioVideoPreview(ThemedReactContext themedReactContext) {
-        super(themedReactContext);
+    public TwilioVideoPreview(Context context) {
+        super(context);
         CustomTwilioVideoView.registerThumbnailVideoView(this.getSurfaceViewRenderer());
         this.getSurfaceViewRenderer().applyZOrder(true);
     }

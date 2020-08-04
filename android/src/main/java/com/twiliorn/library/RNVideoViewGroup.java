@@ -8,24 +8,12 @@ package com.twiliorn.library;
 
 import android.content.Context;
 import android.graphics.Point;
-import android.view.View;
 import android.view.ViewGroup;
-import android.support.annotation.StringDef;
 
-import com.facebook.react.bridge.WritableMap;
-import com.facebook.react.bridge.WritableNativeMap;
-import com.facebook.react.uimanager.ThemedReactContext;
-import com.facebook.react.uimanager.events.RCTEventEmitter;
-import com.twilio.video.VideoFrame;
 import com.twilio.video.VideoRenderer;
 import com.twilio.video.VideoScaleType;
 
 import org.webrtc.RendererCommon;
-
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-
-import static com.twiliorn.library.RNVideoViewGroup.Events.ON_FRAME_DIMENSIONS_CHANGED;
 
 public class RNVideoViewGroup extends ViewGroup {
     private PatchedVideoView surfaceViewRenderer = null;
@@ -33,22 +21,12 @@ public class RNVideoViewGroup extends ViewGroup {
     private int videoHeight = 0;
     private final Object layoutSync = new Object();
     private RendererCommon.ScalingType scalingType = RendererCommon.ScalingType.SCALE_ASPECT_FILL;
-    private final RCTEventEmitter eventEmitter;
 
-    @Retention(RetentionPolicy.SOURCE)
-    @StringDef({ON_FRAME_DIMENSIONS_CHANGED})
-    public @interface Events {
-        String ON_FRAME_DIMENSIONS_CHANGED = "onFrameDimensionsChanged";
-    }
 
-    void pushEvent(View view, String name, WritableMap data) {
-        eventEmitter.receiveEvent(view.getId(), name, data);
-    }
+    public RNVideoViewGroup(Context context) {
+        super(context);
 
-    public RNVideoViewGroup(ThemedReactContext themedReactContext) {
-        super(themedReactContext);
-        this.eventEmitter = themedReactContext.getJSModule(RCTEventEmitter.class);
-        surfaceViewRenderer = new PatchedVideoView(themedReactContext);
+        surfaceViewRenderer = new PatchedVideoView(context);
         surfaceViewRenderer.setVideoScaleType(VideoScaleType.ASPECT_FILL);
         addView(surfaceViewRenderer);
         surfaceViewRenderer.setListener(
@@ -61,21 +39,9 @@ public class RNVideoViewGroup extends ViewGroup {
                     @Override
                     public void onFrameDimensionsChanged(int vw, int vh, int rotation) {
                         synchronized (layoutSync) {
-                            if (rotation == VideoFrame.RotationAngle.ROTATION_90.getValue() ||
-                                    rotation == VideoFrame.RotationAngle.ROTATION_270.getValue()) {
-                                videoHeight = vw;
-                                videoWidth = vh;
-                            } else {
-                                videoHeight = vh;
-                                videoWidth = vw;
-                            }
+                            videoHeight = vh;
+                            videoWidth = vw;
                             RNVideoViewGroup.this.forceLayout();
-
-                            WritableMap event = new WritableNativeMap();
-                            event.putInt("height", vh);
-                            event.putInt("width", vw);
-                            event.putInt("rotation", rotation);
-                            pushEvent(RNVideoViewGroup.this, ON_FRAME_DIMENSIONS_CHANGED, event);
                         }
                     }
                 }

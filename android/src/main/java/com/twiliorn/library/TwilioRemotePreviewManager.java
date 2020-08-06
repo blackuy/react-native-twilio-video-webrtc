@@ -1,3 +1,4 @@
+
 /**
  * Component for Twilio Video participant views.
  * <p>
@@ -15,12 +16,15 @@ import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.annotations.ReactProp;
 
 import org.webrtc.RendererCommon;
-
+import com.facebook.react.bridge.ReadableArray;
+import java.util.Map;
+import com.facebook.react.common.MapBuilder;
 
 public class TwilioRemotePreviewManager extends SimpleViewManager<TwilioRemotePreview> {
 
     public static final String REACT_CLASS = "RNTwilioRemotePreview";
     public String myTrackSid = "";
+    private static final int TAKE_SNAPSHOT = 10001;
 
     @Override
     public String getName() {
@@ -46,6 +50,32 @@ public class TwilioRemotePreviewManager extends SimpleViewManager<TwilioRemotePr
         CustomTwilioVideoView.registerPrimaryVideoView(view.getSurfaceViewRenderer(), trackSid);
     }
 
+    @Override
+    public void receiveCommand(TwilioRemotePreview view, int commandId, @Nullable ReadableArray args) {
+      switch (commandId) {
+          case TAKE_SNAPSHOT:
+              view.takeSnapshot();
+              break;
+      }
+    }
+
+    @Override
+    @Nullable
+    public Map<String, Integer> getCommandsMap() {
+        return MapBuilder.<String, Integer>builder()
+                .put("takeSnapshot", TAKE_SNAPSHOT)
+                .build();
+    }
+
+    @Override
+    @Nullable
+    public Map getExportedCustomDirectEventTypeConstants() {
+        Map<String, Map<String, String>> map = MapBuilder.of(
+                "onSnapshot", MapBuilder.of("registrationName", "onSnapshot")
+        );
+
+        return map;
+    }
 
     @Override
     protected TwilioRemotePreview createViewInstance(ThemedReactContext reactContext) {

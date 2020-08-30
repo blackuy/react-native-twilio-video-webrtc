@@ -22,10 +22,6 @@ class TwilioVideoPreview extends React.Component {
 }
 
 TwilioVideoPreview.propTypes = propTypes
-TwilioVideoPreview.defaultProps = {
-  applyZOrder: true
-}
-
 
 const NativeTwilioVideoPreview = requireNativeComponent(
   'RNTwilioVideoPreview',

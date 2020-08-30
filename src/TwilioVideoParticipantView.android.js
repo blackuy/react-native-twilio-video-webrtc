@@ -32,10 +32,6 @@ class TwilioRemotePreview extends React.Component {
     applyZOrder: PropTypes.bool
   }
 
-  static defaultProps = {
-    applyZOrder: false
-  }
-
   buildNativeEventWrappers () {
     return [
       'onFrameDimensionsChanged'

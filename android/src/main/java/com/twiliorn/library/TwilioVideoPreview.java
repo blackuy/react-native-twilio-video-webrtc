@@ -16,13 +16,9 @@ public class TwilioVideoPreview extends RNVideoViewGroup {
     public TwilioVideoPreview(ThemedReactContext themedReactContext) {
         super(themedReactContext);
         CustomTwilioVideoView.registerThumbnailVideoView(this.getSurfaceViewRenderer());
-        // TODO: Make this work!
-        this.applyZOrder(true);
     }
 
-    public applyZOrder(Boolean applyZOrder) {
-        if (applyZOrder != null) {
-            this.getSurfaceViewRenderer().applyZOrder(applyZOrder);
-        }
+    public applyZOrder(boolean applyZOrder) {
+        this.getSurfaceViewRenderer().applyZOrder(applyZOrder);
     }
 }

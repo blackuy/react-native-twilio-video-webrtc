@@ -8,18 +8,29 @@
  */
 package com.twiliorn.library;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.ByteBuffer;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.AudioAttributes;
 import android.media.AudioFocusRequest;
 import android.media.AudioManager;
 import android.os.Build;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.support.annotation.NonNull;
@@ -119,7 +130,8 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
             Events.ON_PARTICIPANT_DISABLED_VIDEO_TRACK,
             Events.ON_PARTICIPANT_ENABLED_AUDIO_TRACK,
             Events.ON_PARTICIPANT_DISABLED_AUDIO_TRACK,
-            Events.ON_STATS_RECEIVED})
+            Events.ON_STATS_RECEIVED,
+            Events.ON_TAKE_CAPTURE_SUCCESS,})
     public @interface Events {
         String ON_CAMERA_SWITCHED = "onCameraSwitched";
         String ON_VIDEO_CHANGED = "onVideoChanged";
@@ -141,6 +153,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         String ON_PARTICIPANT_ENABLED_AUDIO_TRACK = "onParticipantEnabledAudioTrack";
         String ON_PARTICIPANT_DISABLED_AUDIO_TRACK = "onParticipantDisabledAudioTrack";
         String ON_STATS_RECEIVED = "onStatsReceived";
+        String ON_TAKE_CAPTURE_SUCCESS = "onTakeCaptureSuccess";
     }
 
     private final ThemedReactContext themedReactContext;
@@ -606,6 +619,69 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         }
     }
 
+    public void takeCapture() {
+        if (cameraCapturer != null) {
+            cameraCapturer.takePicture(pictureListener);
+        }
+    }
+
+    private final CameraCapturer.PictureListener pictureListener =
+            new CameraCapturer.PictureListener() {
+                @Override
+                public void onShutter() {
+
+                }
+
+                @Override
+                public void onPictureTaken(@NonNull byte[] bytes) {
+                    Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                    if (bitmap != null) {
+                        saveTempBitmap(bitmap);
+                    } else {
+                        Log.w(TAG, "onPictureTaken: null bitmap");
+                    }
+                }
+            };
+
+    private void saveTempBitmap(Bitmap bitmap) {
+        if (isExternalStorageWritable()) {
+            try {
+                saveToStorage(bitmap);
+            } catch (IOException e) {
+                Log.e(TAG, "Save bitmap exception: " + e.getMessage());
+            }
+        }else{
+            Log.w(TAG, "No Writable storage");
+        }
+    }
+
+    private void saveToStorage(final Bitmap finalBitmap) throws IOException {
+        String path = Environment
+                .getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).toString();
+
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault())
+                .format(new Date());
+        String name = "IMG_" + timeStamp +".jpg";
+        File bitmapFile = new File(path, name);
+
+        // Get the file output stream
+        OutputStream stream = new FileOutputStream(bitmapFile);
+
+        // Compress the bitmap
+        finalBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+
+        // Flush the output stream
+        stream.flush();
+
+        // Close the output stream
+        stream.close();
+    }
+
+    /* Checks if external storage is available for read and write */
+    public boolean isExternalStorageWritable() {
+        String state = Environment.getExternalStorageState();
+        return Environment.MEDIA_MOUNTED.equals(state);
+    }
 
     private void convertBaseTrackStats(BaseTrackStats bs, WritableMap result) {
         result.putString("codec", bs.codec);

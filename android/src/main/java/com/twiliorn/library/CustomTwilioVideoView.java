@@ -528,12 +528,12 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         }
 
     // ===== BUTTON LISTENERS ======================================================================
+
+    // TODO: add posible to pass property from props
     private static void setThumbnailMirror() {
         if (cameraCapturer != null) {
-            CameraCapturer.CameraSource cameraSource = cameraCapturer.getCameraSource();
-            final boolean isBackCamera = (cameraSource == CameraCapturer.CameraSource.BACK_CAMERA);
             if (thumbnailVideoView != null && thumbnailVideoView.getVisibility() == View.VISIBLE) {
-                thumbnailVideoView.setMirror(!isBackCamera);
+                thumbnailVideoView.setMirror(false);
             }
         }
     }

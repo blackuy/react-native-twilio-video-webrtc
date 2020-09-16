@@ -21,6 +21,8 @@ import java.util.Locale;
 import java.util.Map;
 
 import android.content.BroadcastReceiver;
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -29,12 +31,16 @@ import android.graphics.BitmapFactory;
 import android.media.AudioAttributes;
 import android.media.AudioFocusRequest;
 import android.media.AudioManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
-import android.support.annotation.NonNull;
-import android.support.annotation.StringDef;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.StringDef;
+
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 
@@ -83,6 +89,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_AUDIO_CHANGED;
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_CAMERA_SWITCHED;
@@ -636,45 +643,59 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
                 public void onPictureTaken(@NonNull byte[] bytes) {
                     Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
                     if (bitmap != null) {
-                        saveTempBitmap(bitmap);
+                        savePicture(bitmap);
                     } else {
                         Log.w(TAG, "onPictureTaken: null bitmap");
                     }
                 }
             };
 
-    private void saveTempBitmap(Bitmap bitmap) {
+    private void savePicture(Bitmap bitmap) {
         if (isExternalStorageWritable()) {
             try {
                 saveToStorage(bitmap);
             } catch (IOException e) {
                 Log.e(TAG, "Save bitmap exception: " + e.getMessage());
             }
-        }else{
+        } else {
             Log.w(TAG, "No Writable storage");
         }
     }
 
-    private void saveToStorage(final Bitmap finalBitmap) throws IOException {
-        String path = Environment
-                .getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).toString();
-
+    private void saveToStorage(Bitmap bitmap) throws IOException {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault())
                 .format(new Date());
-        String name = "IMG_" + timeStamp +".jpg";
-        File bitmapFile = new File(path, name);
+        String imageName = "RW_" + timeStamp + ".jpg";
 
-        // Get the file output stream
-        OutputStream stream = new FileOutputStream(bitmapFile);
+        OutputStream fos;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            ContentResolver resolver = getContext().getContentResolver();
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, imageName);
+            contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "image/jpg");
+            contentValues.put(MediaStore.MediaColumns.RELATIVE_PATH,
+                    Environment.DIRECTORY_DCIM + "/" + Environment.DIRECTORY_SCREENSHOTS);
+            Uri imageUri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues);
+            fos = resolver.openOutputStream(Objects.requireNonNull(imageUri));
+        } else {
+            String imagesDir = Environment.getExternalStoragePublicDirectory(
+                    Environment.DIRECTORY_DCIM).toString();
+            String pathToScreenshotDir = imagesDir + "/Screenshots";
 
-        // Compress the bitmap
-        finalBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+            File screenshotDir = new File(pathToScreenshotDir);
+            if (!screenshotDir.exists()) {
+                if (!screenshotDir.mkdirs()) {
+                    Log.w(TAG, "Screenshots dir not created!");
+                    return;
+                }
+            }
 
-        // Flush the output stream
-        stream.flush();
+            File image = new File(pathToScreenshotDir, imageName);
 
-        // Close the output stream
-        stream.close();
+            fos = new FileOutputStream(image);
+        }
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+        Objects.requireNonNull(fos).close();
     }
 
     /* Checks if external storage is available for read and write */

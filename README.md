@@ -278,10 +278,10 @@ export default class Example extends Component {
   _onParticipantRemovedVideoTrack = ({participant, track}) => {
     console.log("onParticipantRemovedVideoTrack: ", participant, track)
 
-    const videoTracks = this.state.videoTracks
+    const videoTracks = new Map(this.state.videoTracks)
     videoTracks.delete(track.trackSid)
 
-    this.setState({videoTracks: { ...videoTracks }})
+    this.setState({videoTracks})
   }
 
   render() {

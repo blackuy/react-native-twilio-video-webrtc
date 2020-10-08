@@ -196,8 +196,10 @@ RCT_EXPORT_METHOD(stopLocalAudio) {
 }
 
 RCT_EXPORT_METHOD(publishLocalVideo) {
-  TVILocalParticipant *localParticipant = self.room.localParticipant;
-  [localParticipant publishVideoTrack:self.localVideoTrack];
+  if(self.localVideoTrack != nil){
+    TVILocalParticipant *localParticipant = self.room.localParticipant;
+    [localParticipant publishVideoTrack:self.localVideoTrack];
+  }
 }
 
 RCT_EXPORT_METHOD(publishLocalAudio) {

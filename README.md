@@ -211,7 +211,7 @@ import {
 Here you can see a complete example of a simple application that uses almost all the apis:
 
 ````javascript
-import React, { Component } from 'react';
+import React, { Component, useRef } from 'react';
 import {
   TwilioVideoLocalView,
   TwilioVideoParticipantView,
@@ -225,25 +225,25 @@ const CallScreen = (props) => {
   const [participants, setParticipants] = useState(new Map());
   const [videoTracks, setVideoTracks] = useState(new Map());
   const [token, setToken] = useState('');
-  let twilioRef = null;
+  const twilioRef = useRef(null);
 
   const _onConnectButtonPress = () => {
-    twilioRef.connect({ accessToken: token });
+    twilioRef.current.connect({ accessToken: token });
     setStatus('connecting');
   }
   
   const _onEndButtonPress = () => {
-    twilioRef.disconnect();
+    twilioRef.current.disconnect();
   };
 
   const _onMuteButtonPress = () => {
-    twilioRef
+    twilioRef.current
       .setLocalAudioEnabled(!isAudioEnabled)
       .then(isEnabled => setIsAudioEnabled(isEnabled));
   };
 
   const _onFlipButtonPress = () => {
-    twilioRef.flipCamera();
+    twilioRef.current.flipCamera();
   };
 
   const _onRoomDidConnect = ({roomName, error}) => {
@@ -285,10 +285,6 @@ const CallScreen = (props) => {
     videoTracksLocal.delete(track.trackSid);
 
     setVideoTracks(videoTracksLocal);
-  };
-
-  const _setTwilioRef = ref => {
-    twilioRef = ref;
   };
 
   return (
@@ -358,7 +354,7 @@ const CallScreen = (props) => {
       }
 
       <TwilioVideo
-        ref={ _setTwilioRef }
+        ref={ twilioRef }
         onRoomDidConnect={ _onRoomDidConnect }
         onRoomDidDisconnect={ _onRoomDidDisconnect }
         onRoomDidFailToConnect= { _onRoomDidFailToConnect }

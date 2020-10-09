@@ -218,7 +218,7 @@ import {
   TwilioVideo
 } from 'react-native-twilio-video-webrtc';
 
-const CallScreen = (props) => {
+const Example = (props) => {
   const [isAudioEnabled, setIsAudioEnabled] = useState(true);
   const [isVideoEnabled, setIsVideoEnabled] = useState(true);
   const [status, setStatus] = useState('disconnected');

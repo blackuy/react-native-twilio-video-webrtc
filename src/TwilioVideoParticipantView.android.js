@@ -17,6 +17,7 @@ class TwilioRemotePreview extends React.Component {
        */
       videoTrackSid: PropTypes.string.isRequired
     }),
+    onFrameDimensionsChanged: PropTypes.func,
     trackSid: PropTypes.string,
     renderToHardwareTextureAndroid: PropTypes.string,
     onLayout: PropTypes.string,
@@ -28,12 +29,27 @@ class TwilioRemotePreview extends React.Component {
     testID: PropTypes.string
   }
 
+  buildNativeEventWrappers () {
+    return [
+      'onFrameDimensionsChanged'
+    ].reduce((wrappedEvents, eventName) => {
+      if (this.props[eventName]) {
+        return {
+          ...wrappedEvents,
+          [eventName]: data => this.props[eventName](data.nativeEvent)
+        }
+      }
+      return wrappedEvents
+    }, {})
+  }
+
   render () {
     const { trackIdentifier } = this.props
     return (
       <NativeTwilioRemotePreview
         trackSid={trackIdentifier && trackIdentifier.videoTrackSid}
         {...this.props}
+        {...this.buildNativeEventWrappers()}
       />
     )
   }

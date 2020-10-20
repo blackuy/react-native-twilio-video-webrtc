@@ -21,9 +21,10 @@ import android.media.AudioFocusRequest;
 import android.media.AudioManager;
 import android.os.Build;
 import android.os.Handler;
+import androidx.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.StringDef;
 import android.os.HandlerThread;
-import android.support.annotation.NonNull;
-import android.support.annotation.StringDef;
 import android.util.Log;
 import android.view.View;
 

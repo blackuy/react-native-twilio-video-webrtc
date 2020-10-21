@@ -78,11 +78,7 @@ TVIVideoFormat *RCTTWVideoModuleCameraSourceSelectVideoFormatBySize(AVCaptureDev
 RCT_EXPORT_MODULE();
 
 - (void)dealloc {
-  // We are done with camera
-  if (self.camera) {
-      [self.camera stopCapture];
-      self.camera = nil;
-  }
+  [self clearCameraInstance];
 }
 
 - (dispatch_queue_t)methodQueue {
@@ -431,7 +427,16 @@ RCT_EXPORT_METHOD(sendString:(nonnull NSString *)message) {
 }
 
 RCT_EXPORT_METHOD(disconnect) {
+  [self clearCameraInstance];
   [self.room disconnect];
+}
+
+- (void)clearCameraInstance {
+    // We are done with camera
+    if (self.camera) {
+        [self.camera stopCapture];
+        self.camera = nil;
+    }
 }
 
 # pragma mark - Common

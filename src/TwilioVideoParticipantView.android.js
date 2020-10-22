@@ -5,9 +5,13 @@
  *   Jonathan Chang <slycoder@gmail.com>
  */
 
-import { requireNativeComponent } from 'react-native'
+import { requireNativeComponent, Platform, UIManager, findNodeHandle } from 'react-native'
 import PropTypes from 'prop-types'
 import React from 'react'
+
+const nativeEvents = {
+  takeSnapshot: 10001,
+}
 
 class TwilioRemotePreview extends React.Component {
   static propTypes = {
@@ -29,8 +33,27 @@ class TwilioRemotePreview extends React.Component {
     testID: PropTypes.string
   }
 
+  takeSnapshot() {
+    this.runCommand(nativeEvents.takeSnapshot)
+  }
+
+  runCommand(event, args) {
+    switch (Platform.OS) {
+      case 'android':
+        UIManager.dispatchViewManagerCommand(
+          findNodeHandle(this.refs.remoteParticipantView),
+          event,
+          args
+        )
+        break
+      default:
+        break
+    }
+  }
+
   buildNativeEventWrappers () {
     return [
+      'onSnapshot',
       'onFrameDimensionsChanged'
     ].reduce((wrappedEvents, eventName) => {
       if (this.props[eventName]) {
@@ -47,6 +70,7 @@ class TwilioRemotePreview extends React.Component {
     const { trackIdentifier } = this.props
     return (
       <NativeTwilioRemotePreview
+        ref="remoteParticipantView"
         trackSid={trackIdentifier && trackIdentifier.videoTrackSid}
         {...this.props}
         {...this.buildNativeEventWrappers()}

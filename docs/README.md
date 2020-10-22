@@ -237,4 +237,22 @@ trackIdentifier: {
 }
 ```
 
+#### onSnapshot (Android only)
+
+```js
+onSnapshot: Function
+```
+
+Callback when snapshot has been saved.
+
+@param {{error, uri}} Uri of temp image file, or error if failed to take snapshot
+
+#### takeSnapshot (Android only, method, not props)
+
+```js
+takeSnapshot: Function
+```
+
+Take snapshot.
+
 <br><br>

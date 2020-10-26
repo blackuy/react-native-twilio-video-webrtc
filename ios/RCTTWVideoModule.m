@@ -78,11 +78,7 @@ TVIVideoFormat *RCTTWVideoModuleCameraSourceSelectVideoFormatBySize(AVCaptureDev
 RCT_EXPORT_MODULE();
 
 - (void)dealloc {
-  // We are done with camera
-  if (self.camera) {
-      [self.camera stopCapture];
-      self.camera = nil;
-  }
+  [self stopLocalVideo];
 }
 
 - (dispatch_queue_t)methodQueue {
@@ -116,7 +112,9 @@ RCT_EXPORT_MODULE();
 }
 
 - (void)addLocalView:(TVIVideoView *)view {
-  [self.localVideoTrack addRenderer:view];
+  if (self.localVideoTrack != nil) {
+    [self.localVideoTrack addRenderer:view];
+  }
   [self updateLocalViewMirroring:view];
 }
 
@@ -127,7 +125,9 @@ RCT_EXPORT_MODULE();
 }
 
 - (void)removeLocalView:(TVIVideoView *)view {
-  [self.localVideoTrack removeRenderer:view];
+  if (self.localVideoTrack != nil) {
+    [self.localVideoTrack removeRenderer:view];
+  }
 }
 
 - (void)removeParticipantView:(TVIVideoView *)view sid:(NSString *)sid trackSid:(NSString *)trackSid {
@@ -169,6 +169,12 @@ RCT_EXPORT_METHOD(startLocalVideo) {
       return;
   }
   self.localVideoTrack = [TVILocalVideoTrack trackWithSource:self.camera enabled:YES name:@"camera"];
+}
+
+- (void)startCameraCapture {
+  if (self.camera == nil) {
+    return;
+  }
   AVCaptureDevice *camera = [TVICameraSource captureDeviceForPosition:AVCaptureDevicePositionFront];
   [self.camera startCaptureWithDevice:camera completion:^(AVCaptureDevice *device,
           TVIVideoFormat *startFormat,
@@ -187,8 +193,9 @@ RCT_EXPORT_METHOD(startLocalAudio) {
 }
 
 RCT_EXPORT_METHOD(stopLocalVideo) {
-  self.localVideoTrack = nil;
-  self.camera = nil;
+  if (self.camera) {
+    [self.camera stopCapture];
+  }
 }
 
 RCT_EXPORT_METHOD(stopLocalAudio) {
@@ -224,26 +231,18 @@ RCT_REMAP_METHOD(setLocalAudioEnabled, enabled:(BOOL)enabled setLocalAudioEnable
 
 RCT_REMAP_METHOD(setLocalVideoEnabled, enabled:(BOOL)enabled setLocalVideoEnabledWithResolver:(RCTPromiseResolveBlock)resolve
                  rejecter:(RCTPromiseRejectBlock)reject) {
-  if(self.localVideoTrack != nil){
+  if (self.localVideoTrack != nil) {
       [self.localVideoTrack setEnabled:enabled];
+      if (self.camera && self.camera.device) {
+          if (enabled) {
+            [self startCameraCapture];
+          } else {
+            [self stopLocalVideo];
+          }
+      }
       resolve(@(enabled));
-  } else if(enabled) {
-      [self createLocalVideoTrack];
-      resolve(@true);
-  } else {
-      resolve(@false);
   }
 }
-
--(void)createLocalVideoTrack {
-  [self startLocalVideo];
-  // Publish video so other Room Participants can subscribe
-  // This check is required when TVICameraSource return nil Eg: simulator
-  if(self.localVideoTrack != nil){
-    [self.localParticipant publishVideoTrack:self.localVideoTrack];
-  }
-}
-
 
 RCT_EXPORT_METHOD(flipCamera) {
     if (self.camera) {
@@ -374,22 +373,10 @@ RCT_EXPORT_METHOD(getStats) {
   }
 }
 
--(void)enableLocalVideoAtCreationTime:(BOOL *)enableVideo {
-    if(enableVideo){
-      if (self.localVideoTrack == nil) {
-          // We disabled video in a previous call, attempt to re-enable
-          [self startLocalVideo];
-      } else {
-          [self.localVideoTrack setEnabled:true];
-      }
-    } else {
-        [self stopLocalVideo];
-    }
-}
-
 RCT_EXPORT_METHOD(connect:(NSString *)accessToken roomName:(NSString *)roomName enableVideo:(BOOL *)enableVideo encodingParameters:(NSDictionary *)encodingParameters) {
-
-  [self enableLocalVideoAtCreationTime: enableVideo];
+  if (enableVideo) {
+    [self startCameraCapture];
+  }
 
   TVIConnectOptions *connectOptions = [TVIConnectOptions optionsWithToken:accessToken block:^(TVIConnectOptionsBuilder * _Nonnull builder) {
     if (self.localVideoTrack) {
@@ -408,17 +395,17 @@ RCT_EXPORT_METHOD(connect:(NSString *)accessToken roomName:(NSString *)roomName 
     }
 
     builder.roomName = roomName;
-    
+
     if(encodingParameters[@"enableH264Codec"]){
       builder.preferredVideoCodecs = @[ [TVIH264Codec new] ];
     }
-      
+
     if(encodingParameters[@"audioBitrate"] || encodingParameters[@"videoBitrate"]){
       NSInteger audioBitrate = [encodingParameters[@"audioBitrate"] integerValue];
       NSInteger videoBitrate = [encodingParameters[@"videoBitrate"] integerValue];
       builder.encodingParameters = [[TVIEncodingParameters alloc] initWithAudioBitrate:(audioBitrate) ? audioBitrate : 40 videoBitrate:(videoBitrate) ? videoBitrate : 1500];
     }
-      
+
   }];
 
   self.room = [TwilioVideoSDK connectWithOptions:connectOptions delegate:self];

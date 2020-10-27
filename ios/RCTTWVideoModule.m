@@ -193,7 +193,7 @@ RCT_EXPORT_METHOD(startLocalAudio) {
 }
 
 RCT_EXPORT_METHOD(stopLocalVideo) {
-  [self clearCameraInstance]
+    [self clearCameraInstance];
 }
 
 RCT_EXPORT_METHOD(stopLocalAudio) {

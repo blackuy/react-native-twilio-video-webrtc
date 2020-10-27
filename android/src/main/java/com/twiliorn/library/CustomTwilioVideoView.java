@@ -256,6 +256,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     }
 
     private boolean createLocalVideo(boolean enableVideo) {
+      isVideoEnabled = enableVideo;
         // Share your camera
         cameraCapturer = this.createCameraCaputer(getContext(), CameraCapturer.CameraSource.FRONT_CAMERA);
         if (cameraCapturer == null){
@@ -270,7 +271,6 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
 
         if (cameraCapturer.getSupportedFormats().size() > 0) {
             localVideoTrack = LocalVideoTrack.create(getContext(), enableVideo, cameraCapturer, buildVideoConstraints());
-            isVideoEnabled = enableVideo;
             if (thumbnailVideoView != null && localVideoTrack != null) {
                 localVideoTrack.addRenderer(thumbnailVideoView);
             }
@@ -539,6 +539,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     }
 
     public void toggleVideo(boolean enabled) {
+      isVideoEnabled = enabled;
         if (localVideoTrack != null) {
             localVideoTrack.enable(enabled);
 

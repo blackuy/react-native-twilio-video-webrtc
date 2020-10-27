@@ -78,7 +78,7 @@ TVIVideoFormat *RCTTWVideoModuleCameraSourceSelectVideoFormatBySize(AVCaptureDev
 RCT_EXPORT_MODULE();
 
 - (void)dealloc {
-  [self stopLocalVideo];
+  [self clearCameraInstance];
 }
 
 - (dispatch_queue_t)methodQueue {
@@ -193,9 +193,7 @@ RCT_EXPORT_METHOD(startLocalAudio) {
 }
 
 RCT_EXPORT_METHOD(stopLocalVideo) {
-  if (self.camera) {
-    [self.camera stopCapture];
-  }
+  [self clearCameraInstance]
 }
 
 RCT_EXPORT_METHOD(stopLocalAudio) {
@@ -203,8 +201,10 @@ RCT_EXPORT_METHOD(stopLocalAudio) {
 }
 
 RCT_EXPORT_METHOD(publishLocalVideo) {
-  TVILocalParticipant *localParticipant = self.room.localParticipant;
-  [localParticipant publishVideoTrack:self.localVideoTrack];
+  if(self.localVideoTrack != nil){
+    TVILocalParticipant *localParticipant = self.room.localParticipant;
+    [localParticipant publishVideoTrack:self.localVideoTrack];
+  }
 }
 
 RCT_EXPORT_METHOD(publishLocalAudio) {
@@ -213,8 +213,10 @@ RCT_EXPORT_METHOD(publishLocalAudio) {
 }
 
 RCT_EXPORT_METHOD(unpublishLocalVideo) {
-  TVILocalParticipant *localParticipant = self.room.localParticipant;
-  [localParticipant unpublishVideoTrack:self.localVideoTrack];
+  if(self.localVideoTrack != nil){
+    TVILocalParticipant *localParticipant = self.room.localParticipant;
+    [localParticipant unpublishVideoTrack:self.localVideoTrack];
+  }
 }
 
 RCT_EXPORT_METHOD(unpublishLocalAudio) {
@@ -237,7 +239,7 @@ RCT_REMAP_METHOD(setLocalVideoEnabled, enabled:(BOOL)enabled setLocalVideoEnable
           if (enabled) {
             [self startCameraCapture];
           } else {
-            [self stopLocalVideo];
+            [self clearCameraInstance];
           }
       }
       resolve(@(enabled));
@@ -418,7 +420,15 @@ RCT_EXPORT_METHOD(sendString:(nonnull NSString *)message) {
 }
 
 RCT_EXPORT_METHOD(disconnect) {
+  [self clearCameraInstance];
   [self.room disconnect];
+}
+
+- (void)clearCameraInstance {
+    // We are done with camera
+    if (self.camera) {
+        [self.camera stopCapture];
+    }
 }
 
 # pragma mark - Common

@@ -98,6 +98,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     private static final String TAG = "CustomTwilioVideoView";
     private static final String DATA_TRACK_MESSAGE_THREAD_NAME = "DataTrackMessages";
     private boolean enableRemoteAudio = false;
+    private boolean isVideoEnabled = false;
 
     @Retention(RetentionPolicy.SOURCE)
     @StringDef({Events.ON_CAMERA_SWITCHED,
@@ -255,6 +256,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     }
 
     private boolean createLocalVideo(boolean enableVideo) {
+      isVideoEnabled = enableVideo;
         // Share your camera
         cameraCapturer = this.createCameraCaputer(getContext(), CameraCapturer.CameraSource.FRONT_CAMERA);
         if (cameraCapturer == null){
@@ -290,7 +292,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
              * If the local video track was released when the app was put in the background, recreate.
              */
             if (cameraCapturer != null && localVideoTrack == null) {
-                localVideoTrack = LocalVideoTrack.create(getContext(), true, cameraCapturer, buildVideoConstraints());
+                localVideoTrack = LocalVideoTrack.create(getContext(), isVideoEnabled, cameraCapturer, buildVideoConstraints());
             }
 
             if (localVideoTrack != null) {
@@ -537,6 +539,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     }
 
     public void toggleVideo(boolean enabled) {
+      isVideoEnabled = enabled;
         if (localVideoTrack != null) {
             localVideoTrack.enable(enabled);
 

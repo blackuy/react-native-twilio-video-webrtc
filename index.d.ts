@@ -1,18 +1,22 @@
-declare module "react-native-twilio-video-webrtc"{
+declare module "react-native-twilio-video-webrtc" {
   import { ViewProps } from "react-native";
   import React from "react";
 
-  interface TwilioVideoLocalViewProps extends ViewProps {
-    enabled: boolean;
-    ref?: React.Ref<any>;
+  export interface TrackIdentifier {
+    participantSid: string;
+    videoTrackSid: string;
   }
 
+  type scaleType = "fit" | "fill";
   interface TwilioVideoParticipantViewProps extends ViewProps {
-    trackIdentifier: {
-      participantSid: string;
-      videoTrackSid: string;
-    };
+    trackIdentifier: TrackIdentifier;
     ref?: React.Ref<any>;
+    scaleType?: scaleType;
+  }
+
+  interface TwilioVideoLocalViewProps extends ViewProps {
+    enabled: boolean;
+    scaleType?: scaleType;
   }
 
   interface Participant {
@@ -38,7 +42,7 @@ declare module "react-native-twilio-video-webrtc"{
     roomSid: string;
   }
 
-  type RoomErrorEventArgs = RoomEventCommonArgs & {
+  export type RoomErrorEventArgs = RoomEventCommonArgs & {
     error: any;
   };
 
@@ -55,7 +59,7 @@ declare module "react-native-twilio-video-webrtc"{
 
   export type ParticipantEventCb = (p: ParticipantEventArgs) => void;
 
-  type TwilioVideoProps = ViewProps & {
+  export type TwilioVideoProps = ViewProps & {
     onCameraDidStart?: () => void;
     onCameraDidStopRunning?: (err: any) => void;
     onCameraWasInterrupted?: () => void;
@@ -72,6 +76,7 @@ declare module "react-native-twilio-video-webrtc"{
     onRoomDidFailToConnect?: RoomErrorEventCb;
     onRoomParticipantDidConnect?: ParticipantEventCb;
     onRoomParticipantDidDisconnect?: ParticipantEventCb;
+    onStatsReceived?: any;
     ref?: React.Ref<any>;
   };
 
@@ -85,8 +90,8 @@ declare module "react-native-twilio-video-webrtc"{
       // if audioBitrate OR videoBitrate is provided, you must provide both
       audioBitrate?: number;
       videoBitrate?: number;
-    }
-  }
+    };
+  };
 
   type androidConnectParams = {
     roomName?: string;
@@ -94,7 +99,7 @@ declare module "react-native-twilio-video-webrtc"{
     enableAudio?: boolean;
     enableVideo?: boolean;
     enableRemoteAudio?: boolean;
-  }
+  };
 
   class TwilioVideo extends React.Component<TwilioVideoProps> {
     setLocalVideoEnabled: (enabled: boolean) => Promise<boolean>;
@@ -104,11 +109,16 @@ declare module "react-native-twilio-video-webrtc"{
     disconnect: () => void;
     flipCamera: () => void;
     toggleSoundSetup: (speaker: boolean) => void;
+    getStats: () => void;
   }
 
-  class TwilioVideoLocalView extends React.Component<TwilioVideoLocalViewProps> {}
+  class TwilioVideoLocalView extends React.Component<
+    TwilioVideoLocalViewProps
+  > {}
 
-  class TwilioVideoParticipantView extends React.Component<TwilioVideoParticipantViewProps> {}
+  class TwilioVideoParticipantView extends React.Component<
+    TwilioVideoParticipantViewProps
+  > {}
 
   export { TwilioVideoLocalView, TwilioVideoParticipantView, TwilioVideo };
 }

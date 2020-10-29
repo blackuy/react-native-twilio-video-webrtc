@@ -71,12 +71,15 @@ declare module "react-native-twilio-video-webrtc" {
     onParticipantEnabledAudioTrack?: TrackEventCb;
     onParticipantRemovedAudioTrack?: TrackEventCb;
     onParticipantRemovedVideoTrack?: TrackEventCb;
+    onParticipantAddedDataTrack?: TrackEventCb;
+    onParticipantRemovedDataTrack?: TrackEventCb;
     onRoomDidConnect?: RoomEventCb;
     onRoomDidDisconnect?: RoomErrorEventCb;
     onRoomDidFailToConnect?: RoomErrorEventCb;
     onRoomParticipantDidConnect?: ParticipantEventCb;
     onRoomParticipantDidDisconnect?: ParticipantEventCb;
     onStatsReceived?: (data: any) => void;
+    onDataTrackMessageReceived?: ({ message: string }) => void;
     ref?: React.Ref<any>;
   };
 

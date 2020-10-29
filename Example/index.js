@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useRef } from "react";
 import {
   AppRegistry,
   StyleSheet,
@@ -17,9 +17,9 @@ import {
   TwilioVideo,
 } from "react-native-twilio-video-webrtc";
 
-import styles from "./styles";
+import styleSheet from "./styles";
 
-const styles = StyleSheet.create(styles);
+const styles = StyleSheet.create(styleSheet);
 
 const Example = (props) => {
   const [isAudioEnabled, setIsAudioEnabled] = useState(true);
@@ -32,8 +32,8 @@ const Example = (props) => {
 
   const _onConnectButtonPress = async () => {
     if (Platform.OS === "android") {
-      await this._requestAudioPermission();
-      await this._requestCameraPermission();
+      await _requestAudioPermission();
+      await _requestCameraPermission();
     }
     twilioVideo.current.connect({ accessToken: token, enableNetworkQualityReporting: true});
     setStatus("connecting");

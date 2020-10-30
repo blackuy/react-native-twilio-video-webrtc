@@ -16,6 +16,7 @@ declare module "react-native-twilio-video-webrtc" {
 
   interface TwilioVideoLocalViewProps extends ViewProps {
     enabled: boolean;
+    ref?: React.Ref<any>;
     scaleType?: scaleType;
   }
 

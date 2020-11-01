@@ -993,7 +993,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
             }
 
             @Override
-            public void onNetworkQualityLevelChanged(@androidx.annotation.NonNull RemoteParticipant remoteParticipant, @androidx.annotation.NonNull NetworkQualityLevel networkQualityLevel) {
+            public void onNetworkQualityLevelChanged(RemoteParticipant remoteParticipant, NetworkQualityLevel networkQualityLevel) {
                 WritableMap event = new WritableNativeMap();
                 event.putMap("participant", buildParticipant(remoteParticipant));
                 event.putBoolean("isLocalUser", false);
@@ -1011,37 +1011,37 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         return new LocalParticipant.Listener() {
 
             @Override
-            public void onAudioTrackPublished(@androidx.annotation.NonNull LocalParticipant localParticipant, @androidx.annotation.NonNull LocalAudioTrackPublication localAudioTrackPublication) {
+            public void onAudioTrackPublished(LocalParticipant localParticipant, LocalAudioTrackPublication localAudioTrackPublication) {
 
             }
 
             @Override
-            public void onAudioTrackPublicationFailed(@androidx.annotation.NonNull LocalParticipant localParticipant, @androidx.annotation.NonNull LocalAudioTrack localAudioTrack, @androidx.annotation.NonNull TwilioException twilioException) {
+            public void onAudioTrackPublicationFailed(LocalParticipant localParticipant, LocalAudioTrack localAudioTrack, TwilioException twilioException) {
 
             }
 
             @Override
-            public void onVideoTrackPublished(@androidx.annotation.NonNull LocalParticipant localParticipant, @androidx.annotation.NonNull LocalVideoTrackPublication localVideoTrackPublication) {
+            public void onVideoTrackPublished(LocalParticipant localParticipant, LocalVideoTrackPublication localVideoTrackPublication) {
 
             }
 
             @Override
-            public void onVideoTrackPublicationFailed(@androidx.annotation.NonNull LocalParticipant localParticipant, @androidx.annotation.NonNull LocalVideoTrack localVideoTrack, @androidx.annotation.NonNull TwilioException twilioException) {
+            public void onVideoTrackPublicationFailed(LocalParticipant localParticipant, LocalVideoTrack localVideoTrack, TwilioException twilioException) {
 
             }
 
             @Override
-            public void onDataTrackPublished(@androidx.annotation.NonNull LocalParticipant localParticipant, @androidx.annotation.NonNull LocalDataTrackPublication localDataTrackPublication) {
+            public void onDataTrackPublished(LocalParticipant localParticipant, LocalDataTrackPublication localDataTrackPublication) {
 
             }
 
             @Override
-            public void onDataTrackPublicationFailed(@androidx.annotation.NonNull LocalParticipant localParticipant, @androidx.annotation.NonNull LocalDataTrack localDataTrack, @androidx.annotation.NonNull TwilioException twilioException) {
+            public void onDataTrackPublicationFailed(LocalParticipant localParticipant, LocalDataTrack localDataTrack, TwilioException twilioException) {
 
             }
 
             @Override
-            public void onNetworkQualityLevelChanged(@androidx.annotation.NonNull LocalParticipant localParticipant, @androidx.annotation.NonNull NetworkQualityLevel networkQualityLevel) {
+            public void onNetworkQualityLevelChanged(LocalParticipant localParticipant, NetworkQualityLevel networkQualityLevel) {
                 WritableMap event = new WritableNativeMap();
                 event.putMap("participant", buildParticipant(localParticipant));
                 event.putBoolean("isLocalUser", true);

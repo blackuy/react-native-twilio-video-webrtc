@@ -20,12 +20,12 @@ declare module "react-native-twilio-video-webrtc" {
     scaleType?: scaleType;
   }
 
-  export interface Participant {
+  interface Participant {
     sid: string;
     identity: string;
   }
 
-  export interface Track {
+  interface Track {
     enabled: boolean;
     trackName: string;
     trackSid: string;

@@ -2,6 +2,13 @@ declare module "react-native-twilio-video-webrtc" {
   import { ViewProps } from "react-native";
   import React from "react";
 
+  interface TwilioVideoLocalViewProps extends ViewProps {
+    enabled: boolean;
+    scalesType: number;
+    onTop?: boolean;
+    ref?: React.Ref<any>;
+  }
+  
   export interface TrackIdentifier {
     participantSid: string;
     videoTrackSid: string;
@@ -20,12 +27,12 @@ declare module "react-native-twilio-video-webrtc" {
     scaleType?: scaleType;
   }
 
-  interface Participant {
+  export interface Participant {
     sid: string;
     identity: string;
   }
 
-  interface Track {
+  export interface Track {
     enabled: boolean;
     trackName: string;
     trackSid: string;
@@ -55,16 +62,18 @@ declare module "react-native-twilio-video-webrtc" {
     participant: Participant;
   };
 
+  type NetworkLevelChangeEventArgs = {
+    participant: Participant;
+    isLocalUser: boolean;
+    quality: number;
+  };
+
   export type RoomEventCb = (p: RoomEventArgs) => void;
   export type RoomErrorEventCb = (t: RoomErrorEventArgs) => void;
 
   export type ParticipantEventCb = (p: ParticipantEventArgs) => void;
   
-  export interface NetworkLevelChangeEventCb {
-    participant: Participant;
-    isLocalUser: boolean;
-    qualityLevel: string;
-  };
+  export type NetworkLevelChangeEventCb = (p: NetworkLevelChangeEventArgs) => void;
 
   export type TwilioVideoProps = ViewProps & {
     onCameraDidStart?: () => void;

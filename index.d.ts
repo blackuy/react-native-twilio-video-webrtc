@@ -55,16 +55,18 @@ declare module "react-native-twilio-video-webrtc" {
     participant: Participant;
   };
 
+  type NetworkLevelChangeEventArgs = {
+    participant: Participant;
+    isLocalUser: boolean;
+    quality: number;
+  };
+
   export type RoomEventCb = (p: RoomEventArgs) => void;
   export type RoomErrorEventCb = (t: RoomErrorEventArgs) => void;
 
   export type ParticipantEventCb = (p: ParticipantEventArgs) => void;
   
-  export interface NetworkLevelChangeEventCb {
-    participant: Participant;
-    isLocalUser: boolean;
-    qualityLevel: string;
-  };
+  export type NetworkLevelChangeEventCb = (p: NetworkLevelChangeEventArgs) => void;
 
   export type TwilioVideoProps = ViewProps & {
     onCameraDidStart?: () => void;

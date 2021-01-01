@@ -50,6 +50,27 @@ const propTypes = {
   onRoomDidDisconnect: PropTypes.func,
 
   /**
+   * Called when a new data track has been added
+   *
+   * @param {{participant, track}}
+   */
+  onParticipantAddedDataTrack: PropTypes.func,
+
+  /**
+   * Called when a data track has been removed
+   *
+   * @param {{participant, track}}
+   */
+  onParticipantRemovedDataTrack: PropTypes.func,
+
+  /**
+   * Called when an dataTrack receives a message
+   *
+   * @param {{message}}
+   */
+  onDataTrackMessageReceived: PropTypes.func,
+
+  /**
    * Called when a new video track has been added
    *
    * @param {{participant, track, enabled}}
@@ -127,7 +148,10 @@ const nativeEvents = {
   toggleSoundSetup: 8,
   toggleRemoteSound: 9,
   releaseResource: 10,
-  toggleBluetoothHeadset: 11
+  toggleBluetoothHeadset: 11,
+  sendString: 12,
+  publishVideo: 13,
+  publishAudio: 14
 }
 
 class CustomTwilioVideoView extends Component {
@@ -145,6 +169,28 @@ class CustomTwilioVideoView extends Component {
       enableVideo,
       enableRemoteAudio
     ])
+  }
+
+  sendString (message) {
+    this.runCommand(nativeEvents.sendString, [
+      message
+    ])
+  }
+
+  publishLocalAudio () {
+    this.runCommand(nativeEvents.publishAudio, [true])
+  }
+
+  publishLocalVideo () {
+    this.runCommand(nativeEvents.publishVideo, [true])
+  }
+
+  unpublishLocalAudio () {
+    this.runCommand(nativeEvents.publishAudio, [false])
+  }
+
+  unpublishLocalVideo () {
+    this.runCommand(nativeEvents.publishVideo, [false])
   }
 
   disconnect () {
@@ -213,6 +259,9 @@ class CustomTwilioVideoView extends Component {
       'onRoomDidConnect',
       'onRoomDidFailToConnect',
       'onRoomDidDisconnect',
+      'onParticipantAddedDataTrack',
+      'onParticipantRemovedDataTrack',
+      'onDataTrackMessageReceived',
       'onParticipantAddedVideoTrack',
       'onParticipantRemovedVideoTrack',
       'onParticipantAddedAudioTrack',

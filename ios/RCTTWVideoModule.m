@@ -170,7 +170,7 @@ RCT_EXPORT_METHOD(startLocalVideo) {
   if (self.camera == nil) {
       return;
   }
-  self.localVideoTrack = [TVILocalVideoTrack trackWithSource:self.camera enabled:YES name:@"camera"];
+  self.localVideoTrack = [TVILocalVideoTrack trackWithSource:self.camera enabled:NO name:@"camera"];
 }
 
 - (void)startCameraCapture {
@@ -233,19 +233,25 @@ RCT_REMAP_METHOD(setLocalAudioEnabled, enabled:(BOOL)enabled setLocalAudioEnable
   resolve(@(enabled));
 }
 
-RCT_REMAP_METHOD(setLocalVideoEnabled, enabled:(BOOL)enabled setLocalVideoEnabledWithResolver:(RCTPromiseResolveBlock)resolve
-                 rejecter:(RCTPromiseRejectBlock)reject) {
+- (bool)_setLocalVideoEnabled:(bool)enabled {
   if (self.localVideoTrack != nil) {
       [self.localVideoTrack setEnabled:enabled];
-      if (self.camera && self.camera.device) {
+      if (self.camera) {
           if (enabled) {
             [self startCameraCapture];
           } else {
             [self clearCameraInstance];
           }
+          return enabled;
       }
-      resolve(@(enabled));
   }
+  return false;
+}
+
+RCT_REMAP_METHOD(setLocalVideoEnabled, enabled:(BOOL)enabled setLocalVideoEnabledWithResolver:(RCTPromiseResolveBlock)resolve
+                 rejecter:(RCTPromiseRejectBlock)reject) {
+  bool result = [self _setLocalVideoEnabled:enabled];
+  resolve(@(result));
 }
 
 RCT_EXPORT_METHOD(flipCamera) {
@@ -378,9 +384,7 @@ RCT_EXPORT_METHOD(getStats) {
 }
 
 RCT_EXPORT_METHOD(connect:(NSString *)accessToken roomName:(NSString *)roomName enableVideo:(BOOL *)enableVideo encodingParameters:(NSDictionary *)encodingParameters enableNetworkQualityReporting:(BOOL *)enableNetworkQualityReporting) {
-  if (enableVideo) {
-    [self startCameraCapture];
-  }
+  [self _setLocalVideoEnabled:enableVideo];
 
   TVIConnectOptions *connectOptions = [TVIConnectOptions optionsWithToken:accessToken block:^(TVIConnectOptionsBuilder * _Nonnull builder) {
     if (self.localVideoTrack) {
@@ -390,7 +394,6 @@ RCT_EXPORT_METHOD(connect:(NSString *)accessToken roomName:(NSString *)roomName 
     if (self.localAudioTrack) {
       builder.audioTracks = @[self.localAudioTrack];
     }
-
 
     self.localDataTrack = [TVILocalDataTrack track];
 
@@ -409,12 +412,12 @@ RCT_EXPORT_METHOD(connect:(NSString *)accessToken roomName:(NSString *)roomName 
       NSInteger videoBitrate = [encodingParameters[@"videoBitrate"] integerValue];
       builder.encodingParameters = [[TVIEncodingParameters alloc] initWithAudioBitrate:(audioBitrate) ? audioBitrate : 40 videoBitrate:(videoBitrate) ? videoBitrate : 1500];
     }
-      
+
     if (enableNetworkQualityReporting) {
       builder.networkQualityEnabled = true;
       builder.networkQualityConfiguration = [ [TVINetworkQualityConfiguration alloc] initWithLocalVerbosity:TVINetworkQualityVerbosityMinimal remoteVerbosity:TVINetworkQualityVerbosityMinimal];
     }
-  
+
   }];
 
   self.room = [TwilioVideoSDK connectWithOptions:connectOptions delegate:self];
@@ -490,7 +493,7 @@ RCT_EXPORT_METHOD(disconnect) {
   }
   self.localParticipant = room.localParticipant;
   self.localParticipant.delegate = self;
-    
+
   [participants addObject:[self.localParticipant toJSON]];
   [self sendEventCheckingListenerWithName:roomDidConnect body:@{ @"roomName" : room.name , @"roomSid": room.sid, @"participants" : participants }];
 

@@ -8,9 +8,9 @@ PODS:
   - glog (0.3.4)
   - React (0.59.9):
     - React/Core (= 0.59.9)
-  - react-native-twilio-video-webrtc (1.0.2-1):
+  - react-native-twilio-video-webrtc (2.0.0):
     - React
-    - TwilioVideo (~> 3.7)
+    - TwilioVideo (~> 4.1)
   - React/Core (0.59.9):
     - yoga (= 0.59.9.React)
   - React/CxxBridge (0.59.9):
@@ -35,7 +35,7 @@ PODS:
     - React/cxxreact
     - React/jsi
   - React/jsinspector (0.59.9)
-  - TwilioVideo (3.7.1)
+  - TwilioVideo (4.1.0)
   - yoga (0.59.9.React)
 
 DEPENDENCIES:
@@ -68,8 +68,8 @@ SPEC CHECKSUMS:
   Folly: de497beb10f102453a1afa9edbf8cf8a251890de
   glog: 1de0bb937dccdc981596d3b5825ebfb765017ded
   React: a86b92f00edbe1873a63e4a212c29b7a7ad5224f
-  react-native-twilio-video-webrtc: c33953a98c71b8600ba321e01f52c62e0c20ab6e
-  TwilioVideo: 807526f68043a11f0e17e5c26ef0f0f73d5678e4
+  react-native-twilio-video-webrtc: 5b40ee0129687cb89fb5055680aed35c8db4be07
+  TwilioVideo: 17bfe3dcac945c6c1235c4584dc37e07a28ccb61
   yoga: 03ff42a6f223fb88deeaed60249020d80c3091ee
 
 PODFILE CHECKSUM: a22eec28b45c6a20b9c752a17cdef0f608e13c10

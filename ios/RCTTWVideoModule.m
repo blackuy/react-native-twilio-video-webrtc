@@ -15,6 +15,7 @@ static NSString* roomDidDisconnect            = @"roomDidDisconnect";
 static NSString* roomDidFailToConnect         = @"roomDidFailToConnect";
 static NSString* roomParticipantDidConnect    = @"roomParticipantDidConnect";
 static NSString* roomParticipantDidDisconnect = @"roomParticipantDidDisconnect";
+static NSString* dominantSpeakerDidChange     = @"onDominantSpeakerDidChange";
 
 static NSString* participantAddedVideoTrack   = @"participantAddedVideoTrack";
 static NSString* participantRemovedVideoTrack = @"participantRemovedVideoTrack";
@@ -109,7 +110,8 @@ RCT_EXPORT_MODULE();
     cameraWasInterrupted,
     cameraInterruptionEnded,
     statsReceived,
-    networkQualityLevelsChanged
+    networkQualityLevelsChanged,
+    dominantSpeakerDidChange
   ];
 }
 
@@ -383,7 +385,7 @@ RCT_EXPORT_METHOD(getStats) {
   }
 }
 
-RCT_EXPORT_METHOD(connect:(NSString *)accessToken roomName:(NSString *)roomName enableVideo:(BOOL *)enableVideo encodingParameters:(NSDictionary *)encodingParameters enableNetworkQualityReporting:(BOOL *)enableNetworkQualityReporting) {
+RCT_EXPORT_METHOD(connect:(NSString *)accessToken roomName:(NSString *)roomName enableVideo:(BOOL *)enableVideo encodingParameters:(NSDictionary *)encodingParameters enableNetworkQualityReporting:(BOOL *)enableNetworkQualityReporting dominantSpeakerEnabled:(BOOL *)dominantSpeakerEnabled) {
   [self _setLocalVideoEnabled:enableVideo];
 
   TVIConnectOptions *connectOptions = [TVIConnectOptions optionsWithToken:accessToken block:^(TVIConnectOptionsBuilder * _Nonnull builder) {
@@ -400,6 +402,8 @@ RCT_EXPORT_METHOD(connect:(NSString *)accessToken roomName:(NSString *)roomName 
     if (self.localDataTrack) {
       builder.dataTracks = @[self.localDataTrack];
     }
+      
+    builder.dominantSpeakerEnabled = dominantSpeakerEnabled ? YES : NO;
 
     builder.roomName = roomName;
 
@@ -483,6 +487,14 @@ RCT_EXPORT_METHOD(disconnect) {
 }
 
 # pragma mark - TVIRoomDelegate
+
+- (void)room:(TVIRoom *)room dominantSpeakerDidChange :(TVIRemoteParticipant *)participant {
+    if (participant) {
+        [self sendEventCheckingListenerWithName:dominantSpeakerDidChange body:@{ @"participant" : [participant toJSON], @"roomName" : room.name , @"roomSid": room.sid }];
+    } else {
+        [self sendEventCheckingListenerWithName:dominantSpeakerDidChange body:@{ @"participant" : @"", @"roomName" : room.name , @"roomSid": room.sid, }];
+    }
+}
 
 - (void)didConnectToRoom:(TVIRoom *)room {
   NSMutableArray *participants = [NSMutableArray array];

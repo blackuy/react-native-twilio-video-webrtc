@@ -143,7 +143,7 @@ const propTypes = {
    * Called when dominant speaker changes
    * @param {{ participant, room }} dominant participant and room
    */
-  onDominantSpeakerDidChange: PropTypes.func,
+  onDominantSpeakerDidChange: PropTypes.func
 }
 
 const nativeEvents = {
@@ -165,14 +165,14 @@ const nativeEvents = {
 
 class CustomTwilioVideoView extends Component {
   connect ({
-             roomName,
-             accessToken,
-             enableAudio = true,
-             enableVideo = true,
-             enableRemoteAudio = true,
-             enableNetworkQualityReporting = false,
-             dominantSpeakerEnabled = false
-           }) {
+    roomName,
+    accessToken,
+    enableAudio = true,
+    enableVideo = true,
+    enableRemoteAudio = true,
+    enableNetworkQualityReporting = false,
+    dominantSpeakerEnabled = false
+  }) {
     this.runCommand(nativeEvents.connectToRoom, [
       roomName,
       accessToken,

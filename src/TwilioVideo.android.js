@@ -134,7 +134,16 @@ const propTypes = {
   /**
    * Callback that is called when stats are received (after calling getStats)
    */
-  onStatsReceived: PropTypes.func
+  onStatsReceived: PropTypes.func,
+  /**
+   * Callback that is called when network quality levels are changed (only if enableNetworkQualityReporting in connect is set to true)
+   */
+  onNetworkQualityLevelsChanged: PropTypes.func,
+  /**
+   * Called when dominant speaker changes
+   * @param {{ participant, room }} dominant participant and room
+   */
+  onDominantSpeakerDidChange: PropTypes.func
 }
 
 const nativeEvents = {
@@ -160,14 +169,18 @@ class CustomTwilioVideoView extends Component {
     accessToken,
     enableAudio = true,
     enableVideo = true,
-    enableRemoteAudio = true
+    enableRemoteAudio = true,
+    enableNetworkQualityReporting = false,
+    dominantSpeakerEnabled = false
   }) {
     this.runCommand(nativeEvents.connectToRoom, [
       roomName,
       accessToken,
       enableAudio,
       enableVideo,
-      enableRemoteAudio
+      enableRemoteAudio,
+      enableNetworkQualityReporting,
+      dominantSpeakerEnabled
     ])
   }
 
@@ -272,7 +285,9 @@ class CustomTwilioVideoView extends Component {
       'onParticipantDisabledVideoTrack',
       'onParticipantEnabledAudioTrack',
       'onParticipantDisabledAudioTrack',
-      'onStatsReceived'
+      'onStatsReceived',
+      'onNetworkQualityLevelsChanged',
+      'onDominantSpeakerDidChange'
     ].reduce((wrappedEvents, eventName) => {
       if (this.props[eventName]) {
         return {

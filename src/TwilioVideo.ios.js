@@ -140,6 +140,16 @@ export default class extends Component {
      *
      */
     onStatsReceived: PropTypes.func,
+    /**
+     * Called when the network quality levels of a participant have changed (only if enableNetworkQualityReporting is set to True when connecting)
+     *
+     */
+    onNetworkQualityLevelsChanged: PropTypes.func,
+    /**
+     * Called when dominant speaker changes
+     * @param {{ participant, room }} dominant participant
+     */
+    onDominantSpeakerDidChange: PropTypes.func,
     ...View.propTypes
   }
 
@@ -152,6 +162,7 @@ export default class extends Component {
 
   componentWillMount () {
     this._registerEvents()
+    this._startLocalVideo()
     this._startLocalAudio()
   }
 
@@ -216,9 +227,10 @@ export default class extends Component {
    * @param  {String} roomName    The connecting room name
    * @param  {String} accessToken The Twilio's JWT access token
    * @param  {String} encodingParameters Control Encoding config
+   * @param  {Boolean} enableNetworkQualityReporting Report network quality of participants
    */
-  connect ({ roomName, accessToken, enableVideo = true, encodingParameters }) {
-    TWVideoModule.connect(accessToken, roomName, enableVideo, encodingParameters)
+  connect ({ roomName, accessToken, enableVideo = true, encodingParameters = null, enableNetworkQualityReporting = false, dominantSpeakerEnabled = false }) {
+    TWVideoModule.connect(accessToken, roomName, enableVideo, encodingParameters, enableNetworkQualityReporting, dominantSpeakerEnabled)
   }
 
   /**
@@ -392,6 +404,16 @@ export default class extends Component {
       this._eventEmitter.addListener('statsReceived', data => {
         if (this.props.onStatsReceived) {
           this.props.onStatsReceived(data)
+        }
+      }),
+      this._eventEmitter.addListener('networkQualityLevelsChanged', data => {
+        if (this.props.onNetworkQualityLevelsChanged) {
+          this.props.onNetworkQualityLevelsChanged(data)
+        }
+      }),
+      this._eventEmitter.addListener('onDominantSpeakerDidChange', data => {
+        if (this.props.onDominantSpeakerDidChange) {
+          this.props.onDominantSpeakerDidChange(data)
         }
       })
     ]

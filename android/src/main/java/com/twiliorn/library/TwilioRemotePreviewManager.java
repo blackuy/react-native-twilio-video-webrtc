@@ -10,12 +10,16 @@ package com.twiliorn.library;
 import androidx.annotation.Nullable;
 import android.util.Log;
 
+import com.facebook.react.common.MapBuilder;
 import com.facebook.react.uimanager.SimpleViewManager;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.annotations.ReactProp;
 
 import org.webrtc.RendererCommon;
 
+import java.util.Map;
+
+import static com.twiliorn.library.RNVideoViewGroup.Events.ON_FRAME_DIMENSIONS_CHANGED;
 
 public class TwilioRemotePreviewManager extends SimpleViewManager<TwilioRemotePreview> {
 
@@ -51,4 +55,15 @@ public class TwilioRemotePreviewManager extends SimpleViewManager<TwilioRemotePr
     protected TwilioRemotePreview createViewInstance(ThemedReactContext reactContext) {
         return new TwilioRemotePreview(reactContext, myTrackSid);
     }
+
+    @Override
+    public Map getExportedCustomBubblingEventTypeConstants() {
+      return MapBuilder.builder()
+          .put(
+            ON_FRAME_DIMENSIONS_CHANGED,
+              MapBuilder.of(
+                  "phasedRegistrationNames",
+                  MapBuilder.of("bubbled", ON_FRAME_DIMENSIONS_CHANGED)))
+                  .build();
+  }
 }

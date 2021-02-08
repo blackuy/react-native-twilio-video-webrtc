@@ -94,6 +94,40 @@ declare module "react-native-twilio-video-webrtc" {
     ref?: React.Ref<any>;
   };
 
+  export enum bandwidthProfileMode {
+    GRID = "GRID",
+    COLLABORATION = "COLLABORATION",
+    PRESENTATION = "PRESENTATION"
+  }
+
+  export enum priority {
+    LOW = "LOW",
+    STANDARD = "STANDARD",
+    HIGH = "HIGH"
+  }
+
+  export enum trackSwitchOffMode {
+    DISABLED = "DISABLED",
+    PREDICTED = "PREDICTED",
+    DETECTED = "DETECTED"
+  }
+
+  // Dimensions are provided in the string in the format of <width>x<height>
+  export type renderDimensions = {
+    "low"?: string,
+    "standard"?: string
+    "high"?: string
+  }
+
+  export type bandwidthProfileOptions = {
+    mode?: bandwidthProfileMode
+    maxTracks?: number,
+    maxSubscriptionBitrate?: number,
+    dominantSpeakerPriority?: priority,
+    renderDimensions?: renderDimensions,
+    trackSwitchOffMode?:trackSwitchOffMode
+  }
+
   type iOSConnectParams = {
     accessToken: string;
     roomName?: string;
@@ -106,19 +140,29 @@ declare module "react-native-twilio-video-webrtc" {
       videoBitrate?: number;
     };
     enableNetworkQualityReporting?: boolean;
+    dominantSpeakerEnabled?: boolean;
+    bandwidthProfileOptions?: bandwidthProfileOptions;
   };
 
+
   type androidConnectParams = {
-    roomName?: string;
     accessToken: string;
+    roomName?: string;
     enableAudio?: boolean;
     enableVideo?: boolean;
-    enableRemoteAudio?: boolean;
+    encodingParameters?: {
+      enableH264Codec?: boolean;
+      // if audioBitrate OR videoBitrate is provided, you must provide both
+      audioBitrate?: number;
+      videoBitrate?: number;
+    };
     enableNetworkQualityReporting?: boolean;
+    dominantSpeakerEnabled?: boolean;
+    bandwidthProfileOptions?: bandwidthProfileOptions;
   };
 
   class TwilioVideo extends React.Component<TwilioVideoProps> {
-    setLocalVideoEnabled: (enabled: boolean) => Promise<boolean>;
+    setLocalVideoEnabled: (enabled: boolean, cameraSettings?: CameraSettings) => Promise<boolean>;
     setLocalAudioEnabled: (enabled: boolean) => Promise<boolean>;
     setRemoteAudioEnabled: (enabled: boolean) => Promise<boolean>;
     setBluetoothHeadsetConnected: (enabled: boolean) => Promise<boolean>;

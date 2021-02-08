@@ -162,7 +162,7 @@ export default class TwilioVideo extends Component {
 
   componentWillMount () {
     this._registerEvents()
-    this._startLocalVideo()
+    this._startLocalVideo(false)
     this._startLocalAudio()
   }
 
@@ -188,9 +188,11 @@ export default class TwilioVideo extends Component {
   }
 
   /**
-   * Enable or disable local video
+   * Enable or disable local video.
+   * NOTE: cameraSettings are ignored on iOS
    */
-  setLocalVideoEnabled (enabled) {
+  setLocalVideoEnabled (enabled, cameraSettings) {
+    this._startLocalVideo(enabled)
     return TWVideoModule.setLocalVideoEnabled(enabled)
   }
 
@@ -202,7 +204,16 @@ export default class TwilioVideo extends Component {
   }
 
   /**
-   * Filp between the front and back camera
+   * Specifies the priority a remote participants video track should get
+   * @param {*} trackSid the SID of the track setting the priority for
+   * @param {*} trackPriority the priority of the track. Can be low, standard, high or null
+   */
+  setTrackPriority (trackSid, trackPriority) {
+    this.runCommand(nativeEvents.setTrackPriority, [trackSid, trackPriority])
+  }
+
+  /**
+   * Flip between the front and back camera
    */
   flipCamera () {
     TWVideoModule.flipCamera()
@@ -226,11 +237,14 @@ export default class TwilioVideo extends Component {
    * Connect to given room name using the JWT access token
    * @param  {String} roomName    The connecting room name
    * @param  {String} accessToken The Twilio's JWT access token
-   * @param  {String} encodingParameters Control Encoding config
+   * @param  {boolean} enableVideo Don't start video unless it's necessary
+   * @param  {object} encodingParameters Control Encoding config
    * @param  {Boolean} enableNetworkQualityReporting Report network quality of participants
+   * @param  {Boolean} dominantSpeakerEnabled Report network quality of participants
+   * @param  {object} bandwidthProfileOptions Report network quality of participants
    */
-  connect ({ roomName, accessToken, enableVideo = true, encodingParameters = null, enableNetworkQualityReporting = false, dominantSpeakerEnabled = false }) {
-    TWVideoModule.connect(accessToken, roomName, enableVideo, encodingParameters, enableNetworkQualityReporting, dominantSpeakerEnabled)
+  connect ({ roomName, accessToken, enableVideo = true, encodingParameters = null, enableNetworkQualityReporting = false, dominantSpeakerEnabled = false, bandwidthProfileOptions = null }) {
+    TWVideoModule.connect(accessToken, roomName, enableVideo, encodingParameters, enableNetworkQualityReporting, dominantSpeakerEnabled, bandwidthProfileOptions);
   }
 
   /**

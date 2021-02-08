@@ -625,18 +625,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
 
         // This initiates a prompt dialog for the user to confirm screen projection.
         themedReactContext.getCurrentActivity().startActivityForResult(mediaProjectionManager.createScreenCaptureIntent(), REQUEST_MEDIA_PROJECTION, Bundle.EMPTY);
-
-        themedReactContext.getCurrentActivity().addActivityEventListener(new ActivityEventListener() {
-            @Override
-            public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
-                Log.i(TAG, "onActivityResult" + requestCode);
-            }
-
-            @Override
-            public void onNewIntent(Intent intent) {
-                Log.i(TAG, "onNewIntent");
-            }
-        });
+        
 
     }
 

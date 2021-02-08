@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Screen Capturer</string>
+    <string name="share_screen">Share screen</string>
+    <string name="stop_screen_share">Stop screen share</string>
+    <string name="screen_capture_permission_not_granted">Screen capture permission not granted</string>
+    <string name="screen_capture_error">Screen capturer error occurred.</string>
+
+</resources>

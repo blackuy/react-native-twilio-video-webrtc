@@ -96,7 +96,7 @@ declare module "react-native-twilio-video-webrtc" {
 
   export type BandwidthProfileMode = "GRID" | "COLLABORATION" | "PRESENTATION";
 
-  export type TrackPriority = "LOW" | "STANDARD" | "HIGH";
+  export type TrackPriority = "LOW" | "STANDARD" | "HIGH" | "NULL";
 
   export type TrackSwitchOffMode = "DISABLED" | "PREDICTED" | "DETECTED";
 

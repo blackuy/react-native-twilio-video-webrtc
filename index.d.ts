@@ -94,23 +94,11 @@ declare module "react-native-twilio-video-webrtc" {
     ref?: React.Ref<any>;
   };
 
-  export const  enum BandwidthProfileMode {
-    GRID = "GRID",
-    COLLABORATION = "COLLABORATION",
-    PRESENTATION = "PRESENTATION",
-  }
+  export type BandwidthProfileMode = "GRID" | "COLLABORATION" | "PRESENTATION";
 
-  export const  enum TrackPriority {
-    LOW = "LOW",
-    STANDARD = "STANDARD",
-    HIGH = "HIGH",
-  }
+  export type TrackPriority = "LOW" | "STANDARD" | "HIGH";
 
-  export const enum TrackSwitchOffMode {
-    DISABLED = "DISABLED",
-    PREDICTED = "PREDICTED",
-    DETECTED = "DETECTED",
-  }
+  export type TrackSwitchOffMode = "DISABLED" | "PREDICTED" | "DETECTED";
 
   export type CameraSettings = {
     maxDimensions: string;

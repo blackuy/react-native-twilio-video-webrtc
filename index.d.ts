@@ -94,58 +94,46 @@ declare module "react-native-twilio-video-webrtc" {
     ref?: React.Ref<any>;
   };
 
-  export enum bandwidthProfileMode {
+  export const  enum BandwidthProfileMode {
     GRID = "GRID",
     COLLABORATION = "COLLABORATION",
-    PRESENTATION = "PRESENTATION"
+    PRESENTATION = "PRESENTATION",
   }
 
-  export enum priority {
+  export const  enum TrackPriorty {
     LOW = "LOW",
     STANDARD = "STANDARD",
-    HIGH = "HIGH"
+    HIGH = "HIGH",
   }
 
-  export enum trackSwitchOffMode {
+  export const enum TrackSwitchOffMode {
     DISABLED = "DISABLED",
     PREDICTED = "PREDICTED",
-    DETECTED = "DETECTED"
+    DETECTED = "DETECTED",
   }
 
-  // Dimensions are provided in the string in the format of <width>x<height>
-  export type renderDimensions = {
-    "low"?: string,
-    "standard"?: string
-    "high"?: string
-  }
-
-  export type bandwidthProfileOptions = {
-    mode?: bandwidthProfileMode
-    maxTracks?: number,
-    maxSubscriptionBitrate?: number,
-    dominantSpeakerPriority?: priority,
-    renderDimensions?: renderDimensions,
-    trackSwitchOffMode?:trackSwitchOffMode
-  }
-
-  type iOSConnectParams = {
-    accessToken: string;
-    roomName?: string;
-    enableAudio?: boolean;
-    enableVideo?: boolean;
-    encodingParameters?: {
-      enableH264Codec?: boolean;
-      // if audioBitrate OR videoBitrate is provided, you must provide both
-      audioBitrate?: number;
-      videoBitrate?: number;
-    };
-    enableNetworkQualityReporting?: boolean;
-    dominantSpeakerEnabled?: boolean;
-    bandwidthProfileOptions?: bandwidthProfileOptions;
+  export type CameraSettings = {
+    maxDimensions: string;
+    maxFPS: number;
   };
 
+  // Dimensions are provided in the string in the format of <width>x<height>
+  export type RenderDimensions = {
+    "low"?: string,
+    "standard"?: string,
+    "high"?: string,
+  }
 
-  type androidConnectParams = {
+  export type BandwidthProfileOptions = {
+    mode?: BandwidthProfileMode
+    maxTracks?: number,
+    maxSubscriptionBitrate?: number,
+    dominantSpeakerPriority?: TrackPriorty,
+    renderDimensions?: RenderDimensions,
+    trackSwitchOffMode?: TrackSwitchOffMode,
+  }
+
+  type ConnectParams = {
     accessToken: string;
     roomName?: string;
     enableAudio?: boolean;
@@ -158,7 +146,7 @@ declare module "react-native-twilio-video-webrtc" {
     };
     enableNetworkQualityReporting?: boolean;
     dominantSpeakerEnabled?: boolean;
-    bandwidthProfileOptions?: bandwidthProfileOptions;
+    bandwidthProfileOptions?: BandwidthProfileOptions;
   };
 
   class TwilioVideo extends React.Component<TwilioVideoProps> {
@@ -166,7 +154,7 @@ declare module "react-native-twilio-video-webrtc" {
     setLocalAudioEnabled: (enabled: boolean) => Promise<boolean>;
     setRemoteAudioEnabled: (enabled: boolean) => Promise<boolean>;
     setBluetoothHeadsetConnected: (enabled: boolean) => Promise<boolean>;
-    connect: (options: iOSConnectParams | androidConnectParams) => void;
+    connect: (options: ConnectParams) => void;
     disconnect: () => void;
     flipCamera: () => void;
     toggleSoundSetup: (speaker: boolean) => void;
@@ -176,6 +164,8 @@ declare module "react-native-twilio-video-webrtc" {
     publishLocalVideo: () => void;
     unpublishLocalVideo: () => void;
     sendString: (message: string) => void;
+    setTrackPriority: (trackSid: string, trackPriority: TrackPriorty) => void;
+    setStereoEnabled: (enabled: boolean) => Promise<boolean>;
   }
 
   class TwilioVideoLocalView extends React.Component<
@@ -187,4 +177,14 @@ declare module "react-native-twilio-video-webrtc" {
   > {}
 
   export { TwilioVideoLocalView, TwilioVideoParticipantView, TwilioVideo };
+
+  export class TwilioStereoTonePlayer {
+      preload: (filename: string) => Promise<boolean>;
+      play: (filename: string, isLooping: boolean, volume: number, playbackSpeed: number) => Promise<void>;
+      pause: () => void;
+      setVolume: (volume: number) => void;
+      setPlaybackSpeed: (speed: number) => void;
+      release: (filename: string) => void;
+      terminate: () => void;
+  }
 }

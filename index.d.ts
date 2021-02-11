@@ -100,7 +100,7 @@ declare module "react-native-twilio-video-webrtc" {
     PRESENTATION = "PRESENTATION",
   }
 
-  export const  enum TrackPriorty {
+  export const  enum TrackPriority {
     LOW = "LOW",
     STANDARD = "STANDARD",
     HIGH = "HIGH",
@@ -128,7 +128,7 @@ declare module "react-native-twilio-video-webrtc" {
     mode?: BandwidthProfileMode
     maxTracks?: number,
     maxSubscriptionBitrate?: number,
-    dominantSpeakerPriority?: TrackPriorty,
+    dominantSpeakerPriority?: TrackPriority,
     renderDimensions?: RenderDimensions,
     trackSwitchOffMode?: TrackSwitchOffMode,
   }
@@ -164,7 +164,7 @@ declare module "react-native-twilio-video-webrtc" {
     publishLocalVideo: () => void;
     unpublishLocalVideo: () => void;
     sendString: (message: string) => void;
-    setTrackPriority: (trackSid: string, trackPriority: TrackPriorty) => void;
+    setTrackPriority: (trackSid: string, trackPriority: TrackPriority) => void;
     setStereoEnabled: (enabled: boolean) => Promise<boolean>;
   }
 

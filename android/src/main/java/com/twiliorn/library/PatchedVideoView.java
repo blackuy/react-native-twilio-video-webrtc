@@ -44,7 +44,7 @@ public class PatchedVideoView extends VideoView {
                 }
             });
         }
-        super.renderFrame(frame);
+        super.onFrame(frame);
     }
 
     /*

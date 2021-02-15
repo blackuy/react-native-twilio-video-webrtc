@@ -111,8 +111,8 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     private boolean enableNetworkQualityReporting = false;
     private boolean isVideoEnabled = false;
     private boolean dominantSpeakerEnabled = false;
-    private String frontFacingDevice;
-    private String backFacingDevice;
+    private static String frontFacingDevice;
+    private static String backFacingDevice;
 
     @Retention(RetentionPolicy.SOURCE)
     @StringDef({Events.ON_CAMERA_SWITCHED,
@@ -275,9 +275,9 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         backFacingDevice = null;
         frontFacingDevice = null;
         for (String deviceName : deviceNames) {
-            if (enumerator.isBackFacing(deviceName)) {
+            if (enumerator.isBackFacing(deviceName) && enumerator.getSupportedFormats(deviceName).size() > 0) {
                 backFacingDevice = deviceName;
-            } else if (enumerator.isFrontFacing(deviceName)) {
+            } else if (enumerator.isFrontFacing(deviceName) && enumerator.getSupportedFormats(deviceName).size() > 0) {
                 frontFacingDevice = deviceName;
             }
         }
@@ -298,13 +298,11 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
             return false;
         }
 
-        if (cameraCapturer.getSupportedFormats().size() > 0) {
-            localVideoTrack = LocalVideoTrack.create(getContext(), enableVideo, cameraCapturer, buildVideoFormat());
-            if (thumbnailVideoView != null && localVideoTrack != null) {
-                localVideoTrack.addSink(thumbnailVideoView);
-            }
-            setThumbnailMirror();
+        localVideoTrack = LocalVideoTrack.create(getContext(), enableVideo, cameraCapturer, buildVideoFormat());
+        if (thumbnailVideoView != null && localVideoTrack != null) {
+            localVideoTrack.addSink(thumbnailVideoView);
         }
+        setThumbnailMirror();
         return true;
     }
 
@@ -557,12 +555,12 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
           }
         }
 
-    private boolean isCurrentCameraSourceBackFacing() {
+    private static boolean isCurrentCameraSourceBackFacing() {
         return cameraCapturer != null && cameraCapturer.getCameraId() == backFacingDevice;
     }
 
     // ===== BUTTON LISTENERS ======================================================================
-    private void setThumbnailMirror() {
+    private static void setThumbnailMirror() {
         if (cameraCapturer != null) {
             final boolean isBackCamera = isCurrentCameraSourceBackFacing();
             if (thumbnailVideoView != null && thumbnailVideoView.getVisibility() == View.VISIBLE) {
@@ -574,8 +572,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     public void switchCamera() {
         if (cameraCapturer != null) {
             cameraCapturer.switchCamera();
-            CameraCapturer.CameraSource cameraSource = cameraCapturer.getCameraSource();
-            final boolean isBackCamera = cameraSource == CameraCapturer.CameraSource.BACK_CAMERA;
+            final boolean isBackCamera = isCurrentCameraSourceBackFacing();
             WritableMap event = new WritableNativeMap();
             event.putBoolean("isBackCamera", isBackCamera);
             pushEvent(CustomTwilioVideoView.this, ON_CAMERA_SWITCHED, event);

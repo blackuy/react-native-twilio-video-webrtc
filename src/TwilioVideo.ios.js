@@ -12,7 +12,7 @@ import { NativeModules, NativeEventEmitter, View } from 'react-native'
 
 const { TWVideoModule } = NativeModules
 
-export default class extends Component {
+export default class TwilioVideo extends Component {
   static propTypes = {
     /**
      * Flag that enables screen sharing RCTRootView instead of camera capture
@@ -145,6 +145,11 @@ export default class extends Component {
      *
      */
     onNetworkQualityLevelsChanged: PropTypes.func,
+    /**
+     * Called when dominant speaker changes
+     * @param {{ participant, room }} dominant participant
+     */
+    onDominantSpeakerDidChange: PropTypes.func,
     ...View.propTypes
   }
 
@@ -224,8 +229,8 @@ export default class extends Component {
    * @param  {String} encodingParameters Control Encoding config
    * @param  {Boolean} enableNetworkQualityReporting Report network quality of participants
    */
-  connect ({ roomName, accessToken, enableVideo = true, encodingParameters = null, enableNetworkQualityReporting = false }) {
-    TWVideoModule.connect(accessToken, roomName, enableVideo, encodingParameters, enableNetworkQualityReporting)
+  connect ({ roomName, accessToken, enableVideo = true, encodingParameters = null, enableNetworkQualityReporting = false, dominantSpeakerEnabled = false }) {
+    TWVideoModule.connect(accessToken, roomName, enableVideo, encodingParameters, enableNetworkQualityReporting, dominantSpeakerEnabled)
   }
 
   /**
@@ -404,6 +409,11 @@ export default class extends Component {
       this._eventEmitter.addListener('networkQualityLevelsChanged', data => {
         if (this.props.onNetworkQualityLevelsChanged) {
           this.props.onNetworkQualityLevelsChanged(data)
+        }
+      }),
+      this._eventEmitter.addListener('onDominantSpeakerDidChange', data => {
+        if (this.props.onDominantSpeakerDidChange) {
+          this.props.onDominantSpeakerDidChange(data)
         }
       })
     ]

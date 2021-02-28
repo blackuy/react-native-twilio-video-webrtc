@@ -90,7 +90,7 @@ declare module "react-native-twilio-video-webrtc" {
     onNetworkQualityLevelsChanged?: NetworkLevelChangeEventCb;
 
     onStatsReceived?: (data: any) => void;
-    onDataTrackMessageReceived?: ({ message: string }) => void;
+    onDataTrackMessageReceived?: (data: { message: string }) => void;
     ref?: React.Ref<any>;
   };
 

@@ -20,6 +20,7 @@ import java.util.Map;
 
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_AUDIO_CHANGED;
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_CAMERA_SWITCHED;
+import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_CAMERA_FLASH_TOGGLED;
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_CONNECTED;
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_CONNECT_FAILURE;
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_DISCONNECTED;
@@ -59,6 +60,7 @@ public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilio
     private static final int SEND_STRING = 12;
     private static final int PUBLISH_VIDEO = 13;
     private static final int PUBLISH_AUDIO = 14;
+    private static final int TOGGLE_FLASH = 15;
 
     @Override
     public String getName() {
@@ -127,6 +129,9 @@ public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilio
             case PUBLISH_AUDIO:
                 view.publishLocalAudio(args.getBoolean(0));
                 break;
+            case TOGGLE_FLASH:
+                view.toggleFlash();
+                break;
         }
     }
 
@@ -142,6 +147,10 @@ public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilio
                 ON_DISCONNECTED, MapBuilder.of("registrationName", ON_DISCONNECTED),
                 ON_PARTICIPANT_CONNECTED, MapBuilder.of("registrationName", ON_PARTICIPANT_CONNECTED)
         );
+
+        map.putAll(MapBuilder.of(
+                ON_CAMERA_FLASH_TOGGLED, MapBuilder.of("registrationName", ON_CAMERA_FLASH_TOGGLED)
+        ));
 
         map.putAll(MapBuilder.of(
                 ON_PARTICIPANT_DISCONNECTED, MapBuilder.of("registrationName", ON_PARTICIPANT_DISCONNECTED),
@@ -177,6 +186,7 @@ public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilio
                 .put("connectToRoom", CONNECT_TO_ROOM)
                 .put("disconnect", DISCONNECT)
                 .put("switchCamera", SWITCH_CAMERA)
+                .put("toggleFlash", TOGGLE_FLASH)
                 .put("toggleVideo", TOGGLE_VIDEO)
                 .put("toggleSound", TOGGLE_SOUND)
                 .put("getStats", GET_STATS)

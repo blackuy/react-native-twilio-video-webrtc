@@ -143,7 +143,12 @@ const propTypes = {
    * Called when dominant speaker changes
    * @param {{ participant, room }} dominant participant and room
    */
-  onDominantSpeakerDidChange: PropTypes.func
+  onDominantSpeakerDidChange: PropTypes.func,
+  /**
+   * Called when torch is done attempting to toggle
+   * @param {{ error, isFlashOn }}
+   */
+   onCameraFlashToggled: PropTypes.func,
 }
 
 const nativeEvents = {
@@ -160,7 +165,8 @@ const nativeEvents = {
   toggleBluetoothHeadset: 11,
   sendString: 12,
   publishVideo: 13,
-  publishAudio: 14
+  publishAudio: 14,
+  toggleFlash: 15
 }
 
 class CustomTwilioVideoView extends Component {
@@ -216,6 +222,10 @@ class CustomTwilioVideoView extends Component {
 
   flipCamera () {
     this.runCommand(nativeEvents.switchCamera, [])
+  }
+
+  toggleFlash() {
+    this.runCommand(nativeEvents.toggleFlash, []);
   }
 
   setLocalVideoEnabled (enabled) {
@@ -287,7 +297,8 @@ class CustomTwilioVideoView extends Component {
       'onParticipantDisabledAudioTrack',
       'onStatsReceived',
       'onNetworkQualityLevelsChanged',
-      'onDominantSpeakerDidChange'
+      'onDominantSpeakerDidChange',
+      'onCameraFlashToggled'
     ].reduce((wrappedEvents, eventName) => {
       if (this.props[eventName]) {
         return {

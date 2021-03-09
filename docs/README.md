@@ -70,6 +70,7 @@ onCameraDidStopRunning | func | no |  | Called when the camera has stopped runin
 onStatsReceived | func | no |  | Called when stats are received (after calling getStats)
 onNetworkQualityLevelsChanged | func | no |  | Called when the network quality levels of a participant have changed (only if enableNetworkQualityReporting is set to True when connecting)
 onDominantSpeakerDidChange | func | no |  | Called when dominant speaker changes @param {{ participant, room }} dominant participant
+onCameraFlashToggled | func | no |  | Called when dominant speaker changes @param {{ isFlashOn, error }} dominant participant
 -----
 
 **src/TwilioVideoLocalView.android.js**

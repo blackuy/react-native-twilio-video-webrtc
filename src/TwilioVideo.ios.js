@@ -415,6 +415,11 @@ export default class TwilioVideo extends Component {
         if (this.props.onDominantSpeakerDidChange) {
           this.props.onDominantSpeakerDidChange(data)
         }
+      }),
+      this._eventEmitter.addListener('onCameraFlashToggled', data => {
+        if (this.props.onCameraFlashToggled) {
+          this.props.onCameraFlashToggled(data)
+        }
       })
     ]
   }

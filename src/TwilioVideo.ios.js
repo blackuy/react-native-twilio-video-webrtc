@@ -150,6 +150,11 @@ export default class TwilioVideo extends Component {
      * @param {{ participant, room }} dominant participant
      */
     onDominantSpeakerDidChange: PropTypes.func,
+    /**
+     * Called when torch is done attempting to toggle
+     * @param {{ error, isFlashOn }}
+     */
+    onCameraFlashToggled: PropTypes.func,
     ...View.propTypes
   }
 

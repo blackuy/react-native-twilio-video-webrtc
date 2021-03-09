@@ -34,6 +34,7 @@ onParticipantDisabledAudioTrack | func | no |  | Called when an audio track has 
 onStatsReceived | func | no |  | Callback that is called when stats are received (after calling getStats)
 onNetworkQualityLevelsChanged | func | no |  | Callback that is called when network quality levels are changed (only if enableNetworkQualityReporting in connect is set to true)
 onDominantSpeakerDidChange | func | no |  | Called when dominant speaker changes @param {{ participant, room }} dominant participant and room
+onCameraFlashToggled | func | no |  | Called when dominant speaker changes @param {{ isFlashOn, error }} dominant participant
 -----
 
 **src/TwilioVideo.ios.js**

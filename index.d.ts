@@ -68,9 +68,12 @@ declare module "react-native-twilio-video-webrtc" {
   
   export type NetworkLevelChangeEventCb = (p: NetworkLevelChangeEventArgs) => void;
 
+  export type CameraToggled = (p: { isFlashOn: boolean, error?: string}) => void;
+
   export type TwilioVideoProps = ViewProps & {
     onCameraDidStart?: () => void;
     onCameraDidStopRunning?: (err: any) => void;
+    onCameraFlashToggled?: CameraToggled;
     onCameraWasInterrupted?: () => void;
     onParticipantAddedAudioTrack?: TrackEventCb;
     onParticipantAddedVideoTrack?: TrackEventCb;

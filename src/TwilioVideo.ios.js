@@ -214,6 +214,13 @@ export default class TwilioVideo extends Component {
   }
 
   /**
+   * Toggle Torch functionality
+   */
+   toggleFlash () {
+    TWVideoModule.toggleFlash()
+  }
+
+  /**
    * Toggle audio setup from speaker (default) and headset
    */
   toggleSoundSetup (speaker) {

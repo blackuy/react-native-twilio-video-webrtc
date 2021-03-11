@@ -153,7 +153,6 @@ declare module "react-native-twilio-video-webrtc" {
     unpublishLocalVideo: () => void;
     sendString: (message: string) => void;
     setTrackPriority: (trackSid: string, trackPriority: TrackPriority) => void;
-    setStereoEnabled: (enabled: boolean) => Promise<boolean>;
   }
 
   class TwilioVideoLocalView extends React.Component<

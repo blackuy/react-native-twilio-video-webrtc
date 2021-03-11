@@ -35,7 +35,27 @@ const Example = (props) => {
       await _requestAudioPermission();
       await _requestCameraPermission();
     }
-    twilioVideo.current.connect({ accessToken: token, enableNetworkQualityReporting: true});
+    twilioVideo.current.connect({ roomName: "test_room", accessToken: token, 
+        enableAudio: true,
+        enableVideo: true,
+        enableNetworkQualityReporting: false,
+        dominantSpeakerEnabled: false, 
+        encodingParameters: {
+          audioBitrate: 16, // Ideal bitrate for speech
+          videoBitrate: 0, // Use default video bitrate
+        },
+        bandwidthProfileOptions: {
+          mode: "COLLABORATION",
+          maxSubscriptionBitrate: 2500,
+        }
+      })
+
+    // Enabled local camera and specify the resolution and framerate (only applicable for Android)
+    twilioVideo.current.setLocalVideoEnabled(true, {
+      maxDimensions: "640x480",
+      maxFPS: 25
+    })
+
     setStatus("connecting");
   };
 

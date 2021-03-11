@@ -237,14 +237,15 @@ export default class TwilioVideo extends Component {
    * Connect to given room name using the JWT access token
    * @param  {String} roomName    The connecting room name
    * @param  {String} accessToken The Twilio's JWT access token
-   * @param  {boolean} enableVideo Don't start video unless it's necessary
+   * @param  {boolean} enableAudio Enable  audio on call connect
+   * @param  {boolean} enableVideo Enable video on call connect
    * @param  {object} encodingParameters Control Encoding config
    * @param  {Boolean} enableNetworkQualityReporting Report network quality of participants
    * @param  {Boolean} dominantSpeakerEnabled Report network quality of participants
    * @param  {object} bandwidthProfileOptions Report network quality of participants
    */
-  connect ({ roomName, accessToken, enableVideo = true, encodingParameters = null, enableNetworkQualityReporting = false, dominantSpeakerEnabled = false, bandwidthProfileOptions = null }) {
-    TWVideoModule.connect(accessToken, roomName, enableVideo, encodingParameters, enableNetworkQualityReporting, dominantSpeakerEnabled, bandwidthProfileOptions);
+  connect ({ roomName, accessToken, enableAudio = true, enableVideo = true, encodingParameters = null, enableNetworkQualityReporting = false, dominantSpeakerEnabled = false, bandwidthProfileOptions = null }) {
+    TWVideoModule.connect(accessToken, roomName, enableAudio, enableVideo, encodingParameters, enableNetworkQualityReporting, dominantSpeakerEnabled, bandwidthProfileOptions);
   }
 
   /**

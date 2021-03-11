@@ -25,7 +25,6 @@ import android.os.HandlerThread;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringDef;
-import kotlin.Unit;
 
 import android.util.Log;
 import android.view.View;
@@ -121,7 +120,6 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     private static final VideoDimensions DEFAULT_MAX_CAPTURE_RESOLUTION = VideoDimensions.CIF_VIDEO_DIMENSIONS;
     private static final int DEFAULT_MAX_CAPTURE_FPS = 25;
 
-    private boolean enableRemoteAudio = false;
     private boolean enableNetworkQualityReporting = false;
     private boolean isVideoEnabled = false;
     private boolean dominantSpeakerEnabled = false;
@@ -421,7 +419,6 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
             ReadableMap bandwidthProfileOptions) {
         this.roomName = roomName;
         this.accessToken = accessToken;
-        this.enableRemoteAudio = enableAudio;
         this.enableNetworkQualityReporting = enableNetworkQualityReporting;
         this.dominantSpeakerEnabled = dominantSpeakerEnabled;
 
@@ -1163,7 +1160,6 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         return new RemoteParticipant.Listener() {
             @Override
             public void onAudioTrackSubscribed(RemoteParticipant participant, RemoteAudioTrackPublication publication, RemoteAudioTrack audioTrack) {
-              audioTrack.enablePlayback(enableRemoteAudio);
               WritableMap event = buildParticipantVideoEvent(participant, publication);
               pushEvent(CustomTwilioVideoView.this, ON_PARTICIPANT_ADDED_AUDIO_TRACK, event);
             }

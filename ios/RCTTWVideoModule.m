@@ -399,9 +399,6 @@ RCT_EXPORT_METHOD(getStats) {
   }
 }
 
-RCT_EXPORT_METHOD(connect:(NSString *)accessToken roomName:(NSString *)roomName enableVideo:(BOOL *)enableVideo encodingParameters:(NSDictionary *)encodingParameters enableNetworkQualityReporting:(BOOL *)enableNetworkQualityReporting dominantSpeakerEnabled:(BOOL *)dominantSpeakerEnabled) {
-  [self _setLocalVideoEnabled:enableVideo];
-
 -(TVITrackPriority)parsePriorityString:(NSString *)priority {
     if (priority == nil) {
         return nil;
@@ -525,16 +522,19 @@ RCT_EXPORT_METHOD(connect:(NSString *)accessToken roomName:(NSString *)roomName 
     }];
 }
 
-RCT_EXPORT_METHOD(connect:(NSString *)accessToken roomName:(NSString *)roomName enableVideo:(BOOL *)enableVideo encodingParameters:(NSDictionary *)encodingParameters enableNetworkQualityReporting:(BOOL *)enableNetworkQualityReporting dominantSpeakerEnabled:(BOOL *)dominantSpeakerEnabled bandwidthProfileOptions:(NSDictionary *)bandwidthProfileOptions) {
-  
-  TVIVideoBandwidthProfileOptions* videoBandwidthProfile = [self prepareBandwidthProfile:bandwidthProfileOptions];
+RCT_EXPORT_METHOD(connect:(NSString *)accessToken roomName:(NSString *)roomName enableAudio:(BOOL *)enableAudio enableVideo:(BOOL *)enableVideo encodingParameters:(NSDictionary *)encodingParameters enableNetworkQualityReporting:(BOOL *)enableNetworkQualityReporting dominantSpeakerEnabled:(BOOL *)dominantSpeakerEnabled bandwidthProfileOptions:(NSDictionary *)bandwidthProfileOptions) {
+
+  [self _setLocalVideoEnabled:enableVideo];
     
+  TVIVideoBandwidthProfileOptions* videoBandwidthProfile = [self prepareBandwidthProfile:bandwidthProfileOptions];
+
   TVIConnectOptions *connectOptions = [TVIConnectOptions optionsWithToken:accessToken block:^(TVIConnectOptionsBuilder * _Nonnull builder) {
     if (self.localVideoTrack) {
       builder.videoTracks = @[self.localVideoTrack];
     }
 
     if (self.localAudioTrack) {
+      [self.localAudioTrack setEnabled:enableAudio];
       builder.audioTracks = @[self.localAudioTrack];
     }
 

@@ -18,6 +18,9 @@
     "react-native-twilio-video-webrtc": "file:../",
     "react-test-renderer": "16.8.3"
   },
+  "resolutions": {
+    "graceful-fs": "^4.2.4"
+  },
   "jest": {
     "preset": "react-native"
   }

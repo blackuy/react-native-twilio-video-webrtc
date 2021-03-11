@@ -22,12 +22,16 @@ import android.media.AudioManager;
 import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
-import android.support.annotation.NonNull;
-import android.support.annotation.StringDef;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.StringDef;
+
 import android.util.Log;
 import android.view.View;
 
 import com.facebook.react.bridge.LifecycleEventListener;
+import com.facebook.react.bridge.ReactContext;
+import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeArray;
@@ -35,9 +39,13 @@ import com.facebook.react.bridge.WritableNativeMap;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.events.RCTEventEmitter;
 import com.twilio.video.AudioTrackPublication;
+import com.twilio.video.BandwidthProfileMode;
+import com.twilio.video.BandwidthProfileOptions;
 import com.twilio.video.BaseTrackStats;
 import com.twilio.video.CameraCapturer;
 import com.twilio.video.ConnectOptions;
+import com.twilio.video.EncodingParameters;
+import com.twilio.video.H264Codec;
 import com.twilio.video.LocalAudioTrack;
 import com.twilio.video.LocalAudioTrackPublication;
 import com.twilio.video.LocalAudioTrackStats;
@@ -66,9 +74,12 @@ import com.twilio.video.Room;
 import com.twilio.video.Room.State;
 import com.twilio.video.StatsListener;
 import com.twilio.video.StatsReport;
+import com.twilio.video.TrackPriority;
 import com.twilio.video.TrackPublication;
+import com.twilio.video.TrackSwitchOffMode;
 import com.twilio.video.TwilioException;
 import com.twilio.video.Video;
+import com.twilio.video.VideoBandwidthProfileOptions;
 import com.twilio.video.VideoConstraints;
 import com.twilio.video.VideoDimensions;
 
@@ -105,10 +116,22 @@ import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_DOMINANT_SPEA
 public class CustomTwilioVideoView extends View implements LifecycleEventListener, AudioManager.OnAudioFocusChangeListener {
     private static final String TAG = "CustomTwilioVideoView";
     private static final String DATA_TRACK_MESSAGE_THREAD_NAME = "DataTrackMessages";
-    private boolean enableRemoteAudio = false;
+
+    private static final VideoDimensions DEFAULT_MAX_CAPTURE_RESOLUTION = VideoDimensions.CIF_VIDEO_DIMENSIONS;
+    private static final int DEFAULT_MAX_CAPTURE_FPS = 25;
+
     private boolean enableNetworkQualityReporting = false;
     private boolean isVideoEnabled = false;
     private boolean dominantSpeakerEnabled = false;
+    private boolean enableH264Codec = false;
+
+    private int audioBitrate = -1;
+    private int videoBitrate = -1;
+
+    private BandwidthProfileOptions bandwidthProfile;
+
+    private VideoDimensions maxCaptureDimensions = CustomTwilioVideoView.DEFAULT_MAX_CAPTURE_RESOLUTION;
+    private int maxCaptureFPS  = CustomTwilioVideoView.DEFAULT_MAX_CAPTURE_FPS;
 
     @Retention(RetentionPolicy.SOURCE)
     @StringDef({Events.ON_CAMERA_SWITCHED,
@@ -234,11 +257,12 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     // ===== SETUP =================================================================================
 
     private VideoConstraints buildVideoConstraints() {
+        Log.d(TAG,"Setting camera constraints. Max Dimensions: "
+            + this.maxCaptureDimensions + " - Max FPS: " + this.maxCaptureFPS);
+
         return new VideoConstraints.Builder()
-                .minVideoDimensions(VideoDimensions.CIF_VIDEO_DIMENSIONS)
-                .maxVideoDimensions(VideoDimensions.CIF_VIDEO_DIMENSIONS)
-                .minFps(5)
-                .maxFps(15)
+                .maxVideoDimensions(this.maxCaptureDimensions)
+                .maxFps(this.maxCaptureFPS)
                 .build();
     }
 
@@ -391,24 +415,186 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
 
     public void connectToRoomWrapper(
             String roomName, String accessToken, boolean enableAudio, boolean enableVideo,
-            boolean enableRemoteAudio, boolean enableNetworkQualityReporting, boolean dominantSpeakerEnabled) {
+            ReadableMap encodingParameters, boolean enableNetworkQualityReporting, boolean dominantSpeakerEnabled,
+            ReadableMap bandwidthProfileOptions) {
         this.roomName = roomName;
         this.accessToken = accessToken;
-        this.enableRemoteAudio = enableAudio;
         this.enableNetworkQualityReporting = enableNetworkQualityReporting;
         this.dominantSpeakerEnabled = dominantSpeakerEnabled;
+
+        if (encodingParameters.hasKey("enableH264Codec")) {
+            this.enableH264Codec = encodingParameters.getBoolean("enableH264Codec");
+        }
+
+        if (encodingParameters.hasKey("audioBitrate")) {
+            this.audioBitrate = encodingParameters.getInt("audioBitrate");
+        }
+
+        if (encodingParameters.hasKey("videoBitrate")) {
+            this.videoBitrate = encodingParameters.getInt("videoBitrate");
+        }
+
+        this.bandwidthProfile = prepareBandwidthProfile(bandwidthProfileOptions);
 
         // Share your microphone
         localAudioTrack = LocalAudioTrack.create(getContext(), enableAudio);
 
         if (cameraCapturer == null) {
-            boolean createVideoStatus = createLocalVideo(enableVideo);
-            if (!createVideoStatus) {
-                // No need to connect to room if video creation failed
-                return;
+                boolean createVideoStatus = createLocalVideo(enableVideo);
+                if (!createVideoStatus) {
+                    // No need to connect to room if video creation failed
+                    return;
+            }
         }
-    }
+
         connectToRoom(enableAudio);
+    }
+
+    // Functions to parse the bandwidth profile map
+    private TrackPriority parsePriorityString(@Nullable String priority) {
+        if (priority != null && !priority.trim().isEmpty()) {
+            if (priority.toUpperCase().equals("LOW")) {
+                return TrackPriority.LOW;
+            } else if (priority.toUpperCase().equals("STANDARD")) {
+                return TrackPriority.STANDARD;
+            } else if (priority.toUpperCase().equals("HIGH")) {
+                return TrackPriority.HIGH;
+            } else if (priority.toUpperCase().equals("NULL")) {
+                return null;
+            } else {
+                Log.w(TAG, "Unknown priority string" + priority);
+                return null;
+            }
+        }
+
+        return null;
+    }
+
+    private VideoDimensions parseDimensionsString(@Nullable String dimensions) {
+        if (dimensions != null && !dimensions.trim().isEmpty()) {
+            String[] dimensions_array = dimensions.split("x");
+
+            // There can only be 2 items for a correct <width>x<height> string
+            if (dimensions_array.length != 2) {
+                return null;
+            }
+
+            int w = Integer.parseInt(dimensions_array[0]);
+            int h = Integer.parseInt(dimensions_array[1]);
+
+            return new VideoDimensions(w,h);
+        }
+
+        return null;
+    }
+
+    private BandwidthProfileOptions prepareBandwidthProfile(ReadableMap options) {
+
+        BandwidthProfileMode mode = null;
+        TrackSwitchOffMode trackSwitchOffMode = null;
+        @Nullable Long maxTracks = null;
+        @Nullable Long maxSubscriptionBitrate = null;
+        TrackPriority dominantSpeakerPriority = null;
+        Map<TrackPriority, VideoDimensions> renderDimensions = new HashMap<>();
+
+        if (options.hasKey("mode")) {
+            String modeString = options.getString("mode");
+
+            // Parse mode of the current call
+            if (modeString != null) {
+                if (modeString.toUpperCase().equals("GRID")) {
+                    mode = BandwidthProfileMode.GRID;
+                } else if (modeString.toUpperCase().equals("COLLABORATION")) {
+                    mode = BandwidthProfileMode.COLLABORATION;
+                } else if (modeString.toUpperCase().equals("PRESENTATION")) {
+                    mode = BandwidthProfileMode.PRESENTATION;
+                } else {
+                    Log.w(TAG, "Unknown Bandwidth Profile Mode" + modeString);
+                }
+            }
+        }
+
+        if (options.hasKey("trackSwitchOffMode")) {
+            String trackSwitchOffModeString = options.getString("trackSwitchOffMode");
+
+            // Parse mode of the current call
+            if (trackSwitchOffModeString != null) {
+                if (trackSwitchOffModeString.toUpperCase().equals("DISABLED")) {
+                    trackSwitchOffMode = TrackSwitchOffMode.DISABLED;
+                } else if (trackSwitchOffModeString.toUpperCase().equals("PREDICTED")) {
+                    trackSwitchOffMode = TrackSwitchOffMode.PREDICTED;
+                } else if (trackSwitchOffModeString.toUpperCase().equals("DETECTED")) {
+                    trackSwitchOffMode = TrackSwitchOffMode.DETECTED;
+                } else {
+                    Log.w(TAG, "Unknown Track Switch Off Mode" + trackSwitchOffModeString);
+                }
+            }
+        }
+
+        // Parse max tracks to enabled during a call
+        if (options.hasKey("maxTracks")) {
+            int maxTracksAsInt = options.getInt("maxTracks");
+            if (maxTracksAsInt > 0) {
+                maxTracks = (long) maxTracksAsInt;
+            }
+        }
+
+        // Parse max subscription bit rate
+        if (options.hasKey("maxSubscriptionBitrate")) {
+            int maxSubscriptionBitrateAsInt = options.getInt("maxSubscriptionBitrate");
+            if (maxSubscriptionBitrateAsInt > 0) {
+                maxSubscriptionBitrate = (long) maxSubscriptionBitrateAsInt;
+            }
+        }
+
+        // Parse priority for dominant speaker
+        if (options.hasKey("dominantSpeakerPriority")) {
+            dominantSpeakerPriority = parsePriorityString(options.getString("dominantSpeakerPriority"));
+        }
+
+        // Parse Render Dimensions
+        if (options.hasKey("renderDimensions")) {
+            ReadableMap renderDimensionsMap = options.getMap("renderDimensions");
+            if (renderDimensionsMap != null) {
+                if (renderDimensionsMap.hasKey("low")) {
+                    VideoDimensions dimensions = parseDimensionsString(renderDimensionsMap.getString("low"));
+                    if (dimensions != null) {
+                        renderDimensions.put(TrackPriority.LOW, dimensions);
+                    }
+                }
+
+                if (renderDimensionsMap.hasKey("standard")) {
+                    VideoDimensions dimensions = parseDimensionsString(renderDimensionsMap.getString("standard"));
+                    if (dimensions != null) {
+                        renderDimensions.put(TrackPriority.STANDARD, dimensions);
+                    }
+                }
+
+                if (renderDimensionsMap.hasKey("high")) {
+                    VideoDimensions dimensions = parseDimensionsString(renderDimensionsMap.getString("high"));
+                    if (dimensions != null) {
+                        renderDimensions.put(TrackPriority.HIGH, dimensions);
+                    }
+                }
+            }
+        }
+
+        Log.d(TAG, "BandwidthProfile - mode: " + mode);
+        Log.d(TAG, "BandwidthProfile - maxTracks: " + maxTracks);
+        Log.d(TAG, "BandwidthProfile - dominantSpeakerPriority: " + dominantSpeakerPriority);
+        Log.d(TAG, "BandwidthProfile - renderDimensions: " + renderDimensions);
+        Log.d(TAG, "BandwidthProfile - trackSwitchOffMode: " + trackSwitchOffMode);
+
+        VideoBandwidthProfileOptions videoBandwidthProfileOptions = new VideoBandwidthProfileOptions.Builder()
+                .mode(mode)
+                .maxTracks(maxTracks)
+                .dominantSpeakerPriority(dominantSpeakerPriority)
+                .maxSubscriptionBitrate(maxSubscriptionBitrate)
+                .renderDimensions(renderDimensions)
+                .trackSwitchOffMode(trackSwitchOffMode)
+                .build();
+
+        return new BandwidthProfileOptions(videoBandwidthProfileOptions);
     }
 
     public void connectToRoom(boolean enableAudio) {
@@ -444,6 +630,25 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
                      NetworkQualityVerbosity.NETWORK_QUALITY_VERBOSITY_MINIMAL,
                      NetworkQualityVerbosity.NETWORK_QUALITY_VERBOSITY_MINIMAL));
          }
+
+         // If we have specified bit rates then use them
+        if (this.audioBitrate >= 0 && this.videoBitrate >= 0) {
+            connectOptionsBuilder.encodingParameters(new EncodingParameters(this.audioBitrate, this.videoBitrate));
+            Log.d(TAG, "Setting max audio rate" + String.valueOf(this.audioBitrate) + " and max video rate: " + String.valueOf(this.videoBitrate));
+        } else {
+            // If we have specified only 1 of the bit rate values
+            if (this.audioBitrate >= 0 || this.videoBitrate >= 0) {
+                // Then warn the user that we are ignoring the value
+                Log.w(TAG, "Ignoring audio or video bitrate as only 1 of them is defined. Audio: " + String.valueOf(this.audioBitrate) + " Video:" + String.valueOf(this.videoBitrate));
+            }
+        }
+
+         if (this.enableH264Codec) {
+             connectOptionsBuilder.preferVideoCodecs(Collections.singletonList(new H264Codec()));
+             Log.d(TAG, "Preferring H264 Codec");
+         }
+
+        connectOptionsBuilder.bandwidthProfile(this.bandwidthProfile);
 
         room = Video.connect(getContext(), connectOptionsBuilder.build(), roomListener());
     }
@@ -565,8 +770,35 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         }
     }
 
-    public void toggleVideo(boolean enabled) {
-      isVideoEnabled = enabled;
+    public void toggleVideo(boolean enabled, ReadableMap cameraSettings) {
+
+        if (cameraSettings != null) {
+            if (cameraSettings.hasKey("maxDimensions")) {
+                this.maxCaptureDimensions = parseDimensionsString(cameraSettings.getString("maxDimensions"));
+            }
+
+            if (cameraSettings.hasKey("maxFPS")) {
+                this.maxCaptureFPS = cameraSettings.getInt("maxFPS");
+            }
+        }
+
+        if (this.maxCaptureDimensions == null) {
+            this.maxCaptureDimensions = CustomTwilioVideoView.DEFAULT_MAX_CAPTURE_RESOLUTION;
+        }
+
+        if (this.maxCaptureFPS < 1) {
+            this.maxCaptureFPS = CustomTwilioVideoView.DEFAULT_MAX_CAPTURE_FPS;;
+        }
+
+        if (enabled && localVideoTrack == null) {
+            createLocalVideo(enabled);
+            if (localParticipant != null) {
+                localParticipant.publishTrack(localVideoTrack);
+            }
+        }
+        
+        isVideoEnabled = enabled;
+
         if (localVideoTrack != null) {
             localVideoTrack.enable(enabled);
 
@@ -611,6 +843,22 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
                     if(at.getAudioTrack() != null) {
                         ((RemoteAudioTrack)at.getAudioTrack()).enablePlayback(enabled);
                     }
+                }
+            }
+        }
+    }
+
+    public void setTrackPriority(String trackSid, String trackPriorityString) {
+        TrackPriority priority = this.parsePriorityString(trackPriorityString);
+
+        for (RemoteParticipant participant : room.getRemoteParticipants()) {
+            for (RemoteVideoTrackPublication publication : participant.getRemoteVideoTracks()) {
+                RemoteVideoTrack track = publication.getRemoteVideoTrack();
+                if (track == null) {
+                    continue;
+                }
+                if (publication.getTrackSid().equals(trackSid)) {
+                    track.setPriority(priority);
                 }
             }
         }
@@ -912,7 +1160,6 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         return new RemoteParticipant.Listener() {
             @Override
             public void onAudioTrackSubscribed(RemoteParticipant participant, RemoteAudioTrackPublication publication, RemoteAudioTrack audioTrack) {
-              audioTrack.enablePlayback(enableRemoteAudio);
               WritableMap event = buildParticipantVideoEvent(participant, publication);
               pushEvent(CustomTwilioVideoView.this, ON_PARTICIPANT_ADDED_AUDIO_TRACK, event);
             }

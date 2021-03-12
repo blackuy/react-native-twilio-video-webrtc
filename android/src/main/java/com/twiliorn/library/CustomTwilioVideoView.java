@@ -16,6 +16,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.hardware.Camera;
 import android.media.AudioAttributes;
 import android.media.AudioFocusRequest;
 import android.media.AudioManager;
@@ -37,6 +38,7 @@ import com.facebook.react.uimanager.events.RCTEventEmitter;
 import com.twilio.video.AudioTrackPublication;
 import com.twilio.video.BaseTrackStats;
 import com.twilio.video.CameraCapturer;
+import com.twilio.video.CameraParameterUpdater;
 import com.twilio.video.ConnectOptions;
 import com.twilio.video.LocalAudioTrack;
 import com.twilio.video.LocalAudioTrackPublication;
@@ -81,6 +83,7 @@ import java.util.List;
 
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_AUDIO_CHANGED;
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_CAMERA_SWITCHED;
+import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_CAMERA_FLASH_TOGGLED;
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_CONNECTED;
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_CONNECT_FAILURE;
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_DISCONNECTED;
@@ -132,7 +135,8 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
             Events.ON_PARTICIPANT_DISABLED_AUDIO_TRACK,
             Events.ON_STATS_RECEIVED,
             Events.ON_NETWORK_QUALITY_LEVELS_CHANGED,
-            Events.ON_DOMINANT_SPEAKER_CHANGED
+            Events.ON_DOMINANT_SPEAKER_CHANGED,
+            Events.ON_CAMERA_FLASH_TOGGLED
     })
     public @interface Events {
         String ON_CAMERA_SWITCHED = "onCameraSwitched";
@@ -157,6 +161,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         String ON_STATS_RECEIVED = "onStatsReceived";
         String ON_NETWORK_QUALITY_LEVELS_CHANGED = "onNetworkQualityLevelsChanged";
         String ON_DOMINANT_SPEAKER_CHANGED = "onDominantSpeakerDidChange";
+        String ON_CAMERA_FLASH_TOGGLED = "onCameraFlashToggled";
     }
 
     private final ThemedReactContext themedReactContext;
@@ -562,6 +567,32 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
             WritableMap event = new WritableNativeMap();
             event.putBoolean("isBackCamera", isBackCamera);
             pushEvent(CustomTwilioVideoView.this, ON_CAMERA_SWITCHED, event);
+        }
+    }
+
+    private final CameraParameterUpdater flashToggler = parameters -> {
+        if (parameters.getFlashMode() != null) {
+            String flashMode = Camera.Parameters.FLASH_MODE_OFF.equals(parameters.getFlashMode()) ?
+                    Camera.Parameters.FLASH_MODE_TORCH :
+                    Camera.Parameters.FLASH_MODE_OFF;
+            parameters.setFlashMode(flashMode);
+            WritableMap event = new WritableNativeMap();
+            event.putBoolean("isFlashOn", flashMode == Camera.Parameters.FLASH_MODE_TORCH);
+            pushEvent(CustomTwilioVideoView.this, ON_CAMERA_FLASH_TOGGLED, event);
+        } else {
+            WritableMap event = new WritableNativeMap();
+            event.putString("error", "Flash is not supported in current camera mode");
+            pushEvent(CustomTwilioVideoView.this, ON_CAMERA_FLASH_TOGGLED, event);
+        }
+    };
+
+    public void toggleFlash() {
+        if (cameraCapturer != null) {
+            cameraCapturer.updateCameraParameters(flashToggler);
+        } else {
+            WritableMap event = new WritableNativeMap();
+            event.putString("error", "There's no camera available");
+            pushEvent(CustomTwilioVideoView.this, ON_CAMERA_FLASH_TOGGLED, event);
         }
     }
 

@@ -35,6 +35,7 @@ static NSString* cameraInterruptionEnded      = @"cameraInterruptionEnded";
 static NSString* cameraDidStopRunning         = @"cameraDidStopRunning";
 static NSString* statsReceived                = @"statsReceived";
 static NSString* networkQualityLevelsChanged  = @"networkQualityLevelsChanged";
+static NSString* onCameraFlashToggled  = @"onCameraFlashToggled";
 
 static const CMVideoDimensions kRCTTWVideoAppCameraSourceDimensions = (CMVideoDimensions){900, 720};
 
@@ -111,7 +112,8 @@ RCT_EXPORT_MODULE();
     cameraInterruptionEnded,
     statsReceived,
     networkQualityLevelsChanged,
-    dominantSpeakerDidChange
+    dominantSpeakerDidChange,
+    onCameraFlashToggled
   ];
 }
 
@@ -273,6 +275,29 @@ RCT_EXPORT_METHOD(flipCamera) {
             }
         }];
   }
+}
+
+RCT_EXPORT_METHOD(toggleFlash) {
+  NSMutableDictionary *body = [[NSMutableDictionary alloc] init];
+  if (self.camera) {
+        AVCaptureDevice *device = self.camera.device;
+        if ([device hasTorch]){
+            [device lockForConfiguration:nil];
+            if (!device.torchActive) {
+                [device setTorchMode:AVCaptureTorchModeOn];
+            } else {
+                [device setTorchMode:AVCaptureTorchModeOff];
+            }
+            BOOL isFlashOn = device.torchActive;
+            [device unlockForConfiguration];
+           [body addEntriesFromDictionary:@{ @"isFlashOn" : [NSNumber numberWithBool:!isFlashOn] }];
+        } else {
+           [body addEntriesFromDictionary:@{ @"error" : @"Flash is not supported in current camera mode" }];
+        }
+  } else {
+    [body addEntriesFromDictionary:@{ @"error" : @"There's no camera available" }];
+  }
+  [self sendEventCheckingListenerWithName:onCameraFlashToggled body:body];
 }
 
 RCT_EXPORT_METHOD(toggleSoundSetup:(BOOL)speaker) {

@@ -150,6 +150,11 @@ export default class TwilioVideo extends Component {
      * @param {{ participant, room }} dominant participant
      */
     onDominantSpeakerDidChange: PropTypes.func,
+    /**
+     * Called when torch is done attempting to toggle
+     * @param {{ error, isFlashOn }}
+     */
+    onCameraFlashToggled: PropTypes.func,
     ...View.propTypes
   }
 
@@ -206,6 +211,13 @@ export default class TwilioVideo extends Component {
    */
   flipCamera () {
     TWVideoModule.flipCamera()
+  }
+
+  /**
+   * Toggle Torch functionality
+   */
+   toggleFlash () {
+    TWVideoModule.toggleFlash()
   }
 
   /**
@@ -414,6 +426,11 @@ export default class TwilioVideo extends Component {
       this._eventEmitter.addListener('onDominantSpeakerDidChange', data => {
         if (this.props.onDominantSpeakerDidChange) {
           this.props.onDominantSpeakerDidChange(data)
+        }
+      }),
+      this._eventEmitter.addListener('onCameraFlashToggled', data => {
+        if (this.props.onCameraFlashToggled) {
+          this.props.onCameraFlashToggled(data)
         }
       })
     ]

@@ -20,7 +20,7 @@ onRoomDidFailToConnect | func | no |  | Callback that is called when connecting 
 onRoomDidDisconnect | func | no |  | Callback that is called when user is disconnected from room.
 onParticipantAddedDataTrack | func | no |  | Called when a new data track has been added  @param {{participant, track}}
 onParticipantRemovedDataTrack | func | no |  | Called when a data track has been removed  @param {{participant, track}}
-onDataTrackMessageReceived | func | no |  | Called when an dataTrack receives a message  @param {{message}}
+onDataTrackMessageReceived | func | no |  | Called when an dataTrack receives a message  @param {{message, trackSid}}
 onParticipantAddedVideoTrack | func | no |  | Called when a new video track has been added  @param {{participant, track, enabled}}
 onParticipantRemovedVideoTrack | func | no |  | Called when a video track has been removed  @param {{participant, track}}
 onParticipantAddedAudioTrack | func | no |  | Called when a new audio track has been added  @param {{participant, track}}
@@ -62,7 +62,7 @@ onParticipantEnabledVideoTrack | func | no |  | Called when a video track has be
 onParticipantDisabledVideoTrack | func | no |  | Called when a video track has been disabled.  @param {{participant, track}}
 onParticipantEnabledAudioTrack | func | no |  | Called when an audio track has been enabled.  @param {{participant, track}}
 onParticipantDisabledAudioTrack | func | no |  | Called when an audio track has been disabled.  @param {{participant, track}}
-onDataTrackMessageReceived | func | no |  | Called when an dataTrack receives a message  @param {{message}}
+onDataTrackMessageReceived | func | no |  | Called when an dataTrack receives a message  @param {{message, trackSid}}
 onCameraDidStart | func | no |  | Called when the camera has started
 onCameraWasInterrupted | func | no |  | Called when the camera has been interrupted
 onCameraInterruptionEnded | func | no |  | Called when the camera interruption has ended

@@ -256,6 +256,9 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
                         @Override
                         public void onCameraSwitched(String newCameraId) {
                             setThumbnailMirror();
+                            WritableMap event = new WritableNativeMap();
+                            event.putBoolean("isBackCamera", isCurrentCameraSourceBackFacing());
+                            pushEvent(CustomTwilioVideoView.this, ON_CAMERA_SWITCHED, event);
                         }
 
                         @Override
@@ -579,9 +582,6 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
             } else {
                 cameraCapturer.switchCamera(backFacingDevice);
             }
-            WritableMap event = new WritableNativeMap();
-            event.putBoolean("isBackCamera", isCurrentCameraSourceBackFacing());
-            pushEvent(CustomTwilioVideoView.this, ON_CAMERA_SWITCHED, event);
         }
     }
 

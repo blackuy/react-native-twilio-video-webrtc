@@ -287,44 +287,50 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     }
 
     public void CameraCapturerCompat(Context context, Source cameraSource) {
-        if (isCamera2Supported(context)) {
-            camera2Capturer = new Camera2Capturer(context, camera2IdMap.get(cameraSource),
-                    new Camera2Capturer.Listener() {
-                        @Override
-                        public void onFirstFrameAvailable() {
-                        }
+        try {
+            if (isCamera2Supported(context)) {
+                camera2Capturer = new Camera2Capturer(context, camera2IdMap.get(cameraSource),
+                        new Camera2Capturer.Listener() {
+                            @Override
+                            public void onFirstFrameAvailable() {
+                            }
 
-                        @Override
-                        public void onCameraSwitched(String newCameraId) {
-                            onCameraSwitchedEvent();
-                        }
+                            @Override
+                            public void onCameraSwitched(String newCameraId) {
+                                onCameraSwitchedEvent();
+                            }
 
-                        @Override
-                        public void onError(Camera2Capturer.Exception camera2CapturerException) {
-                            Log.i(TAG, "capturerCompat-Camera2Capturer: " + camera2CapturerException.getExplanation());
-                            Log.i(TAG, "capturerCompat-Camera2Capturer: Code = " + Integer.toString(camera2CapturerException.getCode()));
-                        }
-                    });
-            cameraCapturer = camera2Capturer;
+                            @Override
+                            public void onError(Camera2Capturer.Exception camera2CapturerException) {
+                                Log.i(TAG, "capturerCompat-Camera2Capturer: " + camera2CapturerException.getExplanation());
+                                Log.i(TAG, "capturerCompat-Camera2Capturer: Code = " + Integer.toString(camera2CapturerException.getCode()));
+                            }
+                        });
+                cameraCapturer = camera2Capturer;
+                camera1Capturer = null;
+            } else {
+                camera1Capturer = new CameraCapturer(context, camera1IdMap.get(cameraSource),
+                        new CameraCapturer.Listener() {
+                            @Override
+                            public void onFirstFrameAvailable() {
+                            }
+
+                            @Override
+                            public void onCameraSwitched(String newCameraId) {
+                                onCameraSwitchedEvent();
+                            }
+
+                            @Override
+                            public void onError(int errorCode) {
+                                Log.i(TAG, "capturerCompat-CameraCapturer: " + Integer.toString(errorCode));
+                            }
+                        });
+                cameraCapturer = camera1Capturer;
+                camera2Capturer = null;
+            }
+        } catch (Exception e) {
+            cameraCapturer = null;
             camera1Capturer = null;
-        } else {
-            camera1Capturer = new CameraCapturer(context, camera1IdMap.get(cameraSource),
-                    new CameraCapturer.Listener() {
-                        @Override
-                        public void onFirstFrameAvailable() {
-                        }
-
-                        @Override
-                        public void onCameraSwitched(String newCameraId) {
-                            onCameraSwitchedEvent();
-                        }
-
-                        @Override
-                        public void onError(int errorCode) {
-                            Log.i(TAG, "capturerCompat-CameraCapturer: " + Integer.toString(errorCode));
-                        }
-                    });
-            cameraCapturer = camera1Capturer;
             camera2Capturer = null;
         }
     }

@@ -31,6 +31,7 @@ import androidx.annotation.RequiresApi;
 import android.os.Handler;
 import android.os.HandlerThread;
 
+import androidx.annotation.Nullable;
 import androidx.annotation.NonNull;
 import androidx.annotation.StringDef;
 
@@ -1306,6 +1307,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private static void setCamera2Maps(Context context) {
+        boolean isFlashFound = false;
         Camera2Enumerator camera2Enumerator = new Camera2Enumerator(context);
         for (String cameraId : camera2Enumerator.getDeviceNames()) {
             if (isCameraIdSupported(cameraId)) {
@@ -1313,7 +1315,18 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
                     camera2IdMap.put(Source.FRONT_CAMERA, cameraId);
                     camera2SourceMap.put(cameraId, Source.FRONT_CAMERA);
                 }
-                if (camera2Enumerator.isBackFacing(cameraId)) {
+                if (camera2Enumerator.isBackFacing(cameraId) && !isFlashFound) {
+
+                    CameraCharacteristics cameraCharacteristics;
+                    cameraCharacteristics = getCameraCharacteristics(cameraId);
+
+                    if (cameraCharacteristics != null) {
+                        boolean flashEnabled = cameraCharacteristics.get(CameraCharacteristics.FLASH_INFO_AVAILABLE);
+                        if (flashEnabled) {
+                            isFlashFound = true;
+                        }
+                    }
+
                     camera2IdMap.put(Source.BACK_CAMERA, cameraId);
                     camera2SourceMap.put(cameraId, Source.BACK_CAMERA);
                 }
@@ -1340,16 +1353,27 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    private static @Nullable
+    CameraCharacteristics getCameraCharacteristics(String deviceName) {
+        try {
+            return cameraManager.getCameraCharacteristics(deviceName);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private static boolean isCameraIdSupported(String cameraId) {
         boolean isMonoChromeSupported = false;
         boolean isPrivateImageFormatSupported = false;
-        CameraCharacteristics cameraCharacteristics;
-        try {
-            cameraCharacteristics = cameraManager.getCameraCharacteristics(cameraId);
-        } catch (Exception e) {
-            e.printStackTrace();
+        CameraCharacteristics cameraCharacteristics = getCameraCharacteristics(cameraId);
+
+        if (cameraCharacteristics == null) {
             return false;
         }
+
+
         /*
          * This is a temporary work around for a RuntimeException that occurs on devices which contain cameras
          * that do not support ImageFormat.PRIVATE output formats. A long term fix is currently in development.

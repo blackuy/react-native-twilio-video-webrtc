@@ -30,8 +30,10 @@ import androidx.annotation.RequiresApi;
 
 import android.os.Handler;
 import android.os.HandlerThread;
-import android.support.annotation.NonNull;
-import android.support.annotation.StringDef;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.StringDef;
+
 import android.util.Log;
 import android.view.View;
 
@@ -264,6 +266,19 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         return new VideoFormat(VideoDimensions.CIF_VIDEO_DIMENSIONS, 15);
     }
 
+    private boolean isCamera2Supported(Context context) {
+        return Camera2Capturer.isSupported(context) && isLollipopApiSupported();
+    }
+
+    private void buildDeviceInfo(Context context) {
+        if (isCamera2Supported(context)) {
+            cameraManager = (CameraManager) context.getSystemService(Context.CAMERA_SERVICE);
+            setCamera2Maps(context);
+        } else {
+            setCamera1Maps();
+        }
+    }
+
     public void onCameraSwitchedEvent() {
         setThumbnailMirror();
         WritableMap event = new WritableNativeMap();
@@ -272,9 +287,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     }
 
     public void CameraCapturerCompat(Context context, Source cameraSource) {
-        if (Camera2Capturer.isSupported(context) && isLollipopApiSupported()) {
-            cameraManager = (CameraManager) context.getSystemService(Context.CAMERA_SERVICE);
-            setCamera2Maps(context);
+        if (isCamera2Supported(context)) {
             camera2Capturer = new Camera2Capturer(context, camera2IdMap.get(cameraSource),
                     new Camera2Capturer.Listener() {
                         @Override
@@ -295,7 +308,6 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
             cameraCapturer = camera2Capturer;
             camera1Capturer = null;
         } else {
-            setCamera1Maps();
             camera1Capturer = new CameraCapturer(context, camera1IdMap.get(cameraSource),
                     new CameraCapturer.Listener() {
                         @Override
@@ -325,14 +337,38 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         }
     }
 
+    public Source getAvailableCamera(Context context) {
+        Map<Source, String> idMap;
+
+        if (isCamera2Supported(context)) {
+            idMap = camera2IdMap;
+        } else {
+            idMap = camera1IdMap;
+        }
+
+        if (idMap.containsKey(Source.FRONT_CAMERA)) {
+            return Source.FRONT_CAMERA;
+        } else if (idMap.containsKey(Source.BACK_CAMERA)) {
+            return Source.BACK_CAMERA;
+        } else {
+            return null;
+        }
+    }
+
     private boolean createLocalVideo(boolean enableVideo) {
         isVideoEnabled = enableVideo;
         ///create capturer here
-        Source finalSource =
-                CameraCapturerCompat(getContext(), Source.FRONT_CAMERA);
+        buildDeviceInfo(getContext());
+        Source finalSource = getAvailableCamera(getContext());
+
+        if (finalSource != null) {
+            CameraCapturerCompat(getContext(), Source.FRONT_CAMERA);
+        }
 
         if (cameraCapturer == null) {
             WritableMap event = new WritableNativeMap();
+            event.putBoolean("isCamera2Capture", isCamera2Supported(getContext()));
+            event.putString("targetCameraSource", finalSource == null ? "none" : finalSource.toString());
             event.putString("error", "No camera is supported on this device");
             pushEvent(CustomTwilioVideoView.this, ON_CONNECT_FAILURE, event);
             return false;

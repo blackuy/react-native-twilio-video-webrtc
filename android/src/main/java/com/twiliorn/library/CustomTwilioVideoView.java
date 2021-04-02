@@ -885,6 +885,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
                 participantsArray.pushMap(buildParticipant(localParticipant));
                 event.putArray("participants", participantsArray);
 
+                event.putBoolean("isBackCamera", isCurrentCameraSourceBackFacing());
                 pushEvent(CustomTwilioVideoView.this, ON_CONNECTED, event);
 
 

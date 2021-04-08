@@ -764,8 +764,10 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
                 for (RemoteParticipant participant : participants) {
                     participantsArray.pushMap(buildParticipant(participant));
                 }
-                participantsArray.pushMap(buildParticipant(localParticipant));
+                WritableMap localParticipantMap = buildParticipant(localParticipant);
+                participantsArray.pushMap(localParticipantMap);
                 event.putArray("participants", participantsArray);
+                event.putArray("localParticipant", localParticipantMap);
 
                 pushEvent(CustomTwilioVideoView.this, ON_CONNECTED, event);
 

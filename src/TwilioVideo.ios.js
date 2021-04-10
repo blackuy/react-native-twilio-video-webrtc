@@ -12,7 +12,7 @@ import { NativeModules, NativeEventEmitter, View } from 'react-native'
 
 const { TWVideoModule } = NativeModules
 
-export default class extends Component {
+export default class TwilioVideo extends Component {
   static propTypes = {
     /**
      * Flag that enables screen sharing RCTRootView instead of camera capture

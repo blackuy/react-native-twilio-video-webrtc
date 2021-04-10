@@ -113,6 +113,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     private boolean dominantSpeakerEnabled = false;
     private static String frontFacingDevice;
     private static String backFacingDevice;
+    private boolean maintainVideoTrackInBackground = false;
 
     @Retention(RetentionPolicy.SOURCE)
     @StringDef({Events.ON_CAMERA_SWITCHED,
@@ -346,7 +347,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
          * Release the local video track before going in the background. This ensures that the
          * camera can be used by other applications while this app is in the background.
          */
-        if (localVideoTrack != null) {
+        if (localVideoTrack != null && !maintainVideoTrackInBackground) {
             /*
              * If this local video track is being shared in a Room, remove from local
              * participant before releasing the video track. Participants will be notified that
@@ -403,12 +404,13 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
 
     public void connectToRoomWrapper(
             String roomName, String accessToken, boolean enableAudio, boolean enableVideo,
-            boolean enableRemoteAudio, boolean enableNetworkQualityReporting, boolean dominantSpeakerEnabled) {
+            boolean enableRemoteAudio, boolean enableNetworkQualityReporting, boolean dominantSpeakerEnabled, boolean maintainVideoTrackInBackground) {
         this.roomName = roomName;
         this.accessToken = accessToken;
         this.enableRemoteAudio = enableAudio;
         this.enableNetworkQualityReporting = enableNetworkQualityReporting;
         this.dominantSpeakerEnabled = dominantSpeakerEnabled;
+        this.maintainVideoTrackInBackground = maintainVideoTrackInBackground;
 
         // Share your microphone
         localAudioTrack = LocalAudioTrack.create(getContext(), enableAudio);
@@ -957,14 +959,14 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
 
             @Override
             public void onDataTrackSubscribed(RemoteParticipant remoteParticipant, RemoteDataTrackPublication remoteDataTrackPublication, RemoteDataTrack remoteDataTrack) {
-                 WritableMap event = buildParticipantDataEvent(remoteParticipant);
+                 WritableMap event = buildParticipantDataEvent(remoteParticipant, remoteDataTrackPublication);
                  pushEvent(CustomTwilioVideoView.this, ON_PARTICIPANT_ADDED_DATA_TRACK, event);
                  dataTrackMessageThreadHandler.post(() -> addRemoteDataTrack(remoteParticipant, remoteDataTrack));
             }
 
             @Override
-            public void onDataTrackUnsubscribed(RemoteParticipant remoteParticipant, RemoteDataTrackPublication publication, RemoteDataTrack remoteDataTrack) {
-                 WritableMap event = buildParticipantDataEvent(remoteParticipant);
+            public void onDataTrackUnsubscribed(RemoteParticipant remoteParticipant, RemoteDataTrackPublication remoteDataTrackPublication, RemoteDataTrack remoteDataTrack) {
+                 WritableMap event = buildParticipantDataEvent(remoteParticipant, remoteDataTrackPublication);
                  pushEvent(CustomTwilioVideoView.this, ON_PARTICIPANT_REMOVED_DATA_TRACK, event);
             }
 
@@ -1101,24 +1103,17 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         return participantMap;
     }
 
-
-    private WritableMap buildParticipantDataEvent(Participant participant) {
-        WritableMap participantMap = buildParticipant(participant);
-        WritableMap participantMap2 = buildParticipant(participant);
-
-        WritableMap event = new WritableNativeMap();
-        event.putMap("participant", participantMap);
-        event.putMap("track", participantMap2);
-        return event;
-    }
-
-    private WritableMap buildParticipantVideoEvent(Participant participant, TrackPublication publication) {
-        WritableMap participantMap = buildParticipant(participant);
-
+    private WritableMap buildTrack(TrackPublication publication) {
         WritableMap trackMap = new WritableNativeMap();
         trackMap.putString("trackSid", publication.getTrackSid());
         trackMap.putString("trackName", publication.getTrackName());
         trackMap.putBoolean("enabled", publication.isTrackEnabled());
+        return trackMap;
+    }
+
+    private WritableMap buildParticipantDataEvent(Participant participant, TrackPublication publication) {
+        WritableMap participantMap = buildParticipant(participant);
+        WritableMap trackMap = buildTrack(publication);
 
         WritableMap event = new WritableNativeMap();
         event.putMap("participant", participantMap);
@@ -1126,9 +1121,20 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         return event;
     }
 
-    private WritableMap buildDataTrackEvent(String message) {
+    private WritableMap buildParticipantVideoEvent(Participant participant, TrackPublication publication) {
+        WritableMap participantMap = buildParticipant(participant);
+        WritableMap trackMap = buildTrack(publication);
+
+        WritableMap event = new WritableNativeMap();
+        event.putMap("participant", participantMap);
+        event.putMap("track", trackMap);
+        return event;
+    }
+
+    private WritableMap buildDataTrackEvent(RemoteDataTrack remoteDataTrack, String message) {
         WritableMap event = new WritableNativeMap();
         event.putString("message", message);
+        event.putString("trackSid", remoteDataTrack.getSid());
         return event;
     }
 
@@ -1185,7 +1191,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
 
             @Override
             public void onMessage(RemoteDataTrack remoteDataTrack, String message) {
-                WritableMap event = buildDataTrackEvent(message);
+                WritableMap event = buildDataTrackEvent(remoteDataTrack, message);
                 pushEvent(CustomTwilioVideoView.this, ON_DATATRACK_MESSAGE_RECEIVED, event);
             }
         };

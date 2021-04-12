@@ -519,7 +519,7 @@ RCT_EXPORT_METHOD(disconnect) {
   self.localParticipant.delegate = self;
 
   [participants addObject:[self.localParticipant toJSON]];
-  [self sendEventCheckingListenerWithName:roomDidConnect body:@{ @"roomName" : room.name , @"roomSid": room.sid, @"participants" : participants }];
+  [self sendEventCheckingListenerWithName:roomDidConnect body:@{ @"roomName" : room.name , @"roomSid": room.sid, @"participants" : participants, @"localParticipant" : [self.localParticipant toJSON] }];
 
 }
 

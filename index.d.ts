@@ -38,6 +38,13 @@ declare module "react-native-twilio-video-webrtc" {
 
   export type TrackEventCb = (t: TrackEventCbArgs) => void;
 
+  export interface DataTrackEventCbArgs {
+    message: string;
+    trackSid: string;
+  }
+
+  export type DataTrackEventCb = (t: DataTrackEventCbArgs) => void;
+
   interface RoomEventCommonArgs {
     roomName: string;
     roomSid: string;
@@ -90,7 +97,7 @@ declare module "react-native-twilio-video-webrtc" {
     onNetworkQualityLevelsChanged?: NetworkLevelChangeEventCb;
 
     onStatsReceived?: (data: any) => void;
-    onDataTrackMessageReceived?: (data: { message: string }) => void;
+    onDataTrackMessageReceived?: DataTrackEventCb;
     ref?: React.Ref<any>;
   };
 

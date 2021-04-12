@@ -15,7 +15,7 @@ Property | Type | Required | Default value | Description
 onCameraSwitched | func | no |  | Callback that is called when camera source changes
 onVideoChanged | func | no |  | Callback that is called when video is toggled.
 onAudioChanged | func | no |  | Callback that is called when a audio is toggled.
-onRoomDidConnect | func | no |  | Callback that is called when user is connected to a room.
+onRoomDidConnect | func | no |  | Called when the room has connected  @param {{roomName, participants, localParticipant}}
 onRoomDidFailToConnect | func | no |  | Callback that is called when connecting to room fails.
 onRoomDidDisconnect | func | no |  | Callback that is called when user is disconnected from room.
 onParticipantAddedDataTrack | func | no |  | Called when a new data track has been added  @param {{participant, track}}
@@ -47,7 +47,7 @@ onDominantSpeakerDidChange | func | no |  | Called when dominant speaker changes
 Property | Type | Required | Default value | Description
 :--- | :--- | :--- | :--- | :---
 screenShare | bool | no |  | Flag that enables screen sharing RCTRootView instead of camera capture
-onRoomDidConnect | func | no |  | Called when the room has connected  @param {{roomName, participants}}
+onRoomDidConnect | func | no |  | Called when the room has connected  @param {{roomName, participants, localParticipant}}
 onRoomDidDisconnect | func | no |  | Called when the room has disconnected  @param {{roomName, error}}
 onRoomDidFailToConnect | func | no |  | Called when connection with room failed  @param {{roomName, error}}
 onRoomParticipantDidConnect | func | no |  | Called when a new participant has connected  @param {{roomName, participant}}

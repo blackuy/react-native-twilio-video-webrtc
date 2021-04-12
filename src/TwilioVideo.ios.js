@@ -160,7 +160,7 @@ export default class TwilioVideo extends Component {
     this._eventEmitter = new NativeEventEmitter(TWVideoModule)
   }
 
-  componentWillMount () {
+  componentDidMount () {
     this._registerEvents()
     this._startLocalVideo()
     this._startLocalAudio()

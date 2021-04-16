@@ -410,7 +410,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
             boolean enableRemoteAudio, boolean enableNetworkQualityReporting, boolean dominantSpeakerEnabled, boolean maintainVideoTrackInBackground) {
         this.roomName = roomName;
         this.accessToken = accessToken;
-        this.enableRemoteAudio = enableAudio;
+        this.enableRemoteAudio = enableRemoteAudio;
         this.enableNetworkQualityReporting = enableNetworkQualityReporting;
         this.dominantSpeakerEnabled = dominantSpeakerEnabled;
         this.maintainVideoTrackInBackground = maintainVideoTrackInBackground;

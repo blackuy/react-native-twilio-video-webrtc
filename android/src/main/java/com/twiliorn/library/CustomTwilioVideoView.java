@@ -287,15 +287,30 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         }
     }
 
-    private boolean createLocalVideo(boolean enableVideo) {
+    private boolean createLocalVideo(boolean enableVideo, String cameraType) {
         isVideoEnabled = enableVideo;
+
         // Share your camera
         buildDeviceInfo();
-        if (this.frontFacingDevice != null) {
-            cameraCapturer = this.createCameraCaputer(getContext(), frontFacingDevice);
-        } else if (this.backFacingDevice != null) {
-            cameraCapturer = this.createCameraCaputer(getContext(), backFacingDevice);
+
+        if (cameraType.equals("front")) {
+            if (frontFacingDevice != null) {
+                cameraCapturer = this.createCameraCaputer(getContext(), frontFacingDevice);
+            } else {
+                // IF the camera is unavailable try the other camera
+                cameraCapturer = this.createCameraCaputer(getContext(), backFacingDevice);
+            }
         } else {
+            if (backFacingDevice != null) {
+                cameraCapturer = this.createCameraCaputer(getContext(), backFacingDevice);
+            } else {
+                // IF the camera is unavailable try the other camera
+                cameraCapturer = this.createCameraCaputer(getContext(), frontFacingDevice);
+            }
+        }
+
+        // If no camera is available let the caller know
+        if (cameraCapturer == null) {
             WritableMap event = new WritableNativeMap();
             event.putString("error", "No camera is supported on this device");
             pushEvent(CustomTwilioVideoView.this, ON_CONNECT_FAILURE, event);
@@ -406,8 +421,16 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     // ====== CONNECTING ===========================================================================
 
     public void connectToRoomWrapper(
-            String roomName, String accessToken, boolean enableAudio, boolean enableVideo,
-            boolean enableRemoteAudio, boolean enableNetworkQualityReporting, boolean dominantSpeakerEnabled, boolean maintainVideoTrackInBackground) {
+            String roomName,
+            String accessToken,
+            boolean enableAudio,
+            boolean enableVideo,
+            boolean enableRemoteAudio,
+            boolean enableNetworkQualityReporting,
+            boolean dominantSpeakerEnabled,
+            boolean maintainVideoTrackInBackground,
+            String cameraType
+          ) {
         this.roomName = roomName;
         this.accessToken = accessToken;
         this.enableRemoteAudio = enableAudio;
@@ -419,7 +442,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         localAudioTrack = LocalAudioTrack.create(getContext(), enableAudio);
 
         if (cameraCapturer == null) {
-            boolean createVideoStatus = createLocalVideo(enableVideo);
+            boolean createVideoStatus = createLocalVideo(enableVideo, cameraType);
             if (!createVideoStatus) {
                 // No need to connect to room if video creation failed
                 return;

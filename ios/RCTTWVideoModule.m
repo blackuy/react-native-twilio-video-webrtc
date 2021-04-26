@@ -175,11 +175,17 @@ RCT_EXPORT_METHOD(startLocalVideo) {
   self.localVideoTrack = [TVILocalVideoTrack trackWithSource:self.camera enabled:NO name:@"camera"];
 }
 
-- (void)startCameraCapture {
+- (void)startCameraCapture:(NSString *)cameraType {
   if (self.camera == nil) {
     return;
   }
-  AVCaptureDevice *camera = [TVICameraSource captureDeviceForPosition:AVCaptureDevicePositionFront];
+  AVCaptureDevice *camera;
+    if ([cameraType isEqualToString:@"back"]) {
+    camera = [TVICameraSource captureDeviceForPosition:AVCaptureDevicePositionBack];
+  } else {
+    camera = [TVICameraSource captureDeviceForPosition:AVCaptureDevicePositionFront];
+  }
+
   [self.camera startCaptureWithDevice:camera completion:^(AVCaptureDevice *device,
           TVIVideoFormat *startFormat,
           NSError *error) {
@@ -235,12 +241,18 @@ RCT_REMAP_METHOD(setLocalAudioEnabled, enabled:(BOOL)enabled setLocalAudioEnable
   resolve(@(enabled));
 }
 
+
+// set a default for setting local video enabled
 - (bool)_setLocalVideoEnabled:(bool)enabled {
+    return [self _setLocalVideoEnabled:enabled cameraType:@"front"];
+}
+
+- (bool)_setLocalVideoEnabled:(bool)enabled cameraType:(NSString *)cameraType {
   if (self.localVideoTrack != nil) {
       [self.localVideoTrack setEnabled:enabled];
       if (self.camera) {
           if (enabled) {
-            [self startCameraCapture];
+            [self startCameraCapture:cameraType];
           } else {
             [self clearCameraInstance];
           }
@@ -385,8 +397,8 @@ RCT_EXPORT_METHOD(getStats) {
   }
 }
 
-RCT_EXPORT_METHOD(connect:(NSString *)accessToken roomName:(NSString *)roomName enableAudio:(BOOL *)enableAudio enableVideo:(BOOL *)enableVideo encodingParameters:(NSDictionary *)encodingParameters enableNetworkQualityReporting:(BOOL *)enableNetworkQualityReporting dominantSpeakerEnabled:(BOOL *)dominantSpeakerEnabled) {
-  [self _setLocalVideoEnabled:enableVideo];
+RCT_EXPORT_METHOD(connect:(NSString *)accessToken roomName:(NSString *)roomName enableAudio:(BOOL *)enableAudio enableVideo:(BOOL *)enableVideo encodingParameters:(NSDictionary *)encodingParameters enableNetworkQualityReporting:(BOOL *)enableNetworkQualityReporting dominantSpeakerEnabled:(BOOL *)dominantSpeakerEnabled cameraType:(NSString *)cameraType) {
+  [self _setLocalVideoEnabled:enableVideo cameraType:cameraType];
   [self.localAudioTrack setEnabled:enableAudio];
 
   TVIConnectOptions *connectOptions = [TVIConnectOptions optionsWithToken:accessToken block:^(TVIConnectOptionsBuilder * _Nonnull builder) {
@@ -613,3 +625,4 @@ RCT_EXPORT_METHOD(disconnect) {
 }
 
 @end
+

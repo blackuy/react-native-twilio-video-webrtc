@@ -284,6 +284,9 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         frontFacingDevice = null;
         for (String deviceName : deviceNames) {
             Log.d(TAG, "[buildDeviceInfo]: " + deviceName);
+            Log.d(TAG, "[buildDeviceInfo]: " + enumerator.isBackFacing(deviceName));
+            Log.d(TAG, "[buildDeviceInfo]: " + enumerator.isFrontFacing(deviceName));
+            Log.d(TAG, "[buildDeviceInfo]: " + enumerator.getSupportedFormats(deviceName).size());
             if (enumerator.isBackFacing(deviceName) && enumerator.getSupportedFormats(deviceName).size() > 0) {
                 backFacingDevice = deviceName;
             } else if (enumerator.isFrontFacing(deviceName) && enumerator.getSupportedFormats(deviceName).size() > 0) {

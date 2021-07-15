@@ -109,6 +109,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     private static final String DATA_TRACK_MESSAGE_THREAD_NAME = "DataTrackMessages";
     private static final String FRONT_CAMERA_TYPE = "front";
     private static final String BACK_CAMERA_TYPE = "back";
+    private static final String EXTERNAL_CAMERA_TYPE = "external";
     private boolean enableRemoteAudio = false;
     private boolean enableNetworkQualityReporting = false;
     private boolean isVideoEnabled = false;
@@ -282,6 +283,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         backFacingDevice = null;
         frontFacingDevice = null;
         for (String deviceName : deviceNames) {
+            Log.d(TAG, "[buildDeviceInfo]: " + deviceName);
             if (enumerator.isBackFacing(deviceName) && enumerator.getSupportedFormats(deviceName).size() > 0) {
                 backFacingDevice = deviceName;
             } else if (enumerator.isFrontFacing(deviceName) && enumerator.getSupportedFormats(deviceName).size() > 0) {

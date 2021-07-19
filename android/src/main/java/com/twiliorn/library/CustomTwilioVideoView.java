@@ -9,6 +9,8 @@
 package com.twiliorn.library;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,6 +30,7 @@ import android.util.Log;
 import android.view.View;
 
 import com.facebook.react.bridge.LifecycleEventListener;
+import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeArray;
@@ -36,6 +39,7 @@ import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.events.RCTEventEmitter;
 import com.twilio.video.AudioTrackPublication;
 import com.twilio.video.BaseTrackStats;
+import com.twilio.video.Camera2Capturer;
 import com.twilio.video.CameraCapturer;
 import com.twilio.video.ConnectOptions;
 import com.twilio.video.LocalAudioTrack;
@@ -71,10 +75,12 @@ import com.twilio.video.TwilioException;
 import com.twilio.video.Video;
 import com.twilio.video.VideoDimensions;
 import com.twilio.video.VideoFormat;
+import com.twilio.video.VideoTrack;
 
 import org.webrtc.voiceengine.WebRtcAudioManager;
 
 import tvi.webrtc.Camera1Enumerator;
+import tvi.webrtc.Camera2Enumerator;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -189,6 +195,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
      */
     private static PatchedVideoView thumbnailVideoView;
     private static LocalVideoTrack localVideoTrack;
+    private static LocalVideoTrack[] preloadedTracks;
 
     private static CameraCapturer cameraCapturer;
     private LocalAudioTrack localAudioTrack;
@@ -238,6 +245,29 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         dataTrackMessageThread.start();
         dataTrackMessageThreadHandler = new Handler(dataTrackMessageThread.getLooper());
 
+        preloadedTracks = getPreloadedVideoTracks();
+
+    }
+
+    private LocalVideoTrack[] getPreloadedVideoTracks() {
+        String[] cameras = getAvaliableCameras(themedReactContext);
+        List<VideoTrack> localTracks = new ArrayList<>();
+        for(String camera : cameras) {
+            try {
+                Camera2Capturer camera2Capturer = createCameraCapturer(themedReactContext, camera);
+
+                VideoTrack track = createLocalVideo(
+                        themedReactContext,
+                        false,
+                        camera2Capturer,
+                        camera);
+                localTracks.add(track);
+            } catch (Exception e) {
+                Log.d(TAG, "unable to get camera");
+                Log.d(TAG, "Reason: " + e.getMessage());
+            }
+        }
+        return localTracks.toArray(new LocalVideoTrack[0]);
     }
 
     // ===== SETUP =================================================================================
@@ -480,8 +510,8 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
             connectOptionsBuilder.audioTracks(Collections.singletonList(localAudioTrack));
         }
 
-        if (localVideoTrack != null) {
-            connectOptionsBuilder.videoTracks(Collections.singletonList(localVideoTrack));
+        if (preloadedTracks != null) {
+            connectOptionsBuilder.videoTracks(Arrays.asList(preloadedTracks));
         }
 
         //LocalDataTrack localDataTrack = LocalDataTrack.create(getContext());
@@ -1230,6 +1260,46 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         setThumbnailMirror();
     }
 
+    private static LocalVideoTrack getTrackFromList(List<LocalVideoTrack> list, String trackId) {
+        for (LocalVideoTrack track:
+             list) {
+            if(track.getName() == trackId)
+                return track;
+        }
+        return null;
+    }
+
+    public static void addLocalSink(PatchedVideoView v, String trackId) {
+        LocalVideoTrack track = CustomTwilioVideoView.getTrackFromList(Arrays.asList(preloadedTracks), trackId);
+        if (track != null) {
+            track.addSink(v);
+        }
+    }
+
+    public static void removeLocalSink(PatchedVideoView v, String trackId) {
+        LocalVideoTrack track = CustomTwilioVideoView.getTrackFromList(Arrays.asList(preloadedTracks), trackId);
+        if (track != null) {
+            track.removeSink(v);
+        }
+    }
+
+    public static void setLocalVideoTrackStatus(String trackId, boolean enabled)
+    {
+        LocalVideoTrack track = CustomTwilioVideoView.getTrackFromList(Arrays.asList(preloadedTracks), trackId);
+        if (track != null) {
+            track.enable(enabled);
+        }
+    }
+
+    public static String[] getAvailableLocalTracks() {
+        ArrayList<String> trackNames = new ArrayList<>();
+        for (LocalVideoTrack track: preloadedTracks) {
+            trackNames.add(track.getName());
+        }
+        return trackNames.toArray(new String[0]);
+    }
+
+
     private RemoteDataTrack.Listener remoteDataTrackListener() {
         return new RemoteDataTrack.Listener() {
 
@@ -1245,5 +1315,42 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
                 pushEvent(CustomTwilioVideoView.this, ON_DATATRACK_MESSAGE_RECEIVED, event);
             }
         };
+    }
+
+    /// new functions
+    private String[] getAvaliableCameras(Context context) {
+        Camera2Enumerator enumerator = new Camera2Enumerator(context);
+        return enumerator.getDeviceNames();
+    }
+
+    private Camera2Capturer createCameraCapturer(Context context, String cameraId) {
+        Camera2Capturer newCameraCapturer = null;
+        try {
+            newCameraCapturer = new Camera2Capturer(context, cameraId, new Camera2Capturer.Listener() {
+                @Override
+                public void onFirstFrameAvailable() {
+
+                }
+
+                @Override
+                public void onCameraSwitched(String newCameraId) {
+
+                }
+
+                @Override
+                public void onError(Camera2Capturer.Exception camera2CapturerException) {
+
+                }
+            });
+            return newCameraCapturer;
+        } catch (Exception e) {
+            Log.d(TAG, "createCameraCapturer: " + e.getMessage());
+            return null;
+        }
+    }
+
+    private VideoTrack createLocalVideo(ReactContext context, boolean enableVideo, Camera2Capturer cameraCapturer, String cameraId) {
+        VideoTrack videoTrack = LocalVideoTrack.create(context, enableVideo, cameraCapturer, buildVideoFormat());
+        return videoTrack;
     }
 }

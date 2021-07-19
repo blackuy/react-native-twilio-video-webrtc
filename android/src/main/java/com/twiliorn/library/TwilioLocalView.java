@@ -95,14 +95,13 @@ public class TwilioLocalView extends RNVideoViewGroup {
         }
     }
 
+    private VideoTrack createLocalVideo(ReactContext context, boolean enableVideo, Camera2Capturer cameraCapturer, String cameraId) {
+        VideoTrack videoTrack = LocalVideoTrack.create(_reactContext, enableVideo, cameraCapturer, buildVideoFormat());
+        return videoTrack;
+    }
+
     private VideoFormat buildVideoFormat() {
         return new VideoFormat(VideoDimensions.CIF_VIDEO_DIMENSIONS, 15);
     }
 
-    private VideoTrack createLocalVideo(ReactContext context, boolean enableVideo, Camera2Capturer cameraCapturer, String cameraId) {
-
-        VideoTrack videoTrack = LocalVideoTrack.create(_reactContext, enableVideo, cameraCapturer, buildVideoFormat());
-
-        return videoTrack;
-    }
 }

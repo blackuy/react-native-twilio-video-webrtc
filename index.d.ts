@@ -28,6 +28,13 @@ declare module "react-native-twilio-video-webrtc" {
     scaleType?: scaleType;
   }
 
+  interface TwilioVideoLocalView3Props extends ViewProps {
+    trackId: string;
+    enabled?: boolean;
+    ref?: React.Ref<any>;
+    scaleType?: scaleType;
+  }
+
   interface Participant {
     sid: string;
     identity: string;
@@ -155,6 +162,7 @@ declare module "react-native-twilio-video-webrtc" {
     setRemoteAudioEnabled: (enabled: boolean) => Promise<boolean>;
     setBluetoothHeadsetConnected: (enabled: boolean) => Promise<boolean>;
     connect: (options: iOSConnectParams | androidConnectParams) => void;
+    getPreloadTracks: () => string[];
     disconnect: () => void;
     flipCamera: () => void;
     toggleSoundSetup: (speaker: boolean) => void;
@@ -169,13 +177,20 @@ declare module "react-native-twilio-video-webrtc" {
   class TwilioVideoLocalView extends React.Component<TwilioVideoLocalViewProps> {}
 
   class TwilioVideoLocalView2 extends React.Component<TwilioVideoLocalView2Props> {}
+  class TwilioVideoLocalView3 extends React.Component<TwilioVideoLocalView3Props> {}
 
   class TwilioVideoParticipantView extends React.Component<TwilioVideoParticipantViewProps> {}
+
+  class TwilioModule {
+    static getPreloadTracks: () => Promise<string>;
+  }
 
   export {
     TwilioVideoLocalView,
     TwilioVideoParticipantView,
     TwilioVideo,
     TwilioVideoLocalView2,
+    TwilioVideoLocalView3,
+    TwilioModule,
   };
 }

@@ -75,14 +75,18 @@ declare module "react-native-twilio-video-webrtc" {
   export type RoomErrorEventCb = (t: RoomErrorEventArgs) => void;
 
   export type ParticipantEventCb = (p: ParticipantEventArgs) => void;
-  
-  export type NetworkLevelChangeEventCb = (p: NetworkLevelChangeEventArgs) => void;
+
+  export type NetworkLevelChangeEventCb = (
+    p: NetworkLevelChangeEventArgs
+  ) => void;
 
   export type DominantSpeakerChangedEventArgs = RoomEventCommonArgs & {
     participant: Participant;
-  }
-  
-  export type DominantSpeakerChangedCb = (d: DominantSpeakerChangedEventArgs) => void;
+  };
+
+  export type DominantSpeakerChangedCb = (
+    d: DominantSpeakerChangedEventArgs
+  ) => void;
 
   export type TwilioVideoProps = ViewProps & {
     onCameraDidStart?: () => void;
@@ -156,13 +160,15 @@ declare module "react-native-twilio-video-webrtc" {
     sendString: (message: string) => void;
   }
 
-  class TwilioVideoLocalView extends React.Component<
-    TwilioVideoLocalViewProps
-  > {}
+  class TwilioVideoLocalView extends React.Component<TwilioVideoLocalViewProps> {}
 
-  class TwilioVideoParticipantView extends React.Component<
-    TwilioVideoParticipantViewProps
-  > {}
+  class TwilioVideoLocalView2 extends React.Component<TwilioVideoLocalViewProps> {}
+
+  class TwilioVideoParticipantView extends React.Component<{
+    cameraId: string;
+    ref?: React.Ref<any>;
+    scaleType?: scaleType;
+  }> {}
 
   export { TwilioVideoLocalView, TwilioVideoParticipantView, TwilioVideo };
 }

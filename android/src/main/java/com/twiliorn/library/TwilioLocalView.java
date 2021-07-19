@@ -36,6 +36,7 @@ public class TwilioLocalView extends RNVideoViewGroup {
     public TwilioLocalView(ThemedReactContext context) {
         super(context);
         logStr(getAvaliableCameras());
+        this._reactContext = context;
     }
 
     public void setCameraId(@Nullable String cameraId) {

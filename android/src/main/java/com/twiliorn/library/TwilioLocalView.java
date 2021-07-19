@@ -13,13 +13,14 @@ import android.util.Log;
 
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.uimanager.ThemedReactContext;
-import com.twilio.video.CameraCapturer;
+import com.twilio.video.Camera2Capturer;
 import com.twilio.video.LocalVideoTrack;
 import com.twilio.video.VideoDimensions;
 import com.twilio.video.VideoFormat;
 import com.twilio.video.VideoTrack;
 
 import tvi.webrtc.Camera1Enumerator;
+import tvi.webrtc.Camera2Enumerator;
 
 
 public class TwilioLocalView extends RNVideoViewGroup {
@@ -28,7 +29,7 @@ public class TwilioLocalView extends RNVideoViewGroup {
     private static final String TAG = "TwilioLocalView";
 
     private String _trackName = "";
-    private CameraCapturer _cameraCapturer = null;
+    private Camera2Capturer _cameraCapturer = null;
     private VideoTrack _localVideoTrack = null;
     private ThemedReactContext _reactContext;
 
@@ -64,33 +65,29 @@ public class TwilioLocalView extends RNVideoViewGroup {
     }
 
     private String[] getAvaliableCameras() {
-        Camera1Enumerator enumerator = new Camera1Enumerator();
+        Camera2Enumerator enumerator = new Camera2Enumerator();
         return enumerator.getDeviceNames();
     }
 
-    private CameraCapturer createCameraCapturer(Context context, String cameraId) {
-        CameraCapturer newCameraCapturer = null;
+    private Camera2Capturer createCameraCapturer(Context context, String cameraId) {
+        Camera2Capturer newCameraCapturer = null;
         try {
-            newCameraCapturer = new CameraCapturer(
-                    context,
-                    cameraId,
-                    new CameraCapturer.Listener() {
-                        @Override
-                        public void onFirstFrameAvailable() {
-                        }
+            newCameraCapturer = new Camera2Capturer(context, cameraId, new Camera2Capturer.Listener() {
+                @Override
+                public void onFirstFrameAvailable() {
 
-                        @Override
-                        public void onCameraSwitched(String newCameraId) {
+                }
 
-                        }
+                @Override
+                public void onCameraSwitched(String newCameraId) {
 
+                }
 
-                        @Override
-                        public void onError(int i) {
-                            Log.i("CustomTwilioVideoView", "Error getting camera");
-                        }
-                    }
-            );
+                @Override
+                public void onError(Camera2Capturer.Exception camera2CapturerException) {
+
+                }
+            })
             return newCameraCapturer;
         } catch (Exception e) {
             Log.d(TAG, "createCameraCapturer: " + e.getMessage());
@@ -102,7 +99,7 @@ public class TwilioLocalView extends RNVideoViewGroup {
         return new VideoFormat(VideoDimensions.CIF_VIDEO_DIMENSIONS, 15);
     }
 
-    private VideoTrack createLocalVideo(ReactContext context, boolean enableVideo, CameraCapturer cameraCapturer, String cameraId) {
+    private VideoTrack createLocalVideo(ReactContext context, boolean enableVideo, Camera2Capturer cameraCapturer, String cameraId) {
 
         VideoTrack videoTrack = LocalVideoTrack.create(_reactContext, enableVideo, cameraCapturer, buildVideoFormat());
 

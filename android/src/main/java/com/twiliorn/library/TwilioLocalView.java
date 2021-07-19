@@ -37,6 +37,7 @@ public class TwilioLocalView extends RNVideoViewGroup {
     private String trackName = "";
     private CameraCapturer cameraCapturer = null;
     private VideoTrack localVideoTrack = null;
+    private ThemedReactContext reactContext;
 
 
     public TwilioLocalView(ThemedReactContext context) {
@@ -47,9 +48,11 @@ public class TwilioLocalView extends RNVideoViewGroup {
     public void setCameraId(@Nullable String cameraId) {
         Log.i(TAG, "Initialize Twilio Local video");
         this.cameraId = cameraId;
-        VideoTrack videoTrack = createLocalVideo(null, true, cameraId);
+
+        VideoTrack videoTrack = createLocalVideo(reactContext, true, cameraId);
         videoTrack.addSink(this.getSurfaceViewRenderer());
         trackName = videoTrack.getName();
+
         this.localVideoTrack = videoTrack;
     }
 

@@ -87,7 +87,7 @@ public class TwilioLocalView extends RNVideoViewGroup {
                 public void onError(Camera2Capturer.Exception camera2CapturerException) {
 
                 }
-            })
+            });
             return newCameraCapturer;
         } catch (Exception e) {
             Log.d(TAG, "createCameraCapturer: " + e.getMessage());

@@ -22,6 +22,12 @@ declare module "react-native-twilio-video-webrtc" {
     scaleType?: scaleType;
   }
 
+  interface TwilioVideoLocalView2Props extends ViewProps {
+    cameraId: string;
+    ref?: React.Ref<any>;
+    scaleType?: scaleType;
+  }
+
   interface Participant {
     sid: string;
     identity: string;
@@ -162,11 +168,7 @@ declare module "react-native-twilio-video-webrtc" {
 
   class TwilioVideoLocalView extends React.Component<TwilioVideoLocalViewProps> {}
 
-  class TwilioVideoLocalView2 extends React.Component<{
-    cameraId: string;
-    ref?: React.Ref<any>;
-    scaleType?: scaleType;
-  }> {}
+  class TwilioVideoLocalView2 extends React.Component<TwilioVideoLocalView2Props> {}
 
   class TwilioVideoParticipantView extends React.Component<TwilioVideoParticipantViewProps> {}
 

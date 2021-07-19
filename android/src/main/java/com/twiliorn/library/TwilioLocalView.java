@@ -36,7 +36,7 @@ public class TwilioLocalView extends RNVideoViewGroup {
 
     public TwilioLocalView(ThemedReactContext context) {
         super(context);
-        logStr(getAvaliableCameras());
+        logStr(getAvaliableCameras(context));
         this._reactContext = context;
     }
 
@@ -64,8 +64,8 @@ public class TwilioLocalView extends RNVideoViewGroup {
         }
     }
 
-    private String[] getAvaliableCameras() {
-        Camera2Enumerator enumerator = new Camera2Enumerator(this._reactContext);
+    private String[] getAvaliableCameras(Context context) {
+        Camera2Enumerator enumerator = new Camera2Enumerator(context);
         return enumerator.getDeviceNames();
     }
 

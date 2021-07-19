@@ -162,13 +162,18 @@ declare module "react-native-twilio-video-webrtc" {
 
   class TwilioVideoLocalView extends React.Component<TwilioVideoLocalViewProps> {}
 
-  class TwilioVideoLocalView2 extends React.Component<TwilioVideoLocalViewProps> {}
-
-  class TwilioVideoParticipantView extends React.Component<{
+  class TwilioVideoLocalView2 extends React.Component<{
     cameraId: string;
     ref?: React.Ref<any>;
     scaleType?: scaleType;
   }> {}
 
-  export { TwilioVideoLocalView, TwilioVideoParticipantView, TwilioVideo };
+  class TwilioVideoParticipantView extends React.Component<TwilioVideoParticipantViewProps> {}
+
+  export {
+    TwilioVideoLocalView,
+    TwilioVideoParticipantView,
+    TwilioVideo,
+    TwilioVideoLocalView2,
+  };
 }

@@ -34,7 +34,8 @@ public class TwilioPackage implements ReactPackage {
         return Arrays.<ViewManager>asList(
                 new CustomTwilioVideoViewManager(),
                 new TwilioRemotePreviewManager(),
-                new TwilioVideoPreviewManager()
+                new TwilioVideoPreviewManager(),
+                new TwilioLocalViewManager()
         );
     }
 }

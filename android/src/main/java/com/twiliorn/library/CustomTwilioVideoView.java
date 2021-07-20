@@ -147,7 +147,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     }
 
     private void cleanupPreloadTracks() {
-        if(preloadedTracks != null & preloadedTracks.length > 0)
+        if(preloadedTracks != null && preloadedTracks.length > 0)
             for(LocalVideoTrack track : preloadedTracks)
             {
                 for(VideoSink sink : track.getSinks())

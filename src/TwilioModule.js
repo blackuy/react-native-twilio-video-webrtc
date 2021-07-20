@@ -13,6 +13,16 @@ class TwilioModule {
       return Promise.resolve([]);
     }
   }
+
+  static getAvailableCameras = async () => {
+    try {
+      const cameraIds = await RNTwilioModule.getAvailableCameras();
+      return cameraIds;
+    } catch (error) {
+      console.error(error);
+      return Promise.resolve([])
+    }
+  }
 }
 
 export default TwilioModule;

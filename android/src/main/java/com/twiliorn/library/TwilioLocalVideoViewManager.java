@@ -10,6 +10,7 @@ package com.twiliorn.library;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.common.MapBuilder;
 import com.facebook.react.uimanager.SimpleViewManager;
 import com.facebook.react.uimanager.ThemedReactContext;
@@ -32,6 +33,7 @@ public class TwilioLocalVideoViewManager extends SimpleViewManager<TwilioLocalVi
     }
 
     @ReactProp(name = "scaleType")
+    @ReactMethod
     public void setScaleType(TwilioRemotePreview view, @Nullable String scaleType) {
 
       if (scaleType.equals("fit")) {

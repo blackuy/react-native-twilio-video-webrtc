@@ -125,6 +125,7 @@ declare module "react-native-twilio-video-webrtc" {
 
     onStatsReceived?: (data: any) => void;
     onDataTrackMessageReceived?: DataTrackEventCb;
+    preloadCameras: string[];
     ref?: React.Ref<any>;
   };
 
@@ -162,7 +163,6 @@ declare module "react-native-twilio-video-webrtc" {
     setRemoteAudioEnabled: (enabled: boolean) => Promise<boolean>;
     setBluetoothHeadsetConnected: (enabled: boolean) => Promise<boolean>;
     connect: (options: iOSConnectParams | androidConnectParams) => void;
-    getPreloadTracks: () => string[];
     disconnect: () => void;
     flipCamera: () => void;
     toggleSoundSetup: (speaker: boolean) => void;
@@ -182,7 +182,8 @@ declare module "react-native-twilio-video-webrtc" {
   class TwilioVideoParticipantView extends React.Component<TwilioVideoParticipantViewProps> {}
 
   class TwilioModule {
-    static getPreloadTracks: () => Promise<string>;
+    static getPreloadTracks: () => Promise<string[]>;
+    static getAvailableCameras: () => Promise<string[]>;
   }
 
   export {

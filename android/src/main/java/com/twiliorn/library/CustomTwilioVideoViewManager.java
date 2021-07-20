@@ -70,6 +70,12 @@ public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilio
         return new CustomTwilioVideoView(reactContext);
     }
 
+    @ReactProp(name = "preloadCameras")
+    public  void setPreloadCameras(CustomTwilioVideoView view, @Nullable ReadableArray sources)
+    {
+        view.setPreloadCameras(sources);
+    }
+
     @Override
     public void receiveCommand(CustomTwilioVideoView view, int commandId, @Nullable ReadableArray args) {
         switch (commandId) {

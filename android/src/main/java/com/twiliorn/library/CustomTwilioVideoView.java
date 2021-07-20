@@ -8,6 +8,7 @@
  */
 package com.twiliorn.library;
 
+import java.lang.reflect.Array;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,6 +32,8 @@ import android.view.View;
 
 import com.facebook.react.bridge.LifecycleEventListener;
 import com.facebook.react.bridge.ReactContext;
+import com.facebook.react.bridge.ReadableArray;
+import com.facebook.react.bridge.ReadableType;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeArray;
@@ -67,7 +70,6 @@ import com.twilio.video.RemoteVideoTrack;
 import com.twilio.video.RemoteVideoTrackPublication;
 import com.twilio.video.RemoteVideoTrackStats;
 import com.twilio.video.Room;
-import com.twilio.video.Room.State;
 import com.twilio.video.StatsListener;
 import com.twilio.video.StatsReport;
 import com.twilio.video.TrackPublication;
@@ -81,6 +83,8 @@ import org.webrtc.voiceengine.WebRtcAudioManager;
 
 import tvi.webrtc.Camera1Enumerator;
 import tvi.webrtc.Camera2Enumerator;
+import tvi.webrtc.VideoCapturer;
+import tvi.webrtc.VideoSink;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -124,6 +128,42 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     private static String backFacingDevice;
     private boolean maintainVideoTrackInBackground = false;
     private String cameraType = "";
+
+    public void setPreloadCameras(ReadableArray sources) {
+        ArrayList<String> cameras = new ArrayList<>(sources.size());
+        for (int i = 0; i < sources.size(); i++)
+        {
+            ReadableType type = sources.getType(i);
+            switch (type)
+            {
+                case String:
+                    cameras.add(sources.getString(i));
+            }
+        }
+        this.preloadCameraIds = cameras.toArray(new String[0]);
+        cleanupPreloadTracks();
+
+        preloadedTracks = createPreloadedVideoTracks(cameras.toArray(this.preloadCameraIds));
+    }
+
+    private void cleanupPreloadTracks() {
+        if(preloadedTracks != null & preloadedTracks.length > 0)
+            for(LocalVideoTrack track : preloadedTracks)
+            {
+                for(VideoSink sink : track.getSinks())
+                {
+                    track.removeSink(sink);
+                }
+                
+                VideoCapturer v2c = track.getVideoCapturer();
+                try {
+                    v2c.stopCapture();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                v2c.dispose();
+            }
+    }
 
     @Retention(RetentionPolicy.SOURCE)
     @StringDef({Events.ON_CAMERA_SWITCHED,
@@ -196,6 +236,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     private static PatchedVideoView thumbnailVideoView;
     private static LocalVideoTrack localVideoTrack;
     private static LocalVideoTrack[] preloadedTracks;
+    private String[] preloadCameraIds;
 
     private static CameraCapturer cameraCapturer;
     private LocalAudioTrack localAudioTrack;
@@ -245,20 +286,16 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         dataTrackMessageThread.start();
         dataTrackMessageThreadHandler = new Handler(dataTrackMessageThread.getLooper());
 
-        preloadedTracks = getPreloadedVideoTracks();
-
     }
 
-    private LocalVideoTrack[] getPreloadedVideoTracks() {
-        String[] cameras = getAvaliableCameras(themedReactContext);
+    private LocalVideoTrack[] createPreloadedVideoTracks(String[] cameras) {
         List<VideoTrack> localTracks = new ArrayList<>();
         for(String camera : cameras) {
             try {
                 Camera2Capturer camera2Capturer = createCameraCapturer(themedReactContext, camera);
-
                 VideoTrack track = createLocalVideo(
                         themedReactContext,
-                        false,
+                        true,
                         camera2Capturer,
                         camera);
                 localTracks.add(track);
@@ -269,7 +306,6 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         }
         return localTracks.toArray(new LocalVideoTrack[0]);
     }
-
     // ===== SETUP =================================================================================
 
     private VideoFormat buildVideoFormat() {
@@ -510,10 +546,15 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
             connectOptionsBuilder.audioTracks(Collections.singletonList(localAudioTrack));
         }
 
-        if (preloadedTracks != null) {
-            connectOptionsBuilder.videoTracks(Arrays.asList(preloadedTracks));
-        }
+//        if (preloadedTracks != null) {
+//            connectOptionsBuilder.videoTracks(Arrays.asList(preloadedTracks));
+//        }
 
+        if(preloadCameraIds != null && preloadCameraIds.length > 0)
+        {
+            connectOptionsBuilder.videoTracks(Arrays.asList(preloadedTracks));
+
+        }
         //LocalDataTrack localDataTrack = LocalDataTrack.create(getContext());
 
          if (localDataTrack != null) {
@@ -1286,7 +1327,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     public static void setLocalVideoTrackStatus(String trackId, boolean enabled)
     {
         LocalVideoTrack track = CustomTwilioVideoView.getTrackFromList(Arrays.asList(preloadedTracks), trackId);
-        if (track != null) {
+        if (track != null && track.isEnabled() != enabled) {
             track.enable(enabled);
         }
     }

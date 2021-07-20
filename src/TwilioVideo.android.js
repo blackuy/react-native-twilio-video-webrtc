@@ -144,7 +144,9 @@ const propTypes = {
      * Called when dominant speaker changes
      * @param {{ participant, room }} dominant participant and room
      */
-  onDominantSpeakerDidChange: PropTypes.func
+  onDominantSpeakerDidChange: PropTypes.func,
+
+  preloadCameras: PropTypes.arrayOf(PropTypes.string),
 }
 
 const nativeEvents = {
@@ -165,7 +167,7 @@ const nativeEvents = {
 }
 
 class CustomTwilioVideoView extends Component {
-  connect ({
+  connect({
     roomName,
     accessToken,
     cameraType = 'front',
@@ -189,73 +191,73 @@ class CustomTwilioVideoView extends Component {
     ])
   }
 
-  sendString (message) {
+  sendString(message) {
     this.runCommand(nativeEvents.sendString, [
       message
     ])
   }
 
-  publishLocalAudio () {
+  publishLocalAudio() {
     this.runCommand(nativeEvents.publishAudio, [true])
   }
 
-  publishLocalVideo () {
+  publishLocalVideo() {
     this.runCommand(nativeEvents.publishVideo, [true])
   }
 
-  unpublishLocalAudio () {
+  unpublishLocalAudio() {
     this.runCommand(nativeEvents.publishAudio, [false])
   }
 
-  unpublishLocalVideo () {
+  unpublishLocalVideo() {
     this.runCommand(nativeEvents.publishVideo, [false])
   }
 
-  disconnect () {
+  disconnect() {
     this.runCommand(nativeEvents.disconnect, [])
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     this.runCommand(nativeEvents.releaseResource, [])
   }
 
-  flipCamera () {
+  flipCamera() {
     this.runCommand(nativeEvents.switchCamera, [])
   }
 
-  setLocalVideoEnabled (enabled) {
+  setLocalVideoEnabled(enabled) {
     this.runCommand(nativeEvents.toggleVideo, [enabled])
     return Promise.resolve(enabled)
   }
 
-  setLocalAudioEnabled (enabled) {
+  setLocalAudioEnabled(enabled) {
     this.runCommand(nativeEvents.toggleSound, [enabled])
     return Promise.resolve(enabled)
   }
 
-  setRemoteAudioEnabled (enabled) {
+  setRemoteAudioEnabled(enabled) {
     this.runCommand(nativeEvents.toggleRemoteSound, [enabled])
     return Promise.resolve(enabled)
   }
 
-  setBluetoothHeadsetConnected (enabled) {
+  setBluetoothHeadsetConnected(enabled) {
     this.runCommand(nativeEvents.toggleBluetoothHeadset, [enabled])
     return Promise.resolve(enabled)
   }
 
-  getStats () {
+  getStats() {
     this.runCommand(nativeEvents.getStats, [])
   }
 
-  disableOpenSLES () {
+  disableOpenSLES() {
     this.runCommand(nativeEvents.disableOpenSLES, [])
   }
 
-  toggleSoundSetup (speaker) {
+  toggleSoundSetup(speaker) {
     this.runCommand(nativeEvents.toggleSoundSetup, [speaker])
   }
 
-  runCommand (event, args) {
+  runCommand(event, args) {
     switch (Platform.OS) {
       case 'android':
         UIManager.dispatchViewManagerCommand(
@@ -269,7 +271,7 @@ class CustomTwilioVideoView extends Component {
     }
   }
 
-  buildNativeEventWrappers () {
+  buildNativeEventWrappers() {
     return [
       'onCameraSwitched',
       'onVideoChanged',
@@ -304,7 +306,7 @@ class CustomTwilioVideoView extends Component {
     }, {})
   }
 
-  render () {
+  render() {
     return (<NativeCustomTwilioVideoView ref='videoView' {...this.props} {...this.buildNativeEventWrappers()}
     />
     )

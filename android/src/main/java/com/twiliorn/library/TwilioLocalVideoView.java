@@ -38,9 +38,8 @@ public class TwilioLocalVideoView extends RNVideoViewGroup {
     public void setTrackId(@Nullable String trackId, @NonNull boolean enabled) {
         Log.i(TAG, "Initialize Twilio Local video");
         this.trackId = trackId;
-
-        CustomTwilioVideoView.addLocalSink(this.getSurfaceViewRenderer(), trackId);
         this.setEnabled(enabled);
+        CustomTwilioVideoView.addLocalSink(this.getSurfaceViewRenderer(), trackId);
     }
 
     public void setEnabled(boolean enabled)

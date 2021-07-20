@@ -1302,12 +1302,21 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     }
 
     private static LocalVideoTrack getTrackFromList(List<LocalVideoTrack> list, String trackId) {
-        for (LocalVideoTrack track:
-             list) {
+        Log.i(TAG, "getTrackFromList: Searching for track: " + trackId);
+        printTracks(list);
+        for (LocalVideoTrack track: list) {
             if(track.getName() == trackId)
                 return track;
         }
         return null;
+    }
+
+    private static void printTracks(List<LocalVideoTrack> list) {
+        Log.i(TAG, "printTracks: Printing tracks");
+        for(LocalVideoTrack track: list) {
+            Log.i(TAG, "printTracks:\t" + track.getName());
+        }
+        Log.i(TAG, "printTracks: Done");
     }
 
     public static void addLocalSink(PatchedVideoView v, String trackId) {

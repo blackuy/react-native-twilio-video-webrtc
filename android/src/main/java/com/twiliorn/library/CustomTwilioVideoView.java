@@ -518,12 +518,12 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         localAudioTrack = LocalAudioTrack.create(getContext(), enableAudio);
 
         if (cameraCapturer == null && enableVideo) {
-            boolean createVideoStatus = createLocalVideo(enableVideo, cameraType);
-            if (!createVideoStatus) {
-                Log.d("RNTwilioVideo", "Failed to create local video");
-                // No need to connect to room if video creation failed
-                return;
-        }
+//            boolean createVideoStatus = createLocalVideo(enableVideo, cameraType);
+//            if (!createVideoStatus) {
+//                Log.d("RNTwilioVideo", "Failed to create local video");
+//                // No need to connect to room if video creation failed
+//                return;
+//            }
         } else {
             isVideoEnabled = false;
         }
@@ -699,12 +699,12 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
       isVideoEnabled = enabled;
 
         if (cameraCapturer == null && enabled) {
-            String fallbackCameraType = cameraType == null ? CustomTwilioVideoView.FRONT_CAMERA_TYPE : cameraType;
-            boolean createVideoStatus = createLocalVideo(true, fallbackCameraType);
-            if (!createVideoStatus) {
-                Log.d("RNTwilioVideo", "Failed to create local video");
-                return;
-            }
+//            String fallbackCameraType = cameraType == null ? CustomTwilioVideoView.FRONT_CAMERA_TYPE : cameraType;
+//            boolean createVideoStatus = createLocalVideo(true, fallbackCameraType);
+//            if (!createVideoStatus) {
+//                Log.d("RNTwilioVideo", "Failed to create local video");
+//                return;
+//            }
         }
 
         if (localVideoTrack != null) {

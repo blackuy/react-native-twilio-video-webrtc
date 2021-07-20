@@ -1305,8 +1305,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         Log.i(TAG, "getTrackFromList: Searching for track: " + trackId);
         printTracks(list);
         for (LocalVideoTrack track: list) {
-            if(track.getName() == trackId) {
-                Log.i(TAG, "getTrackFromList: Track found");
+            if(track.getName().equals(trackId)) {
                 return track;
             }
         }

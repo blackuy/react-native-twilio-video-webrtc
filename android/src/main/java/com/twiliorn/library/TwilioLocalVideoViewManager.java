@@ -49,7 +49,7 @@ public class TwilioLocalVideoViewManager extends SimpleViewManager<TwilioLocalVi
     }
 
     @ReactProp(name = "enabled")
-    public void setTrackId(TwilioLocalVideoView view, @Nullable boolean enabled) {
+    public void setEnabled(TwilioLocalVideoView view, @Nullable boolean enabled) {
         Log.i(REACT_CLASS,  "Attempting to set video Enabled");
         this._enabled = enabled;
         view.setEnabled(enabled);

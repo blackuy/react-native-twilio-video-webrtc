@@ -43,7 +43,7 @@ class TwilioLocalVideoView extends React.Component {
     return (
       <NativeTwilioLocalVideoView
         {...this.props}
-        enabled={this.props ?? false}
+        enabled={this.props.enabled ?? false}
         {...this.buildNativeEventWrappers()}
       />
     )

@@ -18,6 +18,8 @@ import com.facebook.react.uimanager.annotations.ReactProp;
 
 import java.util.Map;
 
+import javax.annotation.Nonnull;
+
 import tvi.webrtc.RendererCommon;
 
 import static com.twiliorn.library.RNVideoViewGroup.Events.ON_FRAME_DIMENSIONS_CHANGED;
@@ -57,7 +59,12 @@ public class TwilioLocalVideoViewManager extends SimpleViewManager<TwilioLocalVi
         view.setEnabled(enabled);
     }
 
+    @Override
+    public void onDropViewInstance(@Nonnull TwilioLocalVideoView view) {
+        super.onDropViewInstance(view);
 
+        CustomTwilioVideoView.removeLocalSink(view.getSurfaceViewRenderer(), view.trackId);
+    }
 
     @Override
     protected TwilioLocalVideoView createViewInstance(ThemedReactContext reactContext) {

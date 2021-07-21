@@ -72,4 +72,8 @@ public class TwilioLocalVideoView extends RNVideoViewGroup {
     private String[] getAvaliableLocalVideoTracks() {
         return CustomTwilioVideoView.getAvailableLocalTracks();
     }
+
+    public void release() {
+        this.getSurfaceViewRenderer().release();
+    }
 }

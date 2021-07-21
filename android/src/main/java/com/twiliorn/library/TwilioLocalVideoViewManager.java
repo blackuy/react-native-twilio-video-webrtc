@@ -62,8 +62,9 @@ public class TwilioLocalVideoViewManager extends SimpleViewManager<TwilioLocalVi
     @Override
     public void onDropViewInstance(@Nonnull TwilioLocalVideoView view) {
         super.onDropViewInstance(view);
-
+        Log.i(REACT_CLASS,  "Attempting to clean up");
         CustomTwilioVideoView.removeLocalSink(view.getSurfaceViewRenderer(), view.trackId);
+        view.release();
     }
 
     @Override

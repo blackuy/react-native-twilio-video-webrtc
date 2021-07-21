@@ -30,6 +30,7 @@ import android.support.annotation.StringDef;
 import android.util.Log;
 import android.view.View;
 
+import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.LifecycleEventListener;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReadableArray;
@@ -81,7 +82,6 @@ import com.twilio.video.VideoTrack;
 
 import org.webrtc.voiceengine.WebRtcAudioManager;
 
-import tvi.webrtc.Camera1Enumerator;
 import tvi.webrtc.Camera2Enumerator;
 import tvi.webrtc.VideoCapturer;
 import tvi.webrtc.VideoSink;
@@ -344,22 +344,22 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     }
 
     private void buildDeviceInfo() {
-        Camera1Enumerator enumerator = new Camera1Enumerator();
-        String[] deviceNames = enumerator.getDeviceNames();
-        backFacingDevice = null;
-        frontFacingDevice = null;
-        for (int i = 0; i < deviceNames.length; i++) {
-            String deviceName = deviceNames[i];
-            Log.d(TAG, "[buildDeviceInfo]: " + deviceName);
-            Log.d(TAG, "[buildDeviceInfo]: " + enumerator.isBackFacing(deviceName));
-            Log.d(TAG, "[buildDeviceInfo]: " + enumerator.isFrontFacing(deviceName));
-            Log.d(TAG, "[buildDeviceInfo]: " + enumerator.getSupportedFormats(deviceName).size());
-            if (i == 0) {
-                backFacingDevice = deviceName;
-            } else {
-                frontFacingDevice = deviceName;
-            }
-        }
+//        Camera1Enumerator enumerator = new Camera1Enumerator();
+//        String[] deviceNames = enumerator.getDeviceNames();
+//        backFacingDevice = null;
+//        frontFacingDevice = null;
+//        for (int i = 0; i < deviceNames.length; i++) {
+//            String deviceName = deviceNames[i];
+//            Log.d(TAG, "[buildDeviceInfo]: " + deviceName);
+//            Log.d(TAG, "[buildDeviceInfo]: " + enumerator.isBackFacing(deviceName));
+//            Log.d(TAG, "[buildDeviceInfo]: " + enumerator.isFrontFacing(deviceName));
+//            Log.d(TAG, "[buildDeviceInfo]: " + enumerator.getSupportedFormats(deviceName).size());
+//            if (i == 0) {
+//                backFacingDevice = deviceName;
+//            } else {
+//                frontFacingDevice = deviceName;
+//            }
+//        }
     }
 
     private boolean createLocalVideo(boolean enableVideo, String cameraType) {
@@ -904,7 +904,13 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
                 }
                 participantsArray.pushMap(buildParticipant(localParticipant));
                 event.putArray("participants", participantsArray);
-                event.putMap("localParticipant", buildParticipant(localParticipant));
+                event.putMap(
+                        "localParticipant",
+                        buildLocalParticipant(
+                                localParticipant,
+                                preloadedTracks
+                        )
+                );
 
                 pushEvent(CustomTwilioVideoView.this, ON_CONNECTED, event);
 
@@ -1221,6 +1227,20 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         WritableMap participantMap = new WritableNativeMap();
         participantMap.putString("identity", participant.getIdentity());
         participantMap.putString("sid", participant.getSid());
+        return participantMap;
+    }
+
+    private WritableMap buildLocalParticipant(Participant participant, LocalVideoTrack[] tracks) {
+        WritableMap participantMap = new WritableNativeMap();
+        participantMap.putString("identity", participant.getIdentity());
+        participantMap.putString("sid", participant.getSid());
+        WritableArray tracksArray = Arguments.createArray();
+        for(LocalVideoTrack track : tracks)
+        {
+            String id = track.getName();
+            tracksArray.pushString(id);
+        }
+        participantMap.putArray("tracks", tracksArray);
         return participantMap;
     }
 

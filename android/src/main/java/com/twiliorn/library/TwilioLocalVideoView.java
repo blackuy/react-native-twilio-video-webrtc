@@ -42,6 +42,14 @@ public class TwilioLocalVideoView extends RNVideoViewGroup {
         CustomTwilioVideoView.addLocalSink(this.getSurfaceViewRenderer(), trackId);
     }
 
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        Log.i(TAG,  "onDetachedFromWindow: Attempting to clean up");
+        CustomTwilioVideoView.removeLocalSink(this.getSurfaceViewRenderer(), this.trackId);
+        this.release();
+    }
+
     public void setEnabled(boolean enabled)
     {
         if(trackId != null)

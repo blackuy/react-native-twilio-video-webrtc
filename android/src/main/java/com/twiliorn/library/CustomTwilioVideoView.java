@@ -20,6 +20,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.AudioAttributes;
+import android.media.AudioDeviceInfo;
 import android.media.AudioFocusRequest;
 import android.media.AudioManager;
 import android.os.Build;
@@ -514,6 +515,8 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         this.maintainVideoTrackInBackground = maintainVideoTrackInBackground;
         this.cameraType = cameraType;
 
+        printAudioDevices();
+
         // Share your microphone
         localAudioTrack = LocalAudioTrack.create(getContext(), enableAudio);
 
@@ -530,6 +533,20 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
 
         setAudioFocus(enableAudio);
         connectToRoom();
+    }
+
+    private void printAudioDevices() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            Log.i(TAG, "[AudioDevices]: Printing audio devices");
+            AudioDeviceInfo[] audioDevices = audioManager.getDevices(AudioManager.GET_DEVICES_INPUTS);
+            for(AudioDeviceInfo info: audioDevices) {
+                Log.i(TAG, "[AudioDevices]:\tName:" + info.getProductName());
+                Log.i(TAG, "[AudioDevices]:\tId:"+ info.getId());
+                info.getId();
+                info.getProductName();
+            }
+            Log.i(TAG, "[AudioDevices]: DONE");
+        }
     }
 
     public void connectToRoom() {

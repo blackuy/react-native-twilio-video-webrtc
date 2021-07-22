@@ -1344,7 +1344,6 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     public static void addLocalSink(PatchedVideoView v, String trackId) {
         LocalVideoTrack track = CustomTwilioVideoView.getTrackFromList(Arrays.asList(preloadedTracks), trackId);
         if (track != null) {
-            track.removeSink(v);
             track.addSink(v);
             return;
         }

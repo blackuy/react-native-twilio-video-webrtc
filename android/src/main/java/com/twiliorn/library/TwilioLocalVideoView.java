@@ -26,6 +26,7 @@ import tvi.webrtc.Camera2Enumerator;
 
 public class TwilioLocalVideoView extends RNVideoViewGroup {
     public String trackId = "";
+    public boolean enabled = false;
 
     private static final String TAG = "TwilioLocalVideoView";
 
@@ -39,23 +40,35 @@ public class TwilioLocalVideoView extends RNVideoViewGroup {
         Log.i(TAG, "Initialize Twilio Local video");
         this.trackId = trackId;
         this.setEnabled(enabled);
-        CustomTwilioVideoView.addLocalSink(this.getSurfaceViewRenderer(), trackId);
     }
 
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         Log.i(TAG,  "onDetachedFromWindow: Attempting to clean up");
-        CustomTwilioVideoView.removeLocalSink(this.getSurfaceViewRenderer(), this.trackId);
-        this.release();
+        this.setEnabled(false);
+    }
+
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        Log.i(TAG,  "onDetachedFromWindow: Attempting to clean up");
+        setEnabled(this.enabled);
     }
 
     public void setEnabled(boolean enabled)
     {
-        if(trackId != null)
-            CustomTwilioVideoView.setLocalVideoTrackStatus(this.trackId, enabled);
-        else
+        this.enabled = enabled;
+        if(trackId == null )
+        {
             Log.i(TAG, "Skipping setEnabled because trackId not set");
+        }
+        if(this.enabled)
+            CustomTwilioVideoView.addLocalSink(this.getSurfaceViewRenderer(), this.trackId);
+        else
+            CustomTwilioVideoView.removeLocalSink(this.getSurfaceViewRenderer(), this.trackId);
+
+        CustomTwilioVideoView.setLocalVideoTrackStatus(this.trackId, this.enabled);
     }
 
     private void logCameras(String[] strings) {

@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useState, useRef } from "react";
 import {
   AppRegistry,
   StyleSheet,
@@ -9,156 +9,98 @@ import {
   PermissionsAndroid,
   Platform,
   TouchableOpacity,
-  Dimensions
-} from 'react-native';
+} from "react-native";
 
 import {
   TwilioVideoLocalView,
   TwilioVideoParticipantView,
-  TwilioVideo
-} from 'react-native-twilio-video-webrtc'
+  TwilioVideo,
+} from "react-native-twilio-video-webrtc";
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: 'white'
-  },
-  callContainer: {
-    flex: 1,
-    position: "absolute",
-    bottom: 0,
-    top: 0,
-    left: 0,
-    right: 0
-  },
-  welcome: {
-    fontSize: 30,
-    textAlign: 'center',
-    paddingTop: 40
-  },
-  input: {
-    height: 50,
-    borderWidth: 1,
-    marginRight: 70,
-    marginLeft: 70,
-    marginTop: 50,
-    textAlign: 'center',
-    backgroundColor: 'white'
-  },
-  button: {
-    marginTop: 100
-  },
-  localVideo: {
-    flex: 1,
-    width: 150,
-    height: 250,
-    position: "absolute",
-    right: 10,
-    bottom: 10
-  },
-  remoteGrid: {
-    flex: 1,
-    flexDirection: "row",
-    flexWrap: 'wrap'
-  },
-  remoteVideo: {
-    marginTop: 20,
-    marginLeft: 10,
-    marginRight: 10,
-    width: 100,
-    height: 120,
-  },
-  optionsContainer: {
-    position: "absolute",
-    left: 0,
-    bottom: 0,
-    right: 0,
-    height: 100,
-    backgroundColor: 'blue',
-    flexDirection: "row",
-    alignItems: "center"
-  },
-  optionButton: {
-    width: 60,
-    height: 60,
-    marginLeft: 10,
-    marginRight: 10,
-    borderRadius: 100 / 2,
-    backgroundColor: 'grey',
-    justifyContent: 'center',
-    alignItems: "center"
-  }
-});
+import styleSheet from "./styles";
 
-export default class Example extends Component {
-  state = {
-    isAudioEnabled: true,
-    isVideoEnabled: true,
-    status: 'disconnected',
-    participants: new Map(),
-    videoTracks: new Map(),
-    token: ''
-  }
+const styles = StyleSheet.create(styleSheet);
 
-  _onConnectButtonPress = async () => {
-    if (Platform.OS === 'android') {
-      await this._requestAudioPermission()
-      await this._requestCameraPermission()
+const Example = (props) => {
+  const [isAudioEnabled, setIsAudioEnabled] = useState(true);
+  const [isVideoEnabled, setIsVideoEnabled] = useState(true);
+  const [status, setStatus] = useState("disconnected");
+  const [participants, setParticipants] = useState(new Map());
+  const [videoTracks, setVideoTracks] = useState(new Map());
+  const [token, setToken] = useState("");
+  const twilioVideo = useRef(null);
+
+  const _onConnectButtonPress = async () => {
+    if (Platform.OS === "android") {
+      await _requestAudioPermission();
+      await _requestCameraPermission();
     }
-    this.refs.twilioVideo.connect({ accessToken: this.state.token })
-    this.setState({status: 'connecting'})
-  }
+    twilioVideo.current.connect({ accessToken: token, enableNetworkQualityReporting: true, dominantSpeakerEnabled: true});
+    setStatus("connecting");
+  };
 
-  _onEndButtonPress = () => {
-    this.refs.twilioVideo.disconnect()
-  }
+  const _onEndButtonPress = () => {
+    twilioVideo.current.disconnect();
+  };
 
-  _onMuteButtonPress = () => {
-    this.refs.twilioVideo.setLocalAudioEnabled(!this.state.isAudioEnabled)
-      .then(isEnabled => this.setState({isAudioEnabled: isEnabled}))
-  }
+  const _onMuteButtonPress = () => {
+    twilioVideo.current
+      .setLocalAudioEnabled(!isAudioEnabled)
+      .then((isEnabled) => setIsAudioEnabled(isEnabled));
+  };
 
-  _onFlipButtonPress = () => {
-    this.refs.twilioVideo.flipCamera()
-  }
+  const _onFlipButtonPress = () => {
+    twilioVideo.current.flipCamera();
+  };
 
-  _onRoomDidConnect = () => {
-    this.setState({status: 'connected'})
-  }
+  const _onRoomDidConnect = () => {
+    setStatus("connected");
+  };
 
-  _onRoomDidDisconnect = ({error}) => {
-    console.log("ERROR: ", error)
+  const _onRoomDidDisconnect = ({ error }) => {
+    console.log("ERROR: ", error);
 
-    this.setState({status: 'disconnected'})
-  }
+    setStatus("disconnected");
+  };
 
-  _onRoomDidFailToConnect = (error) => {
-    console.log("ERROR: ", error)
+  const _onRoomDidFailToConnect = (error) => {
+    console.log("ERROR: ", error);
 
-    this.setState({status: 'disconnected'})
-  }
+    setStatus("disconnected");
+  };
 
-  _onParticipantAddedVideoTrack = ({participant, track}) => {
-    console.log("onParticipantAddedVideoTrack: ", participant, track)
+  const _onParticipantAddedVideoTrack = ({ participant, track }) => {
+    console.log("onParticipantAddedVideoTrack: ", participant, track);
 
-    this.setState({
-      videoTracks: new Map([
-        ...this.state.videoTracks,
-        [track.trackSid, { participantSid: participant.sid, videoTrackSid: track.trackSid }]
-      ]),
-    });
-  }
+    setVideoTracks(
+      new Map([
+        ...videoTracks,
+        [
+          track.trackSid,
+          { participantSid: participant.sid, videoTrackSid: track.trackSid },
+        ],
+      ])
+    );
+  };
 
-  _onParticipantRemovedVideoTrack = ({participant, track}) => {
-    console.log("onParticipantRemovedVideoTrack: ", participant, track)
+  const _onParticipantRemovedVideoTrack = ({ participant, track }) => {
+    console.log("onParticipantRemovedVideoTrack: ", participant, track);
 
-    const videoTracks = this.state.videoTracks
-    videoTracks.delete(track.trackSid)
+    const videoTracks = new Map(videoTracks);
+    videoTracks.delete(track.trackSid);
 
-    this.setState({ videoTracks: new Map([ ...videoTracks ]) });
-  }
+    setVideoTracks(videoTracks);
+  };
 
-  _requestAudioPermission =  () => {
+  const _onNetworkLevelChanged = ({ participant, isLocalUser, quality }) => {
+    console.log("Participant", participant, "isLocalUser", isLocalUser, "quality", quality);
+  };
+
+  const _onDominantSpeakerDidChange = ({ roomName, roomSid, participant }) => {
+    console.log("onDominantSpeakerDidChange", `roomName: ${roomName}`, `roomSid: ${roomSid}`, "participant:", participant);
+  };
+
+  const _requestAudioPermission = () => {
     return PermissionsAndroid.request(
       PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
       {
@@ -166,102 +108,92 @@ export default class Example extends Component {
         message:
           "To run this demo we need permission to access your microphone",
         buttonNegative: "Cancel",
-        buttonPositive: "OK"
+        buttonPositive: "OK",
       }
     );
-  }
+  };
 
-  _requestCameraPermission =  () => {
-    return PermissionsAndroid.request(
-     PermissionsAndroid.PERMISSIONS.CAMERA,
-      {
-        title: "Need permission to access camera",
-        message:
-          "To run this demo we need permission to access your camera",
-        buttonNegative: "Cancel",
-        buttonPositive: "OK"
-      }
-    );
-  }
+  const _requestCameraPermission = () => {
+    return PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.CAMERA, {
+      title: "Need permission to access camera",
+      message: "To run this demo we need permission to access your camera",
+      buttonNegative: "Cancel",
+      buttonPositive: "OK",
+    });
+  };
 
-  render() {
-    return (
-      <View style={styles.container}>
-        {
-          this.state.status === 'disconnected' &&
-          <View>
-            <Text style={styles.welcome}>
-              React Native Twilio Video
-            </Text>
-            <TextInput
-              style={styles.input}
-              autoCapitalize='none'
-              value={this.state.token}
-              onChangeText={(text) => this.setState({token: text})}>
-            </TextInput>
-            <Button
-              title="Connect"
-              style={styles.button}
-              onPress={this._onConnectButtonPress}>
-            </Button>
-          </View>
-        }
+  return (
+    <View style={styles.container}>
+      {status === "disconnected" && (
+        <View>
+          <Text style={styles.welcome}>React Native Twilio Video</Text>
+          <TextInput
+            style={styles.input}
+            autoCapitalize="none"
+            value={token}
+            onChangeText={(text) => setToken(text)}
+          ></TextInput>
+          <Button
+            title="Connect"
+            style={styles.button}
+            onPress={_onConnectButtonPress}
+          ></Button>
+        </View>
+      )}
 
-        {
-          (this.state.status === 'connected' || this.state.status === 'connecting') &&
-            <View style={styles.callContainer}>
-            {
-              this.state.status === 'connected' &&
-              <View style={styles.remoteGrid}>
-                {
-                  Array.from(this.state.videoTracks, ([trackSid, trackIdentifier]) => {
-                    return (
-                      <TwilioVideoParticipantView
-                        style={styles.remoteVideo}
-                        key={trackSid}
-                        trackIdentifier={trackIdentifier}
-                      />
-                    )
-                  })
-                }
-              </View>
-            }
-            <View
-              style={styles.optionsContainer}>
-              <TouchableOpacity
-                style={styles.optionButton}
-                onPress={this._onEndButtonPress}>
-                <Text style={{fontSize: 12}}>End</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.optionButton}
-                onPress={this._onMuteButtonPress}>
-                <Text style={{fontSize: 12}}>{ this.state.isAudioEnabled ? "Mute" : "Unmute" }</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.optionButton}
-                onPress={this._onFlipButtonPress}>
-                <Text style={{fontSize: 12}}>Flip</Text>
-              </TouchableOpacity>
-              <TwilioVideoLocalView
-                enabled={true}
-                style={styles.localVideo}
-              />
+      {(status === "connected" || status === "connecting") && (
+        <View style={styles.callContainer}>
+          {status === "connected" && (
+            <View style={styles.remoteGrid}>
+              {Array.from(videoTracks, ([trackSid, trackIdentifier]) => {
+                return (
+                  <TwilioVideoParticipantView
+                    style={styles.remoteVideo}
+                    key={trackSid}
+                    trackIdentifier={trackIdentifier}
+                  />
+                );
+              })}
             </View>
+          )}
+          <View style={styles.optionsContainer}>
+            <TouchableOpacity
+              style={styles.optionButton}
+              onPress={_onEndButtonPress}
+            >
+              <Text style={{ fontSize: 12 }}>End</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.optionButton}
+              onPress={_onMuteButtonPress}
+            >
+              <Text style={{ fontSize: 12 }}>
+                {isAudioEnabled ? "Mute" : "Unmute"}
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.optionButton}
+              onPress={_onFlipButtonPress}
+            >
+              <Text style={{ fontSize: 12 }}>Flip</Text>
+            </TouchableOpacity>
+            <TwilioVideoLocalView enabled={true} style={styles.localVideo} />
           </View>
-        }
+        </View>
+      )}
 
-        <TwilioVideo
-          ref="twilioVideo"
-          onRoomDidConnect={ this._onRoomDidConnect }
-          onRoomDidDisconnect={ this._onRoomDidDisconnect }
-          onRoomDidFailToConnect= { this._onRoomDidFailToConnect }
-          onParticipantAddedVideoTrack={ this._onParticipantAddedVideoTrack }
-          onParticipantRemovedVideoTrack= { this._onParticipantRemovedVideoTrack }
-        />
-      </View>
-    );
-  }
-}
+      <TwilioVideo
+        ref={twilioVideo}
+        onRoomDidConnect={_onRoomDidConnect}
+        onRoomDidDisconnect={_onRoomDidDisconnect}
+        onRoomDidFailToConnect={_onRoomDidFailToConnect}
+        onParticipantAddedVideoTrack={_onParticipantAddedVideoTrack}
+        onParticipantRemovedVideoTrack={_onParticipantRemovedVideoTrack}
+        onNetworkQualityLevelsChanged={_onNetworkLevelChanged}
+        onDominantSpeakerDidChange={_onDominantSpeakerDidChange}
+      />
+    </View>
+  );
+};
 
-AppRegistry.registerComponent('Example', () => Example);
+AppRegistry.registerComponent("Example", () => Example);

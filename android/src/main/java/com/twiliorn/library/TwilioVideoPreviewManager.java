@@ -17,7 +17,7 @@ import com.facebook.react.uimanager.annotations.ReactProp;
 
 import java.util.Map;
 
-import org.webrtc.RendererCommon;
+import tvi.webrtc.RendererCommon;
 
 public class TwilioVideoPreviewManager extends SimpleViewManager<TwilioVideoPreview> {
 

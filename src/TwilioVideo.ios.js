@@ -12,7 +12,7 @@ import { NativeModules, NativeEventEmitter, View } from 'react-native'
 
 const { TWVideoModule } = NativeModules
 
-export default class extends Component {
+export default class TwilioVideo extends Component {
   static propTypes = {
     /**
      * Flag that enables screen sharing RCTRootView instead of camera capture
@@ -140,6 +140,22 @@ export default class extends Component {
      *
      */
     onStatsReceived: PropTypes.func,
+    /**
+     * Called when the network quality levels of a participant have changed (only if enableNetworkQualityReporting is set to True when connecting)
+     *
+     */
+    onNetworkQualityLevelsChanged: PropTypes.func,
+    /**
+     * Called when dominant speaker changes
+     * @param {{ participant, room }} dominant participant
+     */
+    onDominantSpeakerDidChange: PropTypes.func,
+    /**
+     * Whether or not video should be automatically initialized upon mounting
+     * of this component. Defaults to true. If set to false, any use of the
+     * camera will require calling `_startLocalVideo`.
+     */
+    autoInitializeCamera: PropTypes.bool,
     ...View.propTypes
   }
 
@@ -148,23 +164,13 @@ export default class extends Component {
 
     this._subscriptions = []
     this._eventEmitter = new NativeEventEmitter(TWVideoModule)
-
-    this.setLocalVideoEnabled = this.setLocalVideoEnabled.bind(this)
-    this.setLocalAudioEnabled = this.setLocalAudioEnabled.bind(this)
-    this.flipCamera = this.flipCamera.bind(this)
-    this.connect = this.connect.bind(this)
-    this.disconnect = this.disconnect.bind(this)
-    this.sendString = this.sendString.bind(this)
-    this.setRemoteAudioPlayback = this.setRemoteAudioPlayback.bind(this)
-    this.unpublishLocalAudio = this.unpublishLocalAudio.bind(this)
-    this.unpublishLocalVideo = this.unpublishLocalVideo.bind(this)
-
-    this.publishLocalAudio = this.publishLocalAudio.bind(this)
-    this.publishLocalVideo = this.publishLocalVideo.bind(this)
   }
 
-  componentWillMount () {
+  componentDidMount () {
     this._registerEvents()
+    if (this.props.autoInitializeCamera !== false) {
+      this._startLocalVideo()
+    }
     this._startLocalAudio()
   }
 
@@ -229,9 +235,27 @@ export default class extends Component {
    * @param  {String} roomName    The connecting room name
    * @param  {String} accessToken The Twilio's JWT access token
    * @param  {String} encodingParameters Control Encoding config
+   * @param  {Boolean} enableNetworkQualityReporting Report network quality of participants
    */
-  connect ({ roomName, accessToken, enableVideo = true, encodingParameters }) {
-    TWVideoModule.connect(accessToken, roomName, enableVideo, encodingParameters)
+  connect ({
+    roomName,
+    accessToken,
+    cameraType = 'front',
+    enableAudio = true,
+    enableVideo = true,
+    encodingParameters = null,
+    enableNetworkQualityReporting = false,
+    dominantSpeakerEnabled = false
+  }) {
+    TWVideoModule.connect(accessToken,
+      roomName,
+      enableAudio,
+      enableVideo,
+      encodingParameters,
+      enableNetworkQualityReporting,
+      dominantSpeakerEnabled,
+      cameraType
+    )
   }
 
   /**
@@ -405,6 +429,16 @@ export default class extends Component {
       this._eventEmitter.addListener('statsReceived', data => {
         if (this.props.onStatsReceived) {
           this.props.onStatsReceived(data)
+        }
+      }),
+      this._eventEmitter.addListener('networkQualityLevelsChanged', data => {
+        if (this.props.onNetworkQualityLevelsChanged) {
+          this.props.onNetworkQualityLevelsChanged(data)
+        }
+      }),
+      this._eventEmitter.addListener('onDominantSpeakerDidChange', data => {
+        if (this.props.onDominantSpeakerDidChange) {
+          this.props.onDominantSpeakerDidChange(data)
         }
       })
     ]

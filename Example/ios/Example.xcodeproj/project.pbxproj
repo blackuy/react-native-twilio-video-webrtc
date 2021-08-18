@@ -975,7 +975,7 @@
 			);
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Example/Pods-Example-frameworks.sh",
-				"${PODS_ROOT}/TwilioVideo/Build/iOS/TwilioVideo.framework",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/TwilioVideo/TwilioVideo.framework/TwilioVideo",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (

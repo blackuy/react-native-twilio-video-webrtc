@@ -7,9 +7,15 @@
 
 import { requireNativeComponent, View } from 'react-native'
 import React from 'react'
+import PropTypes from 'prop-types'
 
 const propTypes = {
-  ...View.propTypes
+  ...View.propTypes,
+  /**
+   * How the video stream should be scaled to fit its
+   * container.
+   */
+  scaleType: PropTypes.oneOf(['fit', 'fill'])
 }
 
 class TwilioVideoPreview extends React.Component {

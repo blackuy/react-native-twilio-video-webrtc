@@ -8,7 +8,9 @@ package com.twiliorn.library;
 
 import android.content.Context;
 import android.graphics.Point;
+import android.view.View;
 import android.view.ViewGroup;
+import android.support.annotation.StringDef;
 
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeMap;
@@ -19,18 +21,33 @@ import com.twilio.video.VideoScaleType;
 import tvi.webrtc.RendererCommon;
 import tvi.webrtc.VideoFrame;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+
+import static com.twiliorn.library.RNVideoViewGroup.Events.ON_FRAME_DIMENSIONS_CHANGED;
+
 public class RNVideoViewGroup extends ViewGroup {
     private PatchedVideoView surfaceViewRenderer = null;
     private int videoWidth = 0;
     private int videoHeight = 0;
     private final Object layoutSync = new Object();
     private RendererCommon.ScalingType scalingType = RendererCommon.ScalingType.SCALE_ASPECT_FILL;
+    private final RCTEventEmitter eventEmitter;
 
+    @Retention(RetentionPolicy.SOURCE)
+    @StringDef({ON_FRAME_DIMENSIONS_CHANGED})
+    public @interface Events {
+        String ON_FRAME_DIMENSIONS_CHANGED = "onFrameDimensionsChanged";
+    }
 
-    public RNVideoViewGroup(Context context) {
-        super(context);
+    void pushEvent(View view, String name, WritableMap data) {
+        eventEmitter.receiveEvent(view.getId(), name, data);
+    }
 
-        surfaceViewRenderer = new PatchedVideoView(context);
+    public RNVideoViewGroup(ThemedReactContext themedReactContext) {
+        super(themedReactContext);
+        this.eventEmitter = themedReactContext.getJSModule(RCTEventEmitter.class);
+        surfaceViewRenderer = new PatchedVideoView(themedReactContext);
         surfaceViewRenderer.setVideoScaleType(VideoScaleType.ASPECT_FILL);
         addView(surfaceViewRenderer);
         surfaceViewRenderer.setListener(
@@ -51,6 +68,12 @@ public class RNVideoViewGroup extends ViewGroup {
                                 videoWidth = vw;
                             }
                             RNVideoViewGroup.this.forceLayout();
+
+                            WritableMap event = new WritableNativeMap();
+                            event.putInt("height", vh);
+                            event.putInt("width", vw);
+                            event.putInt("rotation", rotation);
+                            pushEvent(RNVideoViewGroup.this, ON_FRAME_DIMENSIONS_CHANGED, event);
                         }
                     }
                 }

@@ -86,10 +86,10 @@ const Example = (props) => {
   const _onParticipantRemovedVideoTrack = ({ participant, track }) => {
     console.log("onParticipantRemovedVideoTrack: ", participant, track);
 
-    const videoTracks = new Map(videoTracks);
-    videoTracks.delete(track.trackSid);
+    const newVideoTracks = new Map(videoTracks);
+    newVideoTracks.delete(track.trackSid);
 
-    setVideoTracks(videoTracks);
+    setVideoTracks(newVideoTracks);
   };
 
   const _onNetworkLevelChanged = ({ participant, isLocalUser, quality }) => {

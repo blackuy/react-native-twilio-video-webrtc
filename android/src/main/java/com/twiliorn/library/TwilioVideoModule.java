@@ -22,7 +22,7 @@ public class TwilioVideoModule extends ReactContextBaseJavaModule {
 
   @Override
   public String getName() {
-    return "RNTwilioVideoModule";
+    return "TwilioVideoModule";
   }
 
   @ReactMethod

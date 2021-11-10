@@ -19,7 +19,7 @@ import React, { Component } from "react";
 
 import PropTypes from "prop-types";
 
-const TwilioVideoManager = NativeModules.RNTwilioVideoModule;
+const TwilioVideoManager = NativeModules.TwilioVideoModule;
 
 const propTypes = {
   ...View.propTypes,

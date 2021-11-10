@@ -808,11 +808,11 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         }
     }
 
-    public void isActive() {
+    public boolean isActive() {
       return room != null;
     }
 
-    public void isRecording() {
+    public boolean isRecording() {
       return room.isRecording();
     }
 

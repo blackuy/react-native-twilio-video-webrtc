@@ -180,7 +180,7 @@ public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilio
                 ON_NETWORK_QUALITY_LEVELS_CHANGED, MapBuilder.of("registrationName", ON_NETWORK_QUALITY_LEVELS_CHANGED),
                 ON_DOMINANT_SPEAKER_CHANGED, MapBuilder.of("registrationName", ON_DOMINANT_SPEAKER_CHANGED),
                 ON_RECORDING_STARTED, MapBuilder.of("registrationName", ON_RECORDING_STARTED),
-                ON_RECORDING_STOPPED, MapBuilder.of("registrationName", ON_RECORDING_STOPPED),
+                ON_RECORDING_STOPPED, MapBuilder.of("registrationName", ON_RECORDING_STOPPED)
         ));
 
         return map;

@@ -14,7 +14,7 @@ public class RNCameraPackage implements ReactPackage {
     @Override
     public List<NativeModule> createNativeModules(ReactApplicationContext reactApplicationContext) {
         return Arrays.<NativeModule>asList(
-          new TwilioVideoModule(reactApplicationContext),
+          new TwilioVideoModule(reactApplicationContext)
         );
     }
 

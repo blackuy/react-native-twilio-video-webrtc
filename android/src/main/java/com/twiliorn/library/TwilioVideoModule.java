@@ -15,7 +15,7 @@ public class TwilioVideoModule extends ReactContextBaseJavaModule {
 
   private static ReactApplicationContext mReactContext;
 
-  public CameraModule(ReactApplicationContext reactContext) {
+  public TwilioVideoModule(ReactApplicationContext reactContext) {
     super(reactContext);
     mReactContext = reactContext;
   }
@@ -40,9 +40,9 @@ public class TwilioVideoModule extends ReactContextBaseJavaModule {
 
           if(!videoView.isActive()){
             promise.reject("E_VIEW_UNAVAILABLE", "isRecording: Video is not running");
-            return
+          } else {
+            promise.resolve(videoView.isRecording());
           }
-          promise.resolve(videoView.isRecording());
         } catch (Exception e) {
           promise.reject("E_VIEW_NOT_FOUND", "isRecording: Expected a CustomTwilioVideoView component");
         }

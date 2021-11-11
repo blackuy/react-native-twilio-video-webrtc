@@ -68,6 +68,12 @@ public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilio
     }
 
     @Override
+    public void onDropViewInstance(CustomTwilioVideoView view) {
+      view.onHostDestroy();
+      super.onDropViewInstance(view);
+    }
+
+    @Override
     protected CustomTwilioVideoView createViewInstance(ThemedReactContext reactContext) {
         return new CustomTwilioVideoView(reactContext);
     }

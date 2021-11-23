@@ -22,8 +22,8 @@ import android.media.AudioManager;
 import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
-import android.support.annotation.NonNull;
-import android.support.annotation.StringDef;
+import androidx.annotation.NonNull;
+import androidx.annotation.StringDef;
 import android.util.Log;
 import android.view.View;
 
@@ -72,7 +72,7 @@ import com.twilio.video.Video;
 import com.twilio.video.VideoDimensions;
 import com.twilio.video.VideoFormat;
 
-import org.webrtc.voiceengine.WebRtcAudioManager;
+// import org.webrtc.voiceengine.WebRtcAudioManager;
 
 import tvi.webrtc.Camera1Enumerator;
 
@@ -805,7 +805,9 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     }
 
     public void disableOpenSLES() {
-        WebRtcAudioManager.setBlacklistDeviceForOpenSLESUsage(true);
+        // WebRtcAudioManager.setBlacklistDeviceForOpenSLESUsage(true);
+        tvi.webrtc.voiceengine.WebRtcAudioManager.setBlacklistDeviceForOpenSLESUsage(false);
+
     }
 
     // ====== ROOM LISTENER ========================================================================

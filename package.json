@@ -12,6 +12,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "standard 'src/**/*.js'",
     "lint:fix": "standard 'src/**/*.js' --fix",
+    "eas-build-post-install": "jetify",
     "ci": "yarn lint"
   },
   "standard": {
@@ -33,6 +34,7 @@
     "gulp-load-plugins": "^1.5.0",
     "gulp-react-docs": "^0.1.3",
     "gulp-tap": "^1.0.1",
+    "jetifier": "^2.0.0",
     "react-docgen": "^2.15.0",
     "standard": "^13.1.0"
   },

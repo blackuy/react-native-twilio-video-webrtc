@@ -8,7 +8,7 @@
  */
 package com.twiliorn.library;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.common.MapBuilder;
@@ -40,6 +40,8 @@ import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_PARTICIPANT_D
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_STATS_RECEIVED;
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_NETWORK_QUALITY_LEVELS_CHANGED;
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_DOMINANT_SPEAKER_CHANGED;
+import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_RECORDING_STARTED;
+import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_RECORDING_STOPPED;
 
 
 public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilioVideoView> {
@@ -63,6 +65,12 @@ public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilio
     @Override
     public String getName() {
         return REACT_CLASS;
+    }
+
+    @Override
+    public void onDropViewInstance(CustomTwilioVideoView view) {
+      view.onHostDestroy();
+      super.onDropViewInstance(view);
     }
 
     @Override
@@ -166,7 +174,9 @@ public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilio
         ));
 
         map.putAll(MapBuilder.of(
-                ON_PARTICIPANT_REMOVED_DATA_TRACK, MapBuilder.of("registrationName", ON_PARTICIPANT_REMOVED_DATA_TRACK)
+                ON_PARTICIPANT_REMOVED_DATA_TRACK, MapBuilder.of("registrationName", ON_PARTICIPANT_REMOVED_DATA_TRACK),
+                ON_RECORDING_STARTED, MapBuilder.of("registrationName", ON_RECORDING_STARTED),
+                ON_RECORDING_STOPPED, MapBuilder.of("registrationName", ON_RECORDING_STOPPED)
         ));
 
         map.putAll(MapBuilder.of(
@@ -197,5 +207,9 @@ public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilio
                 .put("toggleBluetoothHeadset", TOGGLE_BLUETOOTH_HEADSET)
                 .put("sendString", SEND_STRING)
                 .build();
+    }
+
+    public boolean isRecording(CustomTwilioVideoView view) {
+      return view.isRecording();
     }
 }

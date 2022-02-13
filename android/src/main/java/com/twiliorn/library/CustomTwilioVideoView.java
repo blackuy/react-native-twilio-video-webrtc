@@ -22,8 +22,8 @@ import android.media.AudioManager;
 import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
-import android.support.annotation.NonNull;
-import android.support.annotation.StringDef;
+import androidx.annotation.NonNull;
+import androidx.annotation.StringDef;
 import android.util.Log;
 import android.view.View;
 
@@ -103,6 +103,8 @@ import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_PARTICIPANT_R
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_STATS_RECEIVED;
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_VIDEO_CHANGED;
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_DOMINANT_SPEAKER_CHANGED;
+import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_RECORDING_STARTED;
+import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_RECORDING_STOPPED;
 
 public class CustomTwilioVideoView extends View implements LifecycleEventListener, AudioManager.OnAudioFocusChangeListener {
     private static final String TAG = "CustomTwilioVideoView";
@@ -165,6 +167,8 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         String ON_STATS_RECEIVED = "onStatsReceived";
         String ON_NETWORK_QUALITY_LEVELS_CHANGED = "onNetworkQualityLevelsChanged";
         String ON_DOMINANT_SPEAKER_CHANGED = "onDominantSpeakerDidChange";
+        String ON_RECORDING_STARTED = "onRecordingStarted";
+        String ON_RECORDING_STOPPED = "onRecordingStopped";
     }
 
     private final ThemedReactContext themedReactContext;
@@ -210,6 +214,8 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
 
     public CustomTwilioVideoView(ThemedReactContext context) {
         super(context);
+        releaseResource();
+
         this.themedReactContext = context;
         this.eventEmitter = themedReactContext.getJSModule(RCTEventEmitter.class);
 
@@ -382,46 +388,54 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
 
     @Override
     public void onHostDestroy() {
-        /*
-         * Remove stream voice control
-         */
-        if (themedReactContext.getCurrentActivity() != null) {
-            themedReactContext.getCurrentActivity().setVolumeControlStream(AudioManager.USE_DEFAULT_STREAM_TYPE);
-        }
-        /*
-         * Always disconnect from the room before leaving the Activity to
-         * ensure any memory allocated to the Room resource is freed.
-         */
-        if (room != null && room.getState() != Room.State.DISCONNECTED) {
-            room.disconnect();
-            disconnectedFromOnDestroy = true;
-        }
-
-        /*
-         * Release the local media ensuring any memory allocated to audio or video is freed.
-         */
-        if (localVideoTrack != null) {
-            localVideoTrack.release();
-            localVideoTrack = null;
-        }
-
-        if (localAudioTrack != null) {
-            localAudioTrack.release();
-            localAudioTrack = null;
-        }
-
-        // Quit the data track message thread
-        dataTrackMessageThread.quit();
-
-
+      releaseResource();
     }
 
     public void releaseResource() {
-        themedReactContext.removeLifecycleEventListener(this);
-        room = null;
-        localVideoTrack = null;
-        thumbnailVideoView = null;
-        cameraCapturer = null;
+      thumbnailVideoView = null;
+      roomName = null;
+      accessToken = null;
+
+      /*
+        * Remove stream voice control
+        */
+      if (themedReactContext != null && themedReactContext.getCurrentActivity() != null) {
+          themedReactContext.getCurrentActivity().setVolumeControlStream(AudioManager.USE_DEFAULT_STREAM_TYPE);
+          themedReactContext.removeLifecycleEventListener(this);
+      }
+      /*
+        * Always disconnect from the room before leaving the Activity to
+        * ensure any memory allocated to the Room resource is freed.
+        */
+      if (room != null && room.getState() != Room.State.DISCONNECTED) {
+          room.disconnect();
+          disconnectedFromOnDestroy = true;
+      }
+      room = null;
+
+
+      if (localParticipant != null) {
+          localParticipant.unpublishTrack(localVideoTrack);
+          localParticipant = null;
+      }
+
+      if (localVideoTrack != null) {
+          localVideoTrack.release();
+          localVideoTrack = null;
+      }
+
+      if (localAudioTrack != null) {
+          localAudioTrack.release();
+          localAudioTrack = null;
+      }
+
+      if (cameraCapturer != null) {
+          cameraCapturer.stopCapture();
+          cameraCapturer = null;
+      }
+
+      // Quit the data track message thread
+      dataTrackMessageThread.quit();
     }
 
     // ====== CONNECTING ===========================================================================
@@ -804,6 +818,14 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         }
     }
 
+    public boolean isActive() {
+      return room != null;
+    }
+
+    public boolean isRecording() {
+      return room.isRecording();
+    }
+
     public void disableOpenSLES() {
         WebRtcAudioManager.setBlacklistDeviceForOpenSLESUsage(true);
     }
@@ -915,10 +937,16 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
 
             @Override
             public void onRecordingStarted(Room room) {
+              WritableMap event = new WritableNativeMap();
+
+              pushEvent(CustomTwilioVideoView.this, ON_RECORDING_STARTED, event);
             }
 
             @Override
             public void onRecordingStopped(Room room) {
+              WritableMap event = new WritableNativeMap();
+              
+              pushEvent(CustomTwilioVideoView.this, ON_RECORDING_STOPPED, event);
             }
 
             @Override

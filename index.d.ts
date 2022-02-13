@@ -108,6 +108,8 @@ declare module "react-native-twilio-video-webrtc" {
 
     onStatsReceived?: (data: any) => void;
     onDataTrackMessageReceived?: DataTrackEventCb;
+    onRecordingStarted?: () => void;
+    onRecordingStopped?: () => void;
     // iOS only
     autoInitializeCamera?: boolean;    
     ref?: React.Ref<any>;
@@ -156,6 +158,7 @@ declare module "react-native-twilio-video-webrtc" {
     publishLocalVideo: () => void;
     unpublishLocalVideo: () => void;
     sendString: (message: string) => void;
+    isRecording: () => Promise<boolean>;
   }
 
   class TwilioVideoLocalView extends React.Component<

@@ -7,7 +7,7 @@
  *   Jonathan Chang <slycoder@gmail.com>
  */
 
-import {
+ import {
   Platform,
   UIManager,
   View,
@@ -178,7 +178,8 @@ class CustomTwilioVideoView extends Component {
     enableRemoteAudio = true,
     enableNetworkQualityReporting = false,
     dominantSpeakerEnabled = false,
-    maintainVideoTrackInBackground = false
+    maintainVideoTrackInBackground = false,
+    encodingParameters = {}
   }) {
     this.runCommand(nativeEvents.connectToRoom, [
       roomName,
@@ -189,7 +190,8 @@ class CustomTwilioVideoView extends Component {
       enableNetworkQualityReporting,
       dominantSpeakerEnabled,
       maintainVideoTrackInBackground,
-      cameraType
+      cameraType,
+      encodingParameters
     ])
   }
 

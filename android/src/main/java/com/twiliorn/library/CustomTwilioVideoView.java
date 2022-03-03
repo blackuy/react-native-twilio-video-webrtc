@@ -499,7 +499,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
             connectOptionsBuilder.dataTracks(Collections.singletonList(localDataTrack));
         }
 
-        // Checks if device has H264 support and allows a callback so the user can handle codec negotiation
+        // H264 Codec Support Detection: https://www.twilio.com/docs/video/managing-codecs
         HardwareVideoEncoderFactory hardwareVideoEncoderFactory = new HardwareVideoEncoderFactory(null, true, true);
         HardwareVideoDecoderFactory hardwareVideoDecoderFactory = new HardwareVideoDecoderFactory(null);
 

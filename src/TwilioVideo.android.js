@@ -144,7 +144,11 @@ const propTypes = {
      * Called when dominant speaker changes
      * @param {{ participant, room }} dominant participant and room
      */
-  onDominantSpeakerDidChange: PropTypes.func
+  onDominantSpeakerDidChange: PropTypes.func,
+  /**
+     * Callback that is called after determining whether the participant has h246 support
+     */
+  onLocalParticipantH246Supported: PropTypes.func,
 }
 
 const nativeEvents = {
@@ -255,6 +259,10 @@ class CustomTwilioVideoView extends Component {
     this.runCommand(nativeEvents.toggleSoundSetup, [speaker])
   }
 
+  onLocalParticipantH246NotSupported () {
+    this.runCommand(nativeEvents.onLocalParticipantH246NotSupported, []);
+  }
+
   runCommand (event, args) {
     switch (Platform.OS) {
       case 'android':
@@ -292,7 +300,8 @@ class CustomTwilioVideoView extends Component {
       'onParticipantDisabledAudioTrack',
       'onStatsReceived',
       'onNetworkQualityLevelsChanged',
-      'onDominantSpeakerDidChange'
+      'onDominantSpeakerDidChange',
+      'onLocalParticipantH246Supported',
     ].reduce((wrappedEvents, eventName) => {
       if (this.props[eventName]) {
         return {

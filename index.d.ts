@@ -84,6 +84,12 @@ declare module "react-native-twilio-video-webrtc" {
   
   export type DominantSpeakerChangedCb = (d: DominantSpeakerChangedEventArgs) => void;
 
+  export type LocalParticipantH264CbEventArgs = {
+    isH264Supported: boolean;
+  }
+
+  export type LocalParticipantH264Cb = (d: LocalParticipantH264CbEventArgs) => void;
+
   export type TwilioVideoProps = ViewProps & {
     onCameraDidStart?: () => void;
     onCameraDidStopRunning?: (err: any) => void;
@@ -105,6 +111,7 @@ declare module "react-native-twilio-video-webrtc" {
     onRoomParticipantDidConnect?: ParticipantEventCb;
     onRoomParticipantDidDisconnect?: ParticipantEventCb;
     onNetworkQualityLevelsChanged?: NetworkLevelChangeEventCb;
+    onLocalParticipantH264Supported?: LocalParticipantH264Cb;
 
     onStatsReceived?: (data: any) => void;
     onDataTrackMessageReceived?: DataTrackEventCb;
@@ -137,6 +144,9 @@ declare module "react-native-twilio-video-webrtc" {
     enableAudio?: boolean;
     enableVideo?: boolean;
     enableRemoteAudio?: boolean;
+    encodingParameters?: {
+      enableH264Codec?: boolean;
+    };
     enableNetworkQualityReporting?: boolean;
     maintainVideoTrackInBackground?: boolean;
   };

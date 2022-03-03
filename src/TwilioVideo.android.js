@@ -148,7 +148,7 @@ const propTypes = {
   /**
      * Callback that is called after determining whether the participant has h246 support
      */
-  onLocalParticipantH246Supported: PropTypes.func,
+  onLocalParticipantH246Supported: PropTypes.func
 }
 
 const nativeEvents = {
@@ -260,7 +260,7 @@ class CustomTwilioVideoView extends Component {
   }
 
   onLocalParticipantH246NotSupported () {
-    this.runCommand(nativeEvents.onLocalParticipantH246NotSupported, []);
+    this.runCommand(nativeEvents.onLocalParticipantH246NotSupported, [])
   }
 
   runCommand (event, args) {
@@ -301,7 +301,7 @@ class CustomTwilioVideoView extends Component {
       'onStatsReceived',
       'onNetworkQualityLevelsChanged',
       'onDominantSpeakerDidChange',
-      'onLocalParticipantH246Supported',
+      'onLocalParticipantH246Supported'
     ].reduce((wrappedEvents, eventName) => {
       if (this.props[eventName]) {
         return {

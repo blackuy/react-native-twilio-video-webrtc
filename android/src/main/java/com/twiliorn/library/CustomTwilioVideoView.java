@@ -446,7 +446,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
             boolean dominantSpeakerEnabled,
             boolean maintainVideoTrackInBackground,
             String cameraType,
-            boolean enableH264Codec,
+            boolean enableH264Codec
     ) {
         this.roomName = roomName;
         this.accessToken = accessToken;

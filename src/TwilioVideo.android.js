@@ -146,9 +146,9 @@ const propTypes = {
      */
   onDominantSpeakerDidChange: PropTypes.func,
   /**
-     * Callback that is called after determining whether the participant has h246 support
+     * Callback that is called after determining whether the participant has H264 support
      */
-  onLocalParticipantH246Supported: PropTypes.func
+  onLocalParticipantH264Supported: PropTypes.func
 }
 
 const nativeEvents = {
@@ -261,10 +261,6 @@ class CustomTwilioVideoView extends Component {
     this.runCommand(nativeEvents.toggleSoundSetup, [speaker])
   }
 
-  onLocalParticipantH246NotSupported () {
-    this.runCommand(nativeEvents.onLocalParticipantH246NotSupported, [])
-  }
-
   runCommand (event, args) {
     switch (Platform.OS) {
       case 'android':
@@ -303,7 +299,7 @@ class CustomTwilioVideoView extends Component {
       'onStatsReceived',
       'onNetworkQualityLevelsChanged',
       'onDominantSpeakerDidChange',
-      'onLocalParticipantH246Supported'
+      'onLocalParticipantH264Supported'
     ].reduce((wrappedEvents, eventName) => {
       if (this.props[eventName]) {
         return {

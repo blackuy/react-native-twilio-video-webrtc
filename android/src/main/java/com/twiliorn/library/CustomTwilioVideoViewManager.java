@@ -41,7 +41,7 @@ import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_PARTICIPANT_D
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_STATS_RECEIVED;
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_NETWORK_QUALITY_LEVELS_CHANGED;
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_DOMINANT_SPEAKER_CHANGED;
-import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_LOCAL_PARTICIPANT_H246_SUPPORTED;
+import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_LOCAL_PARTICIPANT_H264_SUPPORTED;
 
 public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilioVideoView> {
     public static final String REACT_CLASS = "RNCustomTwilioVideoView";
@@ -184,7 +184,7 @@ public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilio
         ));
 
         map.putAll(MapBuilder.of(
-                ON_LOCAL_PARTICIPANT_H246_SUPPORTED, MapBuilder.of("registrationName", ON_LOCAL_PARTICIPANT_H246_SUPPORTED)
+                ON_LOCAL_PARTICIPANT_H264_SUPPORTED, MapBuilder.of("registrationName", ON_LOCAL_PARTICIPANT_H264_SUPPORTED)
         ));
 
         return map;

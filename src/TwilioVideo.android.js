@@ -7,7 +7,7 @@
  *   Jonathan Chang <slycoder@gmail.com>
  */
 
- import {
+import {
   Platform,
   UIManager,
   View,

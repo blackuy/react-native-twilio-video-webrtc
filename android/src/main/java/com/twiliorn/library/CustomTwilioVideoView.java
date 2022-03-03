@@ -124,6 +124,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     private static String backFacingDevice;
     private boolean maintainVideoTrackInBackground = false;
     private String cameraType = "";
+    private boolean enableH264Codec = false;
 
     @Retention(RetentionPolicy.SOURCE)
     @StringDef({Events.ON_CAMERA_SWITCHED,
@@ -444,7 +445,8 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
             boolean enableNetworkQualityReporting,
             boolean dominantSpeakerEnabled,
             boolean maintainVideoTrackInBackground,
-            String cameraType
+            String cameraType,
+            boolean enableH264Codec,
     ) {
         this.roomName = roomName;
         this.accessToken = accessToken;
@@ -453,6 +455,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         this.dominantSpeakerEnabled = dominantSpeakerEnabled;
         this.maintainVideoTrackInBackground = maintainVideoTrackInBackground;
         this.cameraType = cameraType;
+        this.enableH264Codec = enableH264Codec;
 
         // Share your microphone
         localAudioTrack = LocalAudioTrack.create(getContext(), enableAudio);
@@ -519,7 +522,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
 
         Log.d("RNTwilioVideo", "isH264Supported: " + isH264Supported);
 
-        VideoCodec videoCodec = isH264Supported ? (new H264Codec()) : (new Vp8Codec());
+        VideoCodec videoCodec = isH264Supported && this.enableH264Codec ? (new H264Codec()) : (new Vp8Codec());
 
         WritableMap event = new WritableNativeMap();
         event.putBoolean("isH264Supported", isH264Supported);

@@ -146,9 +146,9 @@ const propTypes = {
      */
   onDominantSpeakerDidChange: PropTypes.func,
   /**
-     * Callback that is called after determining whether the participant has H264 support
+     * Callback that is called after determining what codecs are supported
      */
-  onLocalParticipantH264Supported: PropTypes.func
+  onLocalParticipantSupportedCodecs: PropTypes.func
 }
 
 const nativeEvents = {
@@ -299,7 +299,7 @@ class CustomTwilioVideoView extends Component {
       'onStatsReceived',
       'onNetworkQualityLevelsChanged',
       'onDominantSpeakerDidChange',
-      'onLocalParticipantH264Supported'
+      'onLocalParticipantSupportedCodecs'
     ].reduce((wrappedEvents, eventName) => {
       if (this.props[eventName]) {
         return {

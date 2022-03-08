@@ -11,6 +11,7 @@ package com.twiliorn.library;
 import android.support.annotation.Nullable;
 
 import com.facebook.react.bridge.ReadableArray;
+import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.common.MapBuilder;
 import com.facebook.react.uimanager.SimpleViewManager;
 import com.facebook.react.uimanager.ThemedReactContext;
@@ -40,7 +41,7 @@ import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_PARTICIPANT_D
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_STATS_RECEIVED;
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_NETWORK_QUALITY_LEVELS_CHANGED;
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_DOMINANT_SPEAKER_CHANGED;
-
+import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_LOCAL_PARTICIPANT_SUPPORTED_CODECS;
 
 public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilioVideoView> {
     public static final String REACT_CLASS = "RNCustomTwilioVideoView";
@@ -83,6 +84,8 @@ public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilio
                 boolean dominantSpeakerEnabled = args.getBoolean(6);
                 boolean maintainVideoTrackInBackground = args.getBoolean(7);
                 String cameraType = args.getString(8);
+                ReadableMap encodingParameters = args.getMap(9);
+                boolean enableH264Codec = encodingParameters.getBoolean("enableH264Codec");
                 view.connectToRoomWrapper(
                     roomName,
                     accessToken,
@@ -92,7 +95,8 @@ public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilio
                     enableNetworkQualityReporting,
                     dominantSpeakerEnabled,
                     maintainVideoTrackInBackground,
-                    cameraType
+                    cameraType,
+                    enableH264Codec
                   );
                 break;
             case DISCONNECT:
@@ -166,7 +170,8 @@ public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilio
         ));
 
         map.putAll(MapBuilder.of(
-                ON_PARTICIPANT_REMOVED_DATA_TRACK, MapBuilder.of("registrationName", ON_PARTICIPANT_REMOVED_DATA_TRACK)
+                ON_PARTICIPANT_REMOVED_DATA_TRACK, MapBuilder.of("registrationName", ON_PARTICIPANT_REMOVED_DATA_TRACK),
+                ON_LOCAL_PARTICIPANT_SUPPORTED_CODECS, MapBuilder.of("registrationName", ON_LOCAL_PARTICIPANT_SUPPORTED_CODECS)
         ));
 
         map.putAll(MapBuilder.of(

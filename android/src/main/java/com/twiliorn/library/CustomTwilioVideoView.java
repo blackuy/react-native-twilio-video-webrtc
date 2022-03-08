@@ -71,10 +71,16 @@ import com.twilio.video.TwilioException;
 import com.twilio.video.Video;
 import com.twilio.video.VideoDimensions;
 import com.twilio.video.VideoFormat;
+import com.twilio.video.VideoCodec;
 
 import org.webrtc.voiceengine.WebRtcAudioManager;
 
 import tvi.webrtc.Camera1Enumerator;
+import tvi.webrtc.HardwareVideoEncoderFactory;
+import tvi.webrtc.HardwareVideoDecoderFactory;
+import tvi.webrtc.VideoCodecInfo;
+import com.twilio.video.H264Codec;
+import com.twilio.video.Vp8Codec;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -103,6 +109,7 @@ import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_PARTICIPANT_R
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_STATS_RECEIVED;
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_VIDEO_CHANGED;
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_DOMINANT_SPEAKER_CHANGED;
+import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_LOCAL_PARTICIPANT_SUPPORTED_CODECS;
 
 public class CustomTwilioVideoView extends View implements LifecycleEventListener, AudioManager.OnAudioFocusChangeListener {
     private static final String TAG = "CustomTwilioVideoView";
@@ -117,6 +124,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     private static String backFacingDevice;
     private boolean maintainVideoTrackInBackground = false;
     private String cameraType = "";
+    private boolean enableH264Codec = false;
 
     @Retention(RetentionPolicy.SOURCE)
     @StringDef({Events.ON_CAMERA_SWITCHED,
@@ -140,7 +148,8 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
             Events.ON_PARTICIPANT_DISABLED_AUDIO_TRACK,
             Events.ON_STATS_RECEIVED,
             Events.ON_NETWORK_QUALITY_LEVELS_CHANGED,
-            Events.ON_DOMINANT_SPEAKER_CHANGED
+            Events.ON_DOMINANT_SPEAKER_CHANGED,
+            Events.ON_LOCAL_PARTICIPANT_SUPPORTED_CODECS,
     })
     public @interface Events {
         String ON_CAMERA_SWITCHED = "onCameraSwitched";
@@ -165,6 +174,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         String ON_STATS_RECEIVED = "onStatsReceived";
         String ON_NETWORK_QUALITY_LEVELS_CHANGED = "onNetworkQualityLevelsChanged";
         String ON_DOMINANT_SPEAKER_CHANGED = "onDominantSpeakerDidChange";
+        String ON_LOCAL_PARTICIPANT_SUPPORTED_CODECS = "onLocalParticipantSupportedCodecs";
     }
 
     private final ThemedReactContext themedReactContext;
@@ -435,7 +445,8 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
             boolean enableNetworkQualityReporting,
             boolean dominantSpeakerEnabled,
             boolean maintainVideoTrackInBackground,
-            String cameraType
+            String cameraType,
+            boolean enableH264Codec
     ) {
         this.roomName = roomName;
         this.accessToken = accessToken;
@@ -444,6 +455,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         this.dominantSpeakerEnabled = dominantSpeakerEnabled;
         this.maintainVideoTrackInBackground = maintainVideoTrackInBackground;
         this.cameraType = cameraType;
+        this.enableH264Codec = enableH264Codec;
 
         // Share your microphone
         localAudioTrack = LocalAudioTrack.create(getContext(), enableAudio);
@@ -486,6 +498,48 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         if (localDataTrack != null) {
             connectOptionsBuilder.dataTracks(Collections.singletonList(localDataTrack));
         }
+
+        // H264 Codec Support Detection: https://www.twilio.com/docs/video/managing-codecs
+        HardwareVideoEncoderFactory hardwareVideoEncoderFactory = new HardwareVideoEncoderFactory(null, true, true);
+        HardwareVideoDecoderFactory hardwareVideoDecoderFactory = new HardwareVideoDecoderFactory(null);
+
+        boolean h264EncoderSupported = false;
+        for (VideoCodecInfo videoCodecInfo : hardwareVideoEncoderFactory.getSupportedCodecs()) {
+            if (videoCodecInfo.name.equalsIgnoreCase("h264")) {
+                h264EncoderSupported = true;
+                break;
+            }
+        }
+        boolean h264DecoderSupported = false;
+        for (VideoCodecInfo videoCodecInfo : hardwareVideoDecoderFactory.getSupportedCodecs()) {
+            if (videoCodecInfo.name.equalsIgnoreCase("h264")) {
+                h264DecoderSupported = true;
+                break;
+            }
+        }
+
+        boolean isH264Supported = h264EncoderSupported && h264DecoderSupported;
+
+        Log.d("RNTwilioVideo", "H264 supported by hardware: " + isH264Supported);
+
+        WritableArray supportedCodecs = new WritableNativeArray();
+
+        VideoCodec videoCodec =  new Vp8Codec();
+        // VP8 is supported on all android devices by default
+        supportedCodecs.pushString(videoCodec.toString());
+
+        if (isH264Supported && this.enableH264Codec) {
+            videoCodec = new H264Codec();
+            supportedCodecs.pushString(videoCodec.toString());
+        }
+
+        WritableMap event = new WritableNativeMap();
+
+        event.putArray("supportedCodecs", supportedCodecs);
+
+        pushEvent(CustomTwilioVideoView.this, ON_LOCAL_PARTICIPANT_SUPPORTED_CODECS, event);
+
+        connectOptionsBuilder.preferVideoCodecs(Collections.singletonList(videoCodec));
 
         connectOptionsBuilder.enableDominantSpeaker(this.dominantSpeakerEnabled);
 

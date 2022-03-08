@@ -144,7 +144,11 @@ const propTypes = {
      * Called when dominant speaker changes
      * @param {{ participant, room }} dominant participant and room
      */
-  onDominantSpeakerDidChange: PropTypes.func
+  onDominantSpeakerDidChange: PropTypes.func,
+  /**
+     * Callback that is called after determining what codecs are supported
+     */
+  onLocalParticipantSupportedCodecs: PropTypes.func
 }
 
 const nativeEvents = {
@@ -174,7 +178,8 @@ class CustomTwilioVideoView extends Component {
     enableRemoteAudio = true,
     enableNetworkQualityReporting = false,
     dominantSpeakerEnabled = false,
-    maintainVideoTrackInBackground = false
+    maintainVideoTrackInBackground = false,
+    encodingParameters = {}
   }) {
     this.runCommand(nativeEvents.connectToRoom, [
       roomName,
@@ -185,7 +190,8 @@ class CustomTwilioVideoView extends Component {
       enableNetworkQualityReporting,
       dominantSpeakerEnabled,
       maintainVideoTrackInBackground,
-      cameraType
+      cameraType,
+      encodingParameters
     ])
   }
 
@@ -292,7 +298,8 @@ class CustomTwilioVideoView extends Component {
       'onParticipantDisabledAudioTrack',
       'onStatsReceived',
       'onNetworkQualityLevelsChanged',
-      'onDominantSpeakerDidChange'
+      'onDominantSpeakerDidChange',
+      'onLocalParticipantSupportedCodecs'
     ].reduce((wrappedEvents, eventName) => {
       if (this.props[eventName]) {
         return {

@@ -85,7 +85,7 @@ public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilio
                 boolean maintainVideoTrackInBackground = args.getBoolean(7);
                 String cameraType = args.getString(8);
                 ReadableMap encodingParameters = args.getMap(9);
-                boolean enableH264Codec = encodingParameters.getBoolean("enableH264Codec");
+                boolean enableH264Codec = encodingParameters.hasKey("enableH264Codec") ? encodingParameters.getBoolean("enableH264Codec") : false;
                 view.connectToRoomWrapper(
                     roomName,
                     accessToken,

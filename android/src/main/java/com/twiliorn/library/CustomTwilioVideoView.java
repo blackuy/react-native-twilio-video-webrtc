@@ -218,8 +218,56 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     private final Map<RemoteDataTrack, RemoteParticipant> dataTrackRemoteParticipantMap =
             new HashMap<>();
 
+    public void releaseResource() {
+        thumbnailVideoView = null;
+        roomName = null;
+        accessToken = null;
+
+        /*
+         * Remove stream voice control
+         */
+        if (themedReactContext != null && themedReactContext.getCurrentActivity() != null) {
+            themedReactContext.getCurrentActivity().setVolumeControlStream(AudioManager.USE_DEFAULT_STREAM_TYPE);
+            themedReactContext.removeLifecycleEventListener(this);
+        }
+        /*
+         * Always disconnect from the room before leaving the Activity to
+         * ensure any memory allocated to the Room resource is freed.
+         */
+        if (room != null && room.getState() != Room.State.DISCONNECTED) {
+            room.disconnect();
+            disconnectedFromOnDestroy = true;
+        }
+        room = null;
+
+
+        if (localParticipant != null) {
+            localParticipant.unpublishTrack(localVideoTrack);
+            localParticipant = null;
+        }
+
+        if (localVideoTrack != null) {
+            localVideoTrack.release();
+            localVideoTrack = null;
+        }
+
+        if (localAudioTrack != null) {
+            localAudioTrack.release();
+            localAudioTrack = null;
+        }
+
+        if (cameraCapturer != null) {
+            cameraCapturer.stopCapture();
+            cameraCapturer = null;
+        }
+
+        // Quit the data track message thread
+        dataTrackMessageThread.quit();
+    }
+
     public CustomTwilioVideoView(ThemedReactContext context) {
         super(context);
+        releaseResource();
         this.themedReactContext = context;
         this.eventEmitter = themedReactContext.getJSModule(RCTEventEmitter.class);
 
@@ -392,46 +440,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
 
     @Override
     public void onHostDestroy() {
-        /*
-         * Remove stream voice control
-         */
-        if (themedReactContext.getCurrentActivity() != null) {
-            themedReactContext.getCurrentActivity().setVolumeControlStream(AudioManager.USE_DEFAULT_STREAM_TYPE);
-        }
-        /*
-         * Always disconnect from the room before leaving the Activity to
-         * ensure any memory allocated to the Room resource is freed.
-         */
-        if (room != null && room.getState() != Room.State.DISCONNECTED) {
-            room.disconnect();
-            disconnectedFromOnDestroy = true;
-        }
-
-        /*
-         * Release the local media ensuring any memory allocated to audio or video is freed.
-         */
-        if (localVideoTrack != null) {
-            localVideoTrack.release();
-            localVideoTrack = null;
-        }
-
-        if (localAudioTrack != null) {
-            localAudioTrack.release();
-            localAudioTrack = null;
-        }
-
-        // Quit the data track message thread
-        dataTrackMessageThread.quit();
-
-
-    }
-
-    public void releaseResource() {
-        themedReactContext.removeLifecycleEventListener(this);
-        room = null;
-        localVideoTrack = null;
-        thumbnailVideoView = null;
-        cameraCapturer = null;
+        releaseResource();
     }
 
     // ====== CONNECTING ===========================================================================

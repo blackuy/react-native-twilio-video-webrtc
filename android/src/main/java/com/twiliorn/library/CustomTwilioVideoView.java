@@ -138,7 +138,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         FRONT("FRONT"),
         STETHOSCOPE("STETHOSCOPE"),
         DERMATASCOPE("DERMATASCOPE"),
-        UNKNOWN("UNKOWN");
+        UNKNOWN("UNKNOWN");
 
         private final String type;
 

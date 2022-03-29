@@ -125,7 +125,7 @@ declare module "react-native-twilio-video-webrtc" {
 
     onStatsReceived?: (data: any) => void;
     onDataTrackMessageReceived?: DataTrackEventCb;
-    preloadCameras: string[];
+    preloadCameras: { id: string; physicalId: string; name: string }[];
     ref?: React.Ref<any>;
   };
 

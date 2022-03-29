@@ -133,24 +133,9 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     private boolean maintainVideoTrackInBackground = false;
     private String cameraType = "";
 
-    private enum DeviceInfoType {
-        OTOSCOPE("OTOSCOPE"),
-        FRONT("FRONT"),
-        STETHOSCOPE("STETHOSCOPE"),
-        DERMATASCOPE("DERMATASCOPE"),
-        UNKNOWN("UNKNOWN");
-
-        private final String type;
-
-        DeviceInfoType(String type) {
-            this.type = type;
-        }
-    }
-
     private class DeviceInfo {
         public String id;
         public String name;
-        public DeviceInfoType type;
         private String physicalId;
 
     }
@@ -168,24 +153,6 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         info.name = map.getString("name");
         info.physicalId = map.getString("physicalId");
 
-        String type = map.getString("type");
-        switch (type) {
-            case "OTOSCOPE":
-                info.type = DeviceInfoType.OTOSCOPE;
-                break;
-            case "DERMATASCOPE":
-                info.type = DeviceInfoType.DERMATASCOPE;
-                break;
-            case "FRONT":
-                info.type = DeviceInfoType.FRONT;
-                break;
-            case "STETHOSCOPE":
-                info.type = DeviceInfoType.STETHOSCOPE;
-                break;
-            default:
-                info.type = DeviceInfoType.UNKNOWN;
-                break;
-        }
         return info;
     }
 
@@ -1542,7 +1509,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         if(!map.containsKey(key)) return defaultValue;
         DeviceInfo value = map.getOrDefault(key, null);
         if(value == null) return defaultValue;
-        return value.type.type;
+        return value.name;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)

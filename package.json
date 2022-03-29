@@ -12,7 +12,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "standard 'src/**/*.js'",
     "lint:fix": "standard 'src/**/*.js' --fix",
-    "eas-build-post-install": "jetify",
+    "post-install": "jetify",
     "ci": "yarn lint"
   },
   "standard": {

@@ -8,7 +8,9 @@
  */
 package com.twiliorn.library;
 
+import android.os.Build;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.common.MapBuilder;
@@ -70,6 +72,7 @@ public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilio
         return new CustomTwilioVideoView(reactContext);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @ReactProp(name = "preloadCameras")
     public  void setPreloadCameras(CustomTwilioVideoView view, @Nullable ReadableArray sources)
     {

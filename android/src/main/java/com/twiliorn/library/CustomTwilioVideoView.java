@@ -8,12 +8,28 @@
  */
 package com.twiliorn.library;
 
-import java.lang.reflect.Array;
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_AUDIO_CHANGED;
+import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_CAMERA_SWITCHED;
+import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_CONNECTED;
+import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_CONNECT_FAILURE;
+import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_DATATRACK_MESSAGE_RECEIVED;
+import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_DISCONNECTED;
+import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_DOMINANT_SPEAKER_CHANGED;
+import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_NETWORK_QUALITY_LEVELS_CHANGED;
+import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_PARTICIPANT_ADDED_AUDIO_TRACK;
+import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_PARTICIPANT_ADDED_DATA_TRACK;
+import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_PARTICIPANT_ADDED_VIDEO_TRACK;
+import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_PARTICIPANT_CONNECTED;
+import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_PARTICIPANT_DISABLED_AUDIO_TRACK;
+import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_PARTICIPANT_DISABLED_VIDEO_TRACK;
+import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_PARTICIPANT_DISCONNECTED;
+import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_PARTICIPANT_ENABLED_AUDIO_TRACK;
+import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_PARTICIPANT_ENABLED_VIDEO_TRACK;
+import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_PARTICIPANT_REMOVED_AUDIO_TRACK;
+import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_PARTICIPANT_REMOVED_DATA_TRACK;
+import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_PARTICIPANT_REMOVED_VIDEO_TRACK;
+import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_STATS_RECEIVED;
+import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_VIDEO_CHANGED;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -23,10 +39,12 @@ import android.media.AudioAttributes;
 import android.media.AudioDeviceInfo;
 import android.media.AudioFocusRequest;
 import android.media.AudioManager;
+import android.media.AudioRecord;
 import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.support.annotation.StringDef;
 import android.util.Log;
 import android.view.View;
@@ -35,6 +53,7 @@ import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.LifecycleEventListener;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReadableArray;
+import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableType;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
@@ -42,6 +61,7 @@ import com.facebook.react.bridge.WritableNativeArray;
 import com.facebook.react.bridge.WritableNativeMap;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.events.RCTEventEmitter;
+import com.twilio.video.AudioDeviceCapturer;
 import com.twilio.video.AudioTrackPublication;
 import com.twilio.video.BaseTrackStats;
 import com.twilio.video.Camera2Capturer;
@@ -50,6 +70,7 @@ import com.twilio.video.ConnectOptions;
 import com.twilio.video.LocalAudioTrack;
 import com.twilio.video.LocalAudioTrackPublication;
 import com.twilio.video.LocalAudioTrackStats;
+import com.twilio.video.LocalDataTrack;
 import com.twilio.video.LocalDataTrackPublication;
 import com.twilio.video.LocalParticipant;
 import com.twilio.video.LocalTrackStats;
@@ -63,7 +84,6 @@ import com.twilio.video.Participant;
 import com.twilio.video.RemoteAudioTrack;
 import com.twilio.video.RemoteAudioTrackPublication;
 import com.twilio.video.RemoteAudioTrackStats;
-import com.twilio.video.LocalDataTrack;
 import com.twilio.video.RemoteDataTrack;
 import com.twilio.video.RemoteDataTrackPublication;
 import com.twilio.video.RemoteParticipant;
@@ -83,37 +103,20 @@ import com.twilio.video.VideoTrack;
 
 import org.webrtc.voiceengine.WebRtcAudioManager;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import tvi.webrtc.Camera2Enumerator;
 import tvi.webrtc.VideoCapturer;
 import tvi.webrtc.VideoSink;
-
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.util.Collections;
-import java.util.List;
-
-import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_AUDIO_CHANGED;
-import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_CAMERA_SWITCHED;
-import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_CONNECTED;
-import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_CONNECT_FAILURE;
-import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_DISCONNECTED;
-import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_DATATRACK_MESSAGE_RECEIVED;
-import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_NETWORK_QUALITY_LEVELS_CHANGED;
-import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_PARTICIPANT_ADDED_DATA_TRACK;
-import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_PARTICIPANT_ADDED_AUDIO_TRACK;
-import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_PARTICIPANT_ADDED_VIDEO_TRACK;
-import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_PARTICIPANT_CONNECTED;
-import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_PARTICIPANT_DISABLED_AUDIO_TRACK;
-import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_PARTICIPANT_DISABLED_VIDEO_TRACK;
-import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_PARTICIPANT_DISCONNECTED;
-import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_PARTICIPANT_ENABLED_AUDIO_TRACK;
-import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_PARTICIPANT_ENABLED_VIDEO_TRACK;
-import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_PARTICIPANT_REMOVED_DATA_TRACK;
-import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_PARTICIPANT_REMOVED_AUDIO_TRACK;
-import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_PARTICIPANT_REMOVED_VIDEO_TRACK;
-import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_STATS_RECEIVED;
-import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_VIDEO_CHANGED;
-import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_DOMINANT_SPEAKER_CHANGED;
 
 public class CustomTwilioVideoView extends View implements LifecycleEventListener, AudioManager.OnAudioFocusChangeListener {
     private static final String TAG = "CustomTwilioVideoView";
@@ -130,21 +133,98 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     private boolean maintainVideoTrackInBackground = false;
     private String cameraType = "";
 
+    private enum DeviceInfoType {
+        OTOSCOPE("OTOSCOPE"),
+        FRONT("FRONT"),
+        STETHOSCOPE("STETHOSCOPE"),
+        DERMATASCOPE("DERMATASCOPE"),
+        UNKNOWN("UNKOWN");
+
+        private final String type;
+
+        DeviceInfoType(String type) {
+            this.type = type;
+        }
+    }
+
+    private class DeviceInfo {
+        public String id;
+        public String name;
+        public DeviceInfoType type;
+        private String physicalId;
+
+    }
+
+    private DeviceInfo getDeviceInfoFromReadableMap(ReadableMap map) {
+        if (!isDeviceInfoValueValid(map, "id")
+                || !isDeviceInfoValueValid(map, "name")
+                || !isDeviceInfoValueValid(map, "physicalId")
+                || !isDeviceInfoValueValid(map, "type")
+        ) {
+            return null;
+        }
+        DeviceInfo info = new DeviceInfo();
+        info.id = map.getString("id");
+        info.name = map.getString("name");
+        info.physicalId = map.getString("physicalId");
+
+        String type = map.getString("type");
+        switch (type) {
+            case "OTOSCOPE":
+                info.type = DeviceInfoType.OTOSCOPE;
+                break;
+            case "DERMATASCOPE":
+                info.type = DeviceInfoType.DERMATASCOPE;
+                break;
+            case "FRONT":
+                info.type = DeviceInfoType.FRONT;
+                break;
+            case "STETHOSCOPE":
+                info.type = DeviceInfoType.STETHOSCOPE;
+                break;
+            default:
+                info.type = DeviceInfoType.UNKNOWN;
+                break;
+        }
+        return info;
+    }
+
+    private static boolean isDeviceInfoValueValid(ReadableMap map, String name) {
+        return map.hasKey(name) && !map.isNull(name);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
     public void setPreloadCameras(ReadableArray sources) {
         ArrayList<String> cameras = new ArrayList<>(sources.size());
-        for (int i = 0; i < sources.size(); i++)
-        {
-            ReadableType type = sources.getType(i);
-            switch (type)
-            {
-                case String:
-                    cameras.add(sources.getString(i));
-            }
-        }
-        this.preloadCameraIds = cameras.toArray(new String[0]);
+        DeviceInfo[] deviceInfo = buildDeviceInfoFrom(sources);
+
+        this.preloadCameraIds = Arrays
+                .stream(deviceInfo)
+                .map(x -> x.physicalId).toArray(String[]::new);
+
+        this.trackAliases = Arrays
+                .stream(deviceInfo)
+                .collect(Collectors.toMap(x -> x.physicalId, x-> x));
         cleanupPreloadTracks();
 
         preloadedTracks = createPreloadedVideoTracks(cameras.toArray(this.preloadCameraIds));
+    }
+
+    private DeviceInfo[] buildDeviceInfoFrom(ReadableArray array) {
+        ArrayList<DeviceInfo> deviceInfos = new ArrayList<>(array.size());
+        for (int i = 0; i < array.size(); i++)
+        {
+            ReadableType type = array.getType(i);
+            switch (type)
+            {
+                case Map:
+                    DeviceInfo device = getDeviceInfoFromReadableMap(array.getMap(i));
+                    if(device != null) {
+                        deviceInfos.add(device);
+                    }
+            }
+        }
+        return deviceInfos.toArray(new DeviceInfo[0]);
     }
 
     private void cleanupPreloadTracks() {
@@ -237,6 +317,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     private static PatchedVideoView thumbnailVideoView;
     private static LocalVideoTrack localVideoTrack;
     private static LocalVideoTrack[] preloadedTracks;
+    private static Map<String, DeviceInfo> trackAliases;
     private String[] preloadCameraIds;
 
     private static CameraCapturer cameraCapturer;
@@ -287,18 +368,21 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         dataTrackMessageThread.start();
         dataTrackMessageThreadHandler = new Handler(dataTrackMessageThread.getLooper());
 
+        trackAliases = new HashMap<>();
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     private LocalVideoTrack[] createPreloadedVideoTracks(String[] cameras) {
         List<VideoTrack> localTracks = new ArrayList<>();
         for(String camera : cameras) {
             try {
                 Camera2Capturer camera2Capturer = createCameraCapturer(themedReactContext, camera);
-                VideoTrack track = createLocalVideo(
+                VideoTrack track = this.createLocalVideo(
                         themedReactContext,
                         true,
                         camera2Capturer,
                         camera);
+                track.addSink(null);
                 localTracks.add(track);
             } catch (Exception e) {
                 Log.d(TAG, "unable to get camera");
@@ -588,6 +672,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
          }
 
         room = Video.connect(getContext(), connectOptionsBuilder.build(), roomListener());
+
     }
 
     private void setAudioFocus(boolean focus) {
@@ -1452,9 +1537,18 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
             return null;
         }
     }
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private String getTrackNameOrDefault(Map<String, DeviceInfo> map, String key, String defaultValue) {
+        if(!map.containsKey(key)) return defaultValue;
+        DeviceInfo value = map.getOrDefault(key, null);
+        if(value == null) return defaultValue;
+        return value.type.type;
+    }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     private VideoTrack createLocalVideo(ReactContext context, boolean enableVideo, Camera2Capturer cameraCapturer, String cameraId) {
-        VideoTrack videoTrack = LocalVideoTrack.create(context, enableVideo, cameraCapturer, buildVideoFormat());
+        String trackName = getTrackNameOrDefault(this.trackAliases, cameraId, cameraId);
+        VideoTrack videoTrack = LocalVideoTrack.create(context, enableVideo, cameraCapturer, buildVideoFormat(), trackName);
         return videoTrack;
     }
 }

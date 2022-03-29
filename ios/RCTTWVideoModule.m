@@ -448,7 +448,7 @@ RCT_EXPORT_METHOD(connect:(NSString *)accessToken roomName:(NSString *)roomName 
       builder.networkQualityConfiguration = [ [TVINetworkQualityConfiguration alloc] initWithLocalVerbosity:TVINetworkQualityVerbosityMinimal remoteVerbosity:TVINetworkQualityVerbosityMinimal];
     }
 
-    if(videoParams[@"width"] || videoParams[@"height"]){
+    if(videoParams[@"width"] && videoParams[@"height"]){
       NSInteger width = [videoParams[@"width"] integerValue];
       NSInteger height = [videoParams[@"height"] integerValue];
       kRCTTWVideoAppCameraSourceDimensions.width = width;

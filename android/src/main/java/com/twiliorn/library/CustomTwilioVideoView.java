@@ -348,7 +348,6 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
                         true,
                         camera2Capturer,
                         camera);
-                track.addSink(null);
                 localTracks.add(track);
             } catch (Exception e) {
                 Log.d(TAG, "unable to get camera");

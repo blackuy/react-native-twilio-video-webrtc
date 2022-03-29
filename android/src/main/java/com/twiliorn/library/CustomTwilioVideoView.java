@@ -136,7 +136,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     private class DeviceInfo {
         public String id;
         public String name;
-        private String physicalId;
+        public String physicalId;
 
     }
 
@@ -161,7 +161,6 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     public void setPreloadCameras(ReadableArray sources) {
-        ArrayList<String> cameras = new ArrayList<>(sources.size());
         DeviceInfo[] deviceInfo = buildDeviceInfoFrom(sources);
 
         this.preloadCameraIds = Arrays
@@ -173,7 +172,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
                 .collect(Collectors.toMap(x -> x.physicalId, x-> x));
         cleanupPreloadTracks();
 
-        preloadedTracks = createPreloadedVideoTracks(cameras.toArray(this.preloadCameraIds));
+        preloadedTracks = createPreloadedVideoTracks(this.preloadCameraIds);
     }
 
     private DeviceInfo[] buildDeviceInfoFrom(ReadableArray array) {

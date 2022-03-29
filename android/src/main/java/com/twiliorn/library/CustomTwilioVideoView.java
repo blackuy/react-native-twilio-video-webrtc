@@ -144,7 +144,6 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         if (!isDeviceInfoValueValid(map, "id")
                 || !isDeviceInfoValueValid(map, "name")
                 || !isDeviceInfoValueValid(map, "physicalId")
-                || !isDeviceInfoValueValid(map, "type")
         ) {
             return null;
         }

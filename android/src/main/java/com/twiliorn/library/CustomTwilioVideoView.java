@@ -564,7 +564,6 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
                 deviceType == AudioDeviceInfo.TYPE_WIRED_HEADSET ||
                 deviceType == AudioDeviceInfo.TYPE_WIRED_HEADPHONES
             ) {
-                audioManager.setSpeakerphoneOn(false);
                 hasNonSpeakerphoneDevice = true;
             }
             if (
@@ -573,7 +572,6 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
             ) {
                 audioManager.startBluetoothSco();
                 audioManager.setBluetoothScoOn(true);
-                audioManager.setSpeakerphoneOn(false);
                 hasNonSpeakerphoneDevice = true;
             }
         }

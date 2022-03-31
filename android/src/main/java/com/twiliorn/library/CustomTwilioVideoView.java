@@ -555,6 +555,31 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         room = Video.connect(getContext(), connectOptionsBuilder.build(), roomListener());
     }
 
+    public void setAudioType() {
+        AudioDeviceInfo[] devicesInfo = audioManager.getDevices(AudioManager.GET_DEVICES_OUTPUTS);
+        boolean hasNonSpeakerphoneDevice = false;
+        for (int i = 0; i < devicesInfo.length; i++) {
+            int deviceType = devicesInfo[i].getType();
+            if (
+                deviceType == AudioDeviceInfo.TYPE_WIRED_HEADSET ||
+                deviceType == AudioDeviceInfo.TYPE_WIRED_HEADPHONES
+            ) {
+                audioManager.setSpeakerphoneOn(false);
+                hasNonSpeakerphoneDevice = true;
+            }
+            if (
+                deviceType == AudioDeviceInfo.TYPE_BLUETOOTH_A2DP ||
+                deviceType == AudioDeviceInfo.TYPE_BLUETOOTH_SCO
+            ) {
+                audioManager.startBluetoothSco();
+                audioManager.setBluetoothScoOn(true);
+                audioManager.setSpeakerphoneOn(false);
+                hasNonSpeakerphoneDevice = true;
+            }
+        }
+        audioManager.setSpeakerphoneOn(!hasNonSpeakerphoneDevice);
+    }
+
     private void setAudioFocus(boolean focus) {
         if (focus) {
             previousAudioMode = audioManager.getMode();
@@ -583,27 +608,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
              * speaker mode if this is not set.
              */
             audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
-            audioManager.setSpeakerphoneOn(!(audioManager.isBluetoothScoOn() || audioManager.isBluetoothA2dpOn()));
-
-            AudioDeviceInfo[] devicesInfo = audioManager.getDevices(AudioManager.GET_DEVICES_OUTPUTS);
-            for (int i = 0; i < devicesInfo.length; i++) {
-                int deviceType = devicesInfo[i].getType();
-                if (
-                    deviceType == AudioDeviceInfo.TYPE_WIRED_HEADSET ||
-                    deviceType == AudioDeviceInfo.TYPE_WIRED_HEADPHONES
-                ) {
-                    audioManager.setSpeakerphoneOn(false);
-                }
-                if (
-                    deviceType == AudioDeviceInfo.TYPE_BLUETOOTH_A2DP ||
-                    deviceType == AudioDeviceInfo.TYPE_BLUETOOTH_SCO
-                ) {
-                    audioManager.startBluetoothSco();
-                    audioManager.setBluetoothScoOn(true);
-                    audioManager.setSpeakerphoneOn(false);
-                }
-            }
-
+            setAudioType();
             getContext().registerReceiver(myNoisyAudioStreamReceiver, intentFilter);
 
         } else {
@@ -632,7 +637,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         public void onReceive(Context context, Intent intent) {
 //            audioManager.setSpeakerphoneOn(true);
             if (Intent.ACTION_HEADSET_PLUG.equals(intent.getAction())) {
-                audioManager.setSpeakerphoneOn(false);
+                setAudioType();
             }
         }
     }

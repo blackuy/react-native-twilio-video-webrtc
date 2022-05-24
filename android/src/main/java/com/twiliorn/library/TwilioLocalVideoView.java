@@ -15,6 +15,11 @@ import android.util.Log;
 
 import com.facebook.react.uimanager.ThemedReactContext;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
 import tvi.webrtc.Camera2Enumerator;
 
 
@@ -67,10 +72,22 @@ public class TwilioLocalVideoView extends RNVideoViewGroup {
 
     public void takeSnapshot(Callback<ImageFileReference> callback) {
         this.snapshotSink.takeSnapshot(bitmap -> {
-            final ImageFileReference reference = new ImageFileReference("Test",
-                    bitmap.getWidth(),
-                    bitmap.getHeight() );
-            callback.invoke(reference);
+            try {
+                File file = new File(
+                        this.getContext().getCacheDir(),
+                        "TempImage");
+                FileOutputStream outStream = new FileOutputStream(file);
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, outStream);
+                outStream.close();
+                final ImageFileReference reference = new ImageFileReference(file.getAbsolutePath(),
+                        bitmap.getWidth(),
+                        bitmap.getHeight());
+                callback.invoke(reference);
+            }  catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         });
     }
 

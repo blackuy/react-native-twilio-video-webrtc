@@ -1417,13 +1417,32 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         
     }
 
+    public static void addSnapshotSink(SnapshotVideoSink sink, String trackId) {
+        LocalVideoTrack track = CustomTwilioVideoView.getTrackFromList(Arrays.asList(preloadedTracks), trackId);
+        if (track != null) {
+            track.addSink(sink);
+            return;
+        }
+        Log.i(TAG, "addLocalSink: Unable to find the track");
+
+    }
+
+    public static void removeSnapshotSink(SnapshotVideoSink sink, String trackId) {
+        LocalVideoTrack track = CustomTwilioVideoView.getTrackFromList(Arrays.asList(preloadedTracks), trackId);
+        if (track != null) {
+            track.removeSink(sink);
+            return;
+        }
+        Log.i(TAG, "removeSnapshotSink: Unable to find the track");
+    }
+
     public static void removeLocalSink(PatchedVideoView v, String trackId) {
         LocalVideoTrack track = CustomTwilioVideoView.getTrackFromList(Arrays.asList(preloadedTracks), trackId);
         if (track != null) {
             track.removeSink(v);
             return;
         }
-        Log.i(TAG, "addLocalSink: Unable to find the track");
+        Log.i(TAG, "removeLocalSink: Unable to find the track");
     }
 
     public static void setLocalVideoTrackStatus(String trackId, boolean enabled)

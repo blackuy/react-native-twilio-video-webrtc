@@ -11,6 +11,7 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.facebook.react.bridge.ReactMethod;
+import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.common.MapBuilder;
 import com.facebook.react.uimanager.SimpleViewManager;
 import com.facebook.react.uimanager.ThemedReactContext;
@@ -25,6 +26,7 @@ import tvi.webrtc.RendererCommon;
 import static com.twiliorn.library.RNVideoViewGroup.Events.ON_FRAME_DIMENSIONS_CHANGED;
 
 public class TwilioLocalVideoViewManager extends SimpleViewManager<TwilioLocalVideoView> {
+    private static final int TAKE_SNAPSHOT = 1;
 
     private boolean _enabled = false;
     public static final String REACT_CLASS = "RNTwilioLocalVideoView";
@@ -74,4 +76,35 @@ public class TwilioLocalVideoViewManager extends SimpleViewManager<TwilioLocalVi
                   MapBuilder.of("bubbled", ON_FRAME_DIMENSIONS_CHANGED)))
                   .build();
   }
+
+    @Override
+    public void receiveCommand(@Nonnull TwilioLocalVideoView root, int commandId, @Nullable ReadableArray args) {
+        switch (commandId) {
+            case TAKE_SNAPSHOT:
+                final int requestId = args.getInt(0);
+                root.takeSnapshot(ref -> {
+                    TakeSnapshotReturnedEvent event = new TakeSnapshotReturnedEvent(root.getId(), requestId, ref);
+                    root.pushEvent(root,
+                            event.EVENT_NAME,
+                            event.toWritableMap());
+                });
+                break;
+            default:
+                super.receiveCommand(root, commandId, args);
+        }
+    }
+
+    @Nullable
+    @Override
+    public Map<String, Integer> getCommandsMap() {
+        return MapBuilder.of(
+                "takeSnapshot",
+                TAKE_SNAPSHOT
+        );
+    }
+    @Nullable
+    @Override
+    public Map getExportedCustomDirectEventTypeConstants() {
+        return MapBuilder.of(TakeSnapshotReturnedEvent.EVENT_NAME, MapBuilder.of("registrationName", "onDataReturned"));
+    }
 }

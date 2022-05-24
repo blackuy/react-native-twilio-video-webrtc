@@ -19,7 +19,6 @@ import com.twilio.video.VideoDimensions;
 import com.twilio.video.VideoFormat;
 import com.twilio.video.VideoTrack;
 
-import tvi.webrtc.Camera1Enumerator;
 import tvi.webrtc.Camera2Enumerator;
 
 

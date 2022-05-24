@@ -8,18 +8,12 @@
 package com.twiliorn.library;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
-import android.view.View;
 
-import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.uimanager.ThemedReactContext;
-import com.twilio.video.Camera2Capturer;
-import com.twilio.video.LocalVideoTrack;
-import com.twilio.video.VideoDimensions;
-import com.twilio.video.VideoFormat;
-import com.twilio.video.VideoTrack;
 
 import tvi.webrtc.Camera2Enumerator;
 
@@ -27,7 +21,7 @@ import tvi.webrtc.Camera2Enumerator;
 public class TwilioLocalVideoView extends RNVideoViewGroup {
     public String trackId = "";
     public boolean enabled = false;
-
+    private final SnapshotVideoSink snapshotSink = new SnapshotVideoSink();
     private static final String TAG = "TwilioLocalVideoView";
 
     public TwilioLocalVideoView(ThemedReactContext context) {
@@ -64,11 +58,30 @@ public class TwilioLocalVideoView extends RNVideoViewGroup {
             Log.i(TAG, "Skipping setEnabled because trackId not set");
         }
         if(this.enabled)
-            CustomTwilioVideoView.addLocalSink(this.getSurfaceViewRenderer(), this.trackId);
+            this.addSinks();
         else
-            CustomTwilioVideoView.removeLocalSink(this.getSurfaceViewRenderer(), this.trackId);
+            this.removeSinks();
 
         CustomTwilioVideoView.setLocalVideoTrackStatus(this.trackId, this.enabled);
+    }
+
+    public void takeSnapshot(Callback<ImageFileReference> callback) {
+        this.snapshotSink.takeSnapshot(bitmap -> {
+            final ImageFileReference reference = new ImageFileReference("Test",
+                    bitmap.getWidth(),
+                    bitmap.getHeight() );
+            callback.invoke(reference);
+        });
+    }
+
+    private void addSinks() {
+        CustomTwilioVideoView.addLocalSink(this.getSurfaceViewRenderer(), this.trackId);
+        CustomTwilioVideoView.addSnapshotSink(this.snapshotSink, this.trackId);
+    }
+
+    private void removeSinks() {
+        CustomTwilioVideoView.removeLocalSink(this.getSurfaceViewRenderer(), this.trackId);
+        CustomTwilioVideoView.removeSnapshotSink(this.snapshotSink, this.trackId);
     }
 
     private void logCameras(String[] strings) {
@@ -89,6 +102,7 @@ public class TwilioLocalVideoView extends RNVideoViewGroup {
         Camera2Enumerator enumerator = new Camera2Enumerator(context);
         return enumerator.getDeviceNames();
     }
+
 
     private String[] getAvaliableLocalVideoTracks() {
         return CustomTwilioVideoView.getAvailableLocalTracks();

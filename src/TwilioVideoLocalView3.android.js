@@ -5,7 +5,11 @@
  *   Jonathan Chang <slycoder@gmail.com>
  */
 
-import { requireNativeComponent, UIManager } from "react-native";
+import {
+  requireNativeComponent,
+  UIManager,
+  findNodeHandle,
+} from "react-native";
 import PropTypes from "prop-types";
 import React from "react";
 
@@ -70,7 +74,9 @@ class TwilioLocalVideoView extends React.Component {
     // parameters.
     UIManager.dispatchViewManagerCommand(
       findNodeHandle(this._ref),
-      UIManager.NativeTwilioLocalVideoView.Commands.takeSnapshots,
+      //@TODO: find out why UIManager.NativeTwilioLocalVideoView.Commands.takeSnapshot doesn't work
+      1,
+      // UIManager.NativeTwilioLocalVideoView.Commands.takeSnapshot,
       [requestId]
     );
 

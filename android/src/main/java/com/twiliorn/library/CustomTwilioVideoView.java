@@ -97,9 +97,11 @@ import com.twilio.video.StatsReport;
 import com.twilio.video.TrackPublication;
 import com.twilio.video.TwilioException;
 import com.twilio.video.Video;
+import com.twilio.video.VideoCodec;
 import com.twilio.video.VideoDimensions;
 import com.twilio.video.VideoFormat;
 import com.twilio.video.VideoTrack;
+import com.twilio.video.Vp8Codec;
 
 import org.webrtc.voiceengine.WebRtcAudioManager;
 
@@ -358,7 +360,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     // ===== SETUP =================================================================================
 
     private VideoFormat buildVideoFormat() {
-        return new VideoFormat(VideoDimensions.HD_720P_VIDEO_DIMENSIONS, 15);
+        return new VideoFormat(VideoDimensions.HD_720P_VIDEO_DIMENSIONS, 5);
     }
 
     private CameraCapturer createCameraCaputer(Context context, String cameraId) {
@@ -627,6 +629,10 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         }
 
         connectOptionsBuilder.enableDominantSpeaker(this.dominantSpeakerEnabled);
+         List<VideoCodec> codecs =  Arrays.asList(
+             new Vp8Codec()
+        );
+        connectOptionsBuilder.preferVideoCodecs(codecs);
 
          if (enableNetworkQualityReporting) {
              connectOptionsBuilder.enableNetworkQuality(true);

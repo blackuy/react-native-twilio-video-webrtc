@@ -50,8 +50,12 @@ import android.util.Log;
 import android.view.View;
 
 import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.LifecycleEventListener;
+import com.facebook.react.bridge.Promise;
+import com.facebook.react.bridge.PromiseImpl;
 import com.facebook.react.bridge.ReactContext;
+import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableType;
@@ -130,6 +134,8 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     private boolean enableNetworkQualityReporting = false;
     private boolean isVideoEnabled = false;
     private boolean dominantSpeakerEnabled = false;
+    private static StethoscopeDevice stethoscopeDevice;
+    private static CustomAudioDevice customAudioDevice;
     private static String frontFacingDevice;
     private static String backFacingDevice;
     private boolean maintainVideoTrackInBackground = false;
@@ -260,6 +266,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         String ON_STATS_RECEIVED = "onStatsReceived";
         String ON_NETWORK_QUALITY_LEVELS_CHANGED = "onNetworkQualityLevelsChanged";
         String ON_DOMINANT_SPEAKER_CHANGED = "onDominantSpeakerDidChange";
+        String ON_ = "onDominantSpeakerDidChange";
     }
 
     private final ThemedReactContext themedReactContext;
@@ -309,6 +316,12 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     public CustomTwilioVideoView(ThemedReactContext context) {
         super(context);
         this.themedReactContext = context;
+
+        if(CustomTwilioVideoView.customAudioDevice != null)
+            CustomTwilioVideoView.customAudioDevice = new CustomAudioDevice(context);
+
+        stethoscopeDevice = new StethoscopeDevice(themedReactContext);
+
         this.eventEmitter = themedReactContext.getJSModule(RCTEventEmitter.class);
 
         // add lifecycle for onResume and on onPause
@@ -641,6 +654,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
                      NetworkQualityVerbosity.NETWORK_QUALITY_VERBOSITY_MINIMAL));
          }
 
+         Video.setAudioDevice(customAudioDevice);
         room = Video.connect(getContext(), connectOptionsBuilder.build(), roomListener());
 
     }
@@ -1540,4 +1554,21 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         VideoTrack videoTrack = LocalVideoTrack.create(context, enableVideo, cameraCapturer, buildVideoFormat(), trackName);
         return videoTrack;
     }
+
+    public static void startStethoscope(SafePromise<String> promise) {
+        CustomTwilioVideoView.stethoscopeDevice.start(promise);
+        CustomTwilioVideoView.customAudioDevice.switchInputToFile();
+    }
+
+    @ReactMethod
+    public static void stopStethoscope(SafePromise<String> promise) {
+        CustomTwilioVideoView.customAudioDevice.switchInputToMic();
+        CustomTwilioVideoView.stethoscopeDevice.stop(promise);
+    }
+
+    @ReactMethod
+    public static void startStethoscopeRecording(String path, int timeout, SafePromise<String> promise) {
+        CustomTwilioVideoView.stethoscopeDevice.recordToFile(path, timeout, promise);
+    }
+
 }

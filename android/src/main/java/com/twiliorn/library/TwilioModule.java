@@ -15,6 +15,7 @@ import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.module.annotations.ReactModule;
+import com.facebook.react.uimanager.ThemedReactContext;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,6 +31,8 @@ import tvi.webrtc.Camera2Enumerator;
 public class TwilioModule extends ReactContextBaseJavaModule {
     static final String TAG = TwilioModule.class.getCanonicalName();
     final CameraManager cameraManager;
+    private StethoscopeDevice stethoscopeDevice;
+
     @Nonnull
     @Override
     public String getName() {
@@ -38,6 +41,7 @@ public class TwilioModule extends ReactContextBaseJavaModule {
 
     public TwilioModule(ReactApplicationContext context) {
         super(context);
+        stethoscopeDevice = new StethoscopeDevice(context);
         cameraManager = (CameraManager)context.getSystemService(Context.CAMERA_SERVICE);;
     }
     
@@ -71,5 +75,27 @@ public class TwilioModule extends ReactContextBaseJavaModule {
         } catch(Exception e) {
              promise.reject("Create Event Error", e);    
         }
+    }
+
+    @ReactMethod
+    public void stethoscopeRecordToFile(String path, Integer timeout, Promise promise) {
+        SafePromise<String> stringSafePromise = new SafePromise<String>(promise);
+        if(timeout == null) {
+            stethoscopeDevice.recordToFile(path, stringSafePromise);
+            return;
+        }
+        stethoscopeDevice.recordToFile(path, timeout, stringSafePromise);
+    }
+
+    @ReactMethod
+    public void startStethoscope(Promise promise) {
+        SafePromise<String> stringSafePromise = new SafePromise<String>(promise);
+        stethoscopeDevice.start(stringSafePromise);
+    }
+
+    @ReactMethod
+    public void stopStethoscope(Promise promise) {
+        SafePromise<String> stringSafePromise = new SafePromise<String>(promise);
+        stethoscopeDevice.stop(stringSafePromise);
     }
 }

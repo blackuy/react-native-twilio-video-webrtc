@@ -7,12 +7,16 @@
 
 package com.twiliorn.library;
 
+import android.animation.Animator;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.facebook.react.bridge.Promise;
+import com.facebook.react.bridge.ReactApplicationContext;
+import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.uimanager.ThemedReactContext;
 
 import java.io.File;
@@ -28,6 +32,7 @@ public class TwilioLocalVideoView extends RNVideoViewGroup {
     public boolean enabled = false;
     private final SnapshotVideoSink snapshotSink = new SnapshotVideoSink();
     private static final String TAG = "TwilioLocalVideoView";
+    private StethoscopeDevice stethoscopeDevice;
 
     public TwilioLocalVideoView(ThemedReactContext context) {
         super(context);
@@ -124,6 +129,7 @@ public class TwilioLocalVideoView extends RNVideoViewGroup {
     private String[] getAvaliableLocalVideoTracks() {
         return CustomTwilioVideoView.getAvailableLocalTracks();
     }
+
 
     public void release() {
         this.getSurfaceViewRenderer().release();

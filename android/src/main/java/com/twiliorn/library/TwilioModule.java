@@ -33,12 +33,12 @@ public class TwilioModule extends ReactContextBaseJavaModule {
         super(context);
         cameraManager = (CameraManager)context.getSystemService(Context.CAMERA_SERVICE);
 
-        if(CustomTwilioVideoView.getCustomAudioDevice() != null) {
+        if(CustomTwilioVideoView.getCustomAudioDevice() == null) {
             Log.d(TAG, "customAudioDevice is null - Initializing new custom audio device");
             CustomTwilioVideoView.setCustomAudioDevice(new CustomAudioDevice(context));
         }
 
-        if(CustomTwilioVideoView.getStethoscopeDevice() != null) {
+        if(CustomTwilioVideoView.getStethoscopeDevice() == null) {
             Log.d(TAG, "stethoscopeDevice is null - Initializing new get stethoscope device");
             CustomTwilioVideoView.setStethoscopeDevice(new StethoscopeDevice(context));
         }

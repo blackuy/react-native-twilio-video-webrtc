@@ -1557,13 +1557,13 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     }
 
     public static void startStethoscope(SafePromise<String> promise) {
-        if(CustomTwilioVideoView.customAudioDevice != null) {
+        if(CustomTwilioVideoView.customAudioDevice == null) {
             Log.d(TAG, "customAudioDevice is null");
             promise.reject("-1", "customAudioDevice is null");
             return;
         }
 
-        if(CustomTwilioVideoView.stethoscopeDevice != null) {
+        if(CustomTwilioVideoView.stethoscopeDevice == null) {
             Log.d(TAG, "stethoscopeDevice is null");
             promise.reject("-1", "stethoscopeDevice is null");
             return;
@@ -1574,13 +1574,13 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     }
 
     public static void stopStethoscope(SafePromise promise) {
-        if(CustomTwilioVideoView.customAudioDevice != null) {
+        if(CustomTwilioVideoView.customAudioDevice == null) {
             Log.d(TAG, "customAudioDevice is null");
             promise.reject("-1", "customAudioDevice is null");
             return;
         }
 
-        if(CustomTwilioVideoView.stethoscopeDevice != null) {
+        if(CustomTwilioVideoView.stethoscopeDevice == null) {
             Log.d(TAG, "stethoscopeDevice is null");
             promise.reject("-1", "stethoscopeDevice is null");
             return;

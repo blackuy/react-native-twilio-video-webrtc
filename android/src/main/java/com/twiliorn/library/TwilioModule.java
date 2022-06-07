@@ -30,7 +30,10 @@ public class TwilioModule extends ReactContextBaseJavaModule {
 
     public TwilioModule(ReactApplicationContext context) {
         super(context);
-        cameraManager = (CameraManager)context.getSystemService(Context.CAMERA_SERVICE);;
+        cameraManager = (CameraManager)context.getSystemService(Context.CAMERA_SERVICE);
+
+        if(CustomTwilioVideoView.getCustomAudioDevice() != null)
+            CustomTwilioVideoView.setCustomAudioDevice(new CustomAudioDevice(context));
     }
     
     @ReactMethod

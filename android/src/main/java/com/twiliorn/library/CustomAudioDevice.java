@@ -1,5 +1,6 @@
 package com.twiliorn.library;
 
+import android.content.Context;
 import android.media.AudioManager;
 import android.media.AudioRecord;
 import android.media.AudioTrack;
@@ -78,7 +79,7 @@ class CustomAudioDevice implements AudioDevice {
     private boolean keepAliveRendererRunnable;
     private boolean isFilePlaying;
 
-    CustomAudioDevice(ThemedReactContext context) {
+    CustomAudioDevice(Context context) {
         utils = new CustomPathUtils(context);
     }
 

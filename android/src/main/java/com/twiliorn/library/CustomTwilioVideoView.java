@@ -65,6 +65,7 @@ import com.facebook.react.bridge.WritableNativeArray;
 import com.facebook.react.bridge.WritableNativeMap;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.events.RCTEventEmitter;
+import com.twilio.video.AudioDevice;
 import com.twilio.video.AudioDeviceCapturer;
 import com.twilio.video.AudioTrackPublication;
 import com.twilio.video.BaseTrackStats;
@@ -1567,5 +1568,13 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
 
     public static void stethoscopeRecordToFile(String path, int timeout, SafePromise<String> promise) {
         CustomTwilioVideoView.stethoscopeDevice.recordToFile(path, timeout, promise);
+    }
+
+    public static CustomAudioDevice getCustomAudioDevice() {
+        return CustomTwilioVideoView.customAudioDevice;
+    }
+
+    public static void setCustomAudioDevice(CustomAudioDevice audioDevice) {
+        CustomTwilioVideoView.customAudioDevice = audioDevice;
     }
 }

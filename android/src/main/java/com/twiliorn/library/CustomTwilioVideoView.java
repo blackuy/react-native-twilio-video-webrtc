@@ -1560,15 +1560,12 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         CustomTwilioVideoView.customAudioDevice.switchInputToFile();
     }
 
-    @ReactMethod
-    public static void stopStethoscope(SafePromise<String> promise) {
+    public static void stopStethoscope(SafePromise promise) {
         CustomTwilioVideoView.customAudioDevice.switchInputToMic();
         CustomTwilioVideoView.stethoscopeDevice.stop(promise);
     }
 
-    @ReactMethod
-    public static void startStethoscopeRecording(String path, int timeout, SafePromise<String> promise) {
+    public static void stethoscopeRecordToFile(String path, int timeout, SafePromise<String> promise) {
         CustomTwilioVideoView.stethoscopeDevice.recordToFile(path, timeout, promise);
     }
-
 }

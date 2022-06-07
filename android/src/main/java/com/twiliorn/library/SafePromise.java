@@ -2,9 +2,7 @@ package com.twiliorn.library;
 
 
 import android.support.annotation.Nullable;
-
 import com.facebook.react.bridge.Promise;
-
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class SafePromise<T> {

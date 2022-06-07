@@ -43,7 +43,7 @@ public class StethoscopeDevice {
         }
     }
 
-    public void stop(SafePromise<String> promise) {
+    public void stop(SafePromise promise) {
         try {
             stethoscopeDeviceStartPromise = null;
             this.stethoscopeDeviceThread.interrupt();

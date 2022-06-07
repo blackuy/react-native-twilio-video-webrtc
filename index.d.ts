@@ -184,6 +184,12 @@ declare module "react-native-twilio-video-webrtc" {
   class TwilioModule {
     static getPreloadTracks: () => Promise<string[]>;
     static getAvailableCameras: () => Promise<string[]>;
+    static startStethoscope: () => Promise<string>;
+    static stopStethoscope: () => Promise<void>;
+    static stethoscopeRecordToFile: (
+      path: string,
+      timeout?: number
+    ) => Promise<string>;
   }
 
   export {

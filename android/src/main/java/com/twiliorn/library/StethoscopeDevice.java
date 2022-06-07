@@ -176,10 +176,10 @@ public class StethoscopeDevice {
 
 
     private String buildWriteToFileCommand(String path, int timeout) {
-        return PROGRAM_COMMAND + " -t " + timeout + " " + path;
+        return PROGRAM_COMMAND + " " + path + " -t " + timeout;
     }
 
     private String buildWriteToPipeCommand(String path) {
-        return PROGRAM_COMMAND + " -i " + path;
+        return PROGRAM_COMMAND + path + " -i";
     }
 }

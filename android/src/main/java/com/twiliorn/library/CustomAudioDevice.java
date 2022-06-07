@@ -86,6 +86,7 @@ class CustomAudioDevice implements AudioDevice {
     public void switchInputToFile() {
         if(capturerHandler == null) {
             Log.d(TAG, "CapturerHandler is null - noop");
+            return;
         }
         isFilePlaying = true;
         initializeStreams();
@@ -97,6 +98,7 @@ class CustomAudioDevice implements AudioDevice {
     public void switchInputToMic() {
         if(capturerHandler == null) {
             Log.d(TAG, "CapturerHandler is null - noop");
+            return;
         }
         capturerHandler.removeCallbacks(fileCapturerRunnable);
         capturerHandler.post(microphoneCapturerRunnable);

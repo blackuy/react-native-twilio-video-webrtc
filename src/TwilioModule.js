@@ -33,8 +33,8 @@ class TwilioModule {
   };
 
   static stethoscopeRecordToFile = async (path, timeout) => {
-    const path = await RNTwilioModule.stethoscopeRecordToFile(path, timeout);
-    return path;
+    const retV = await RNTwilioModule.stethoscopeRecordToFile(path, timeout);
+    return retV;
   };
 }
 

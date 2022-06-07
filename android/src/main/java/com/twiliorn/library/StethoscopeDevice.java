@@ -46,6 +46,11 @@ public class StethoscopeDevice {
     public void stop(SafePromise promise) {
         try {
             stethoscopeDeviceStartPromise = null;
+            if(stethoscopeDeviceThread == null)
+            {
+                promise.resolve(null);
+                return;
+            }
             this.stethoscopeDeviceThread.interrupt();
             if (!ThreadUtils.joinUninterruptibly(this.stethoscopeDeviceThread, THREAD_JOIN_TIMEOUT_MS)) {
                 Log.e(TAG, "Join of stethoscopeDeviceThread timed out");

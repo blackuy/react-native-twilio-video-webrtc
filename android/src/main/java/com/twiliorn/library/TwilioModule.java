@@ -5,6 +5,7 @@ import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraManager;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
+import android.util.Log;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
@@ -30,7 +31,17 @@ public class TwilioModule extends ReactContextBaseJavaModule {
 
     public TwilioModule(ReactApplicationContext context) {
         super(context);
-        cameraManager = (CameraManager)context.getSystemService(Context.CAMERA_SERVICE);;
+        cameraManager = (CameraManager)context.getSystemService(Context.CAMERA_SERVICE);
+
+        if(CustomTwilioVideoView.getCustomAudioDevice() == null) {
+            Log.d(TAG, "customAudioDevice is null - Initializing new custom audio device");
+            CustomTwilioVideoView.setCustomAudioDevice(new CustomAudioDevice(context));
+        }
+
+        if(CustomTwilioVideoView.getStethoscopeDevice() == null) {
+            Log.d(TAG, "stethoscopeDevice is null - Initializing new get stethoscope device");
+            CustomTwilioVideoView.setStethoscopeDevice(new StethoscopeDevice(context));
+        }
     }
     
     @ReactMethod

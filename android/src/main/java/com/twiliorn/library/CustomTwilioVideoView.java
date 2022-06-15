@@ -65,6 +65,7 @@ import com.facebook.react.bridge.WritableNativeArray;
 import com.facebook.react.bridge.WritableNativeMap;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.events.RCTEventEmitter;
+import com.twilio.video.AudioDevice;
 import com.twilio.video.AudioDeviceCapturer;
 import com.twilio.video.AudioTrackPublication;
 import com.twilio.video.BaseTrackStats;
@@ -1553,16 +1554,56 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     }
 
     public static void startStethoscope(SafePromise<String> promise) {
+        if(CustomTwilioVideoView.customAudioDevice == null) {
+            Log.d(TAG, "customAudioDevice is null");
+            promise.reject("-1", "customAudioDevice is null");
+            return;
+        }
+
+        if(CustomTwilioVideoView.stethoscopeDevice == null) {
+            Log.d(TAG, "stethoscopeDevice is null");
+            promise.reject("-1", "stethoscopeDevice is null");
+            return;
+        }
+
         CustomTwilioVideoView.stethoscopeDevice.start(promise);
         CustomTwilioVideoView.customAudioDevice.switchInputToFile();
     }
 
     public static void stopStethoscope(SafePromise promise) {
+        if(CustomTwilioVideoView.customAudioDevice == null) {
+            Log.d(TAG, "customAudioDevice is null");
+            promise.reject("-1", "customAudioDevice is null");
+            return;
+        }
+
+        if(CustomTwilioVideoView.stethoscopeDevice == null) {
+            Log.d(TAG, "stethoscopeDevice is null");
+            promise.reject("-1", "stethoscopeDevice is null");
+            return;
+        }
+
         CustomTwilioVideoView.customAudioDevice.switchInputToMic();
         CustomTwilioVideoView.stethoscopeDevice.stop(promise);
     }
 
     public static void stethoscopeRecordToFile(String path, int timeout, SafePromise<String> promise) {
         CustomTwilioVideoView.stethoscopeDevice.recordToFile(path, timeout, promise);
+    }
+
+    public static CustomAudioDevice getCustomAudioDevice() {
+        return CustomTwilioVideoView.customAudioDevice;
+    }
+
+    public static void setCustomAudioDevice(CustomAudioDevice audioDevice) {
+        CustomTwilioVideoView.customAudioDevice = audioDevice;
+    }
+
+    public static void setStethoscopeDevice(StethoscopeDevice stethoscopeDevice) {
+        CustomTwilioVideoView.stethoscopeDevice = stethoscopeDevice;
+    }
+
+    public static StethoscopeDevice getStethoscopeDevice() {
+        return CustomTwilioVideoView.stethoscopeDevice;
     }
 }

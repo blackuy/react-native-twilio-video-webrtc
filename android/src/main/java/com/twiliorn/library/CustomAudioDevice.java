@@ -1,5 +1,6 @@
 package com.twiliorn.library;
 
+import android.content.Context;
 import android.media.AudioManager;
 import android.media.AudioRecord;
 import android.media.AudioTrack;
@@ -78,11 +79,15 @@ class CustomAudioDevice implements AudioDevice {
     private boolean keepAliveRendererRunnable;
     private boolean isFilePlaying;
 
-    CustomAudioDevice(ThemedReactContext context) {
+    CustomAudioDevice(Context context) {
         utils = new CustomPathUtils(context);
     }
 
     public void switchInputToFile() {
+        if(capturerHandler == null) {
+            Log.d(TAG, "CapturerHandler is null - noop");
+            return;
+        }
         isFilePlaying = true;
         initializeStreams();
         capturerHandler.removeCallbacks(microphoneCapturerRunnable);
@@ -91,6 +96,10 @@ class CustomAudioDevice implements AudioDevice {
     }
 
     public void switchInputToMic() {
+        if(capturerHandler == null) {
+            Log.d(TAG, "CapturerHandler is null - noop");
+            return;
+        }
         capturerHandler.removeCallbacks(fileCapturerRunnable);
         capturerHandler.post(microphoneCapturerRunnable);
     }
@@ -98,7 +107,7 @@ class CustomAudioDevice implements AudioDevice {
 
     @Override
     public AudioFormat getCapturerFormat() {
-        return new AudioFormat(AudioFormat.AUDIO_SAMPLE_RATE_44100,
+        return new AudioFormat(AudioFormat.AUDIO_SAMPLE_RATE_48000,
                 AudioFormat.AUDIO_SAMPLE_MONO);
     }
 
@@ -109,20 +118,19 @@ class CustomAudioDevice implements AudioDevice {
         int  framesPerBuffer = capturerFormat.getSampleRate() / BUFFERS_PER_SECOND;
         // Calculate the minimum buffer size required for the successful creation of
         // an AudioRecord object, in byte units.
-        int channelConfig = channelCountToConfiguration(capturerFormat.getChannelCount());
+        int channelConfig = inChannelCountToConfiguration(capturerFormat.getChannelCount());
         int minBufferSize = AudioRecord.getMinBufferSize(capturerFormat.getSampleRate(),
                 channelConfig, android.media.AudioFormat.ENCODING_PCM_16BIT);
         micWriteBuffer = ByteBuffer.allocateDirect(bytesPerFrame * framesPerBuffer);
 
         ByteBuffer tempMicWriteBuffer = micWriteBuffer;
         int bufferSizeInBytes = Math.max(BUFFER_SIZE_FACTOR * minBufferSize, tempMicWriteBuffer.capacity());
-        audioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC, capturerFormat.getSampleRate(),
-                android.media.AudioFormat.CHANNEL_OUT_STEREO, android.media.AudioFormat.ENCODING_PCM_16BIT, bufferSizeInBytes);
+        audioRecord = new AudioRecord(MediaRecorder.AudioSource.VOICE_COMMUNICATION, capturerFormat.getSampleRate(),
+                android.media.AudioFormat.CHANNEL_IN_MONO, android.media.AudioFormat.ENCODING_PCM_16BIT, bufferSizeInBytes);
         fileWriteByteBuffer = ByteBuffer.allocateDirect(bytesPerFrame * framesPerBuffer);
         ByteBuffer testFileWriteByteBuffer = fileWriteByteBuffer;
         writeBufferSize = testFileWriteByteBuffer.capacity();
         // Initialize the streams.
-        initializeStreams();
         return true;
     }
 
@@ -136,7 +144,7 @@ class CustomAudioDevice implements AudioDevice {
         // Create the capturer handler that processes the capturer Runnables.
         capturerHandler = new Handler(capturerThread.getLooper());
         isFilePlaying = true;
-        capturerHandler.post(fileCapturerRunnable);
+        capturerHandler.post(microphoneCapturerRunnable);
         return true;
     }
 
@@ -172,9 +180,10 @@ class CustomAudioDevice implements AudioDevice {
         AudioFormat rendererFormat = getRendererFormat();
         int bytesPerFrame = rendererFormat.getChannelCount() * (BITS_PER_SAMPLE / 8);
         readByteBuffer = ByteBuffer.allocateDirect(bytesPerFrame * (rendererFormat.getSampleRate() / BUFFERS_PER_SECOND));
-        int channelConfig = channelCountToConfiguration(rendererFormat.getChannelCount());
-        int minBufferSize = AudioRecord.getMinBufferSize(rendererFormat.getSampleRate(), channelConfig, android.media.AudioFormat.ENCODING_PCM_16BIT);
-        audioTrack = new AudioTrack(AudioManager.STREAM_VOICE_CALL, rendererFormat.getSampleRate(), channelConfig,
+        int outChannelConfig = outChannelCountToConfiguration(rendererFormat.getChannelCount());
+        int inChannelConfig = inChannelCountToConfiguration(rendererFormat.getChannelCount());
+        int minBufferSize = AudioRecord.getMinBufferSize(rendererFormat.getSampleRate(), inChannelConfig, android.media.AudioFormat.ENCODING_PCM_16BIT);
+        audioTrack = new AudioTrack(AudioManager.STREAM_VOICE_CALL, rendererFormat.getSampleRate(), outChannelConfig,
                 android.media.AudioFormat.ENCODING_PCM_16BIT, minBufferSize, AudioTrack.MODE_STREAM);
         keepAliveRendererRunnable = true;
         return true;
@@ -248,8 +257,10 @@ class CustomAudioDevice implements AudioDevice {
         Log.d(TAG, "Remove any pending posts of fileCapturerRunnable that are in the message queue");
         capturerHandler.removeCallbacks(fileCapturerRunnable);
         try {
-            dataInputStream.close();
-            inputStream.close();
+            if(dataInputStream != null)
+                dataInputStream.close();
+            if(inputStream != null)
+                inputStream.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -267,7 +278,14 @@ class CustomAudioDevice implements AudioDevice {
     }
 
 
-    private int channelCountToConfiguration(int channels) {
+    private int outChannelCountToConfiguration(int channels) {
+        if (channels == 1)
+            return android.media.AudioFormat.CHANNEL_OUT_MONO;
+        else
+            return android.media.AudioFormat.CHANNEL_OUT_STEREO;
+    }
+
+    private int inChannelCountToConfiguration(int channels) {
         if (channels == 1)
             return android.media.AudioFormat.CHANNEL_IN_MONO;
         else
@@ -303,6 +321,11 @@ class CustomAudioDevice implements AudioDevice {
             Process.setThreadPriority(Process.THREAD_PRIORITY_URGENT_AUDIO);
             int bytesRead = 0;
             try {
+                if(dataInputStream == null) {
+                    capturerHandler.postDelayed(this, CALLBACK_BUFFER_SIZE_MS);
+                    return;
+                }
+
                 bytesRead = dataInputStream.read(fileWriteByteBuffer.array(), 0, writeBufferSize);
                 if ( bytesRead > -1) {
                     if (bytesRead == fileWriteByteBuffer.capacity()) {

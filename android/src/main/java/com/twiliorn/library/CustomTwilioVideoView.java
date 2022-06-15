@@ -317,8 +317,6 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         super(context);
         this.themedReactContext = context;
 
-        if(CustomTwilioVideoView.customAudioDevice != null)
-            CustomTwilioVideoView.customAudioDevice = new CustomAudioDevice(context);
 
         stethoscopeDevice = new StethoscopeDevice(themedReactContext);
 
@@ -653,8 +651,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
                      NetworkQualityVerbosity.NETWORK_QUALITY_VERBOSITY_MINIMAL,
                      NetworkQualityVerbosity.NETWORK_QUALITY_VERBOSITY_MINIMAL));
          }
-
-         Video.setAudioDevice(customAudioDevice);
+ 
         room = Video.connect(getContext(), connectOptionsBuilder.build(), roomListener());
 
     }

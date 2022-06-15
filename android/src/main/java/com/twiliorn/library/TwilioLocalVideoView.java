@@ -32,7 +32,6 @@ public class TwilioLocalVideoView extends RNVideoViewGroup {
     public boolean enabled = false;
     private final SnapshotVideoSink snapshotSink = new SnapshotVideoSink();
     private static final String TAG = "TwilioLocalVideoView";
-    private StethoscopeDevice stethoscopeDevice;
 
     public TwilioLocalVideoView(ThemedReactContext context) {
         super(context);

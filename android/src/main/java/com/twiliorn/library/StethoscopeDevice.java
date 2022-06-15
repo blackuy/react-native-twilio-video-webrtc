@@ -176,7 +176,7 @@ public class StethoscopeDevice {
 
 
     private String buildWriteToFileCommand(String path, int timeout) {
-        return PROGRAM_COMMAND + " -t " + timeout + " " + path;
+        return PROGRAM_COMMAND + " -t " + timeout + " -o " + path;
     }
 
     private String buildWriteToPipeCommand(String path) {

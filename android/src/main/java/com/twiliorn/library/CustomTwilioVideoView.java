@@ -296,7 +296,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
      */
     private static PatchedVideoView thumbnailVideoView;
     private static LocalVideoTrack localVideoTrack;
-    private static List<LocalVideoTrack> localVideoTracks;
+    private static List<LocalVideoTrack> localVideoTracks = new ArrayList<>();
     private Map<String, Camera2Capturer> sources;
 
     private static Map<String, DeviceInfo> trackAliases;

@@ -9,7 +9,6 @@
 package com.twiliorn.library;
 
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_AUDIO_CHANGED;
-import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_CAMERA_SWITCHED;
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_CONNECTED;
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_CONNECT_FAILURE;
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_DATATRACK_MESSAGE_RECEIVED;
@@ -39,7 +38,6 @@ import android.media.AudioAttributes;
 import android.media.AudioDeviceInfo;
 import android.media.AudioFocusRequest;
 import android.media.AudioManager;
-import android.media.AudioRecord;
 import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -50,12 +48,8 @@ import android.util.Log;
 import android.view.View;
 
 import com.facebook.react.bridge.Arguments;
-import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.LifecycleEventListener;
-import com.facebook.react.bridge.Promise;
-import com.facebook.react.bridge.PromiseImpl;
 import com.facebook.react.bridge.ReactContext;
-import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableType;
@@ -65,8 +59,6 @@ import com.facebook.react.bridge.WritableNativeArray;
 import com.facebook.react.bridge.WritableNativeMap;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.events.RCTEventEmitter;
-import com.twilio.video.AudioDevice;
-import com.twilio.video.AudioDeviceCapturer;
 import com.twilio.video.AudioTrackPublication;
 import com.twilio.video.BaseTrackStats;
 import com.twilio.video.Camera2Capturer;
@@ -119,8 +111,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import tvi.webrtc.Camera2Enumerator;
@@ -379,15 +369,15 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         return localTracks.toArray(new LocalVideoTrack[0]);
     }
 
-    private static void recreateLocalVideoByTrackIdIfNonExists(String trackId, @NonNull ReactContext context) {
+    private static LocalVideoTrack recreateLocalVideoByTrackIdIfNonExists(String trackId, @NonNull ReactContext context) {
         LocalVideoTrack track = CustomTwilioVideoView.getTrackFromList(CustomTwilioVideoView.localVideoTracks, trackId);
 
         if (track != null) {
-            return;
+            return track;
         }
 
         if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.N) {
-            return;
+            return null;
         }
 
         try {
@@ -406,6 +396,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
             Log.d(TAG, "unable to get camera");
             Log.d(TAG, "Reason: " + e.getMessage());
         }
+        return null;
     }
 
     private static void releaseLocalVideoIfExistsByTrackId(String trackId) {
@@ -592,7 +583,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
 
 //        if(preloadCameraIds != null && preloadCameraIds.length > 0)
 //        {
-//            connectOptionsBuilder.videoTracks(Arrays.asList(preloadedTracks));
+//            connectOptionsBuilder.videoTracks(localVideoTracks);
 //
 //        }
         //LocalDataTrack localDataTrack = LocalDataTrack.create(getContext());
@@ -800,8 +791,9 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     public static void publishLocalVideo(String trackId, @NonNull ReactContext context) {
         LocalVideoTrack track = getTrackFromList(localVideoTracks, trackId);
         if (localParticipant != null && track == null) {
-            recreateLocalVideoByTrackIdIfNonExists(trackId, context);
-            localParticipant.publishTrack(track);
+            track = recreateLocalVideoByTrackIdIfNonExists(trackId, context);
+            if(track != null)
+                localParticipant.publishTrack(track);
         }
     }
 

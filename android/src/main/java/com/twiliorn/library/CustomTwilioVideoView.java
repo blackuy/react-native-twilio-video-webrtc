@@ -119,6 +119,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import tvi.webrtc.Camera2Enumerator;
@@ -389,7 +391,9 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         }
 
         try {
-            Camera2Capturer camera2Capturer = createCameraCapturer(context, trackId);
+            String cameraId = getFirstKeyByValue(trackAliases, trackId);
+            Log.d(TAG, "Create Local Video track tId: "+ trackId + " cameraId: "+ cameraId);
+            Camera2Capturer camera2Capturer = createCameraCapturer(context, cameraId);
             track = createLocalVideo(
                     context,
                     true,
@@ -795,7 +799,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
 
     public static void publishLocalVideo(String trackId, @NonNull ReactContext context) {
         LocalVideoTrack track = getTrackFromList(localVideoTracks, trackId);
-        if (localParticipant != null && track != null) {
+        if (localParticipant != null && track == null) {
             recreateLocalVideoByTrackIdIfNonExists(trackId, context);
             localParticipant.publishTrack(track);
         }
@@ -1504,6 +1508,15 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         if(value == null) return defaultValue;
         return value.name;
     }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    public static String getFirstKeyByValue(Map<String, DeviceInfo> map, String trackName) {
+        return map.entrySet()
+                .stream()
+                .filter(entry -> entry.getValue().name.equals(trackName))
+                .map(Map.Entry::getKey).findFirst().orElse("");
+    }
+
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     private static LocalVideoTrack createLocalVideo(ReactContext context, boolean enableVideo, Camera2Capturer cameraCapturer, String cameraId) {

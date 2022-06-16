@@ -74,9 +74,9 @@ public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilio
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     @ReactProp(name = "preloadCameras")
-    public  void setPreloadCameras(CustomTwilioVideoView view, @Nullable ReadableArray sources)
+    public  void setTrackAliases(CustomTwilioVideoView view, @Nullable ReadableArray sources)
     {
-        view.setPreloadCameras(sources);
+        view.setTrackAliases(sources);
     }
 
     @Override

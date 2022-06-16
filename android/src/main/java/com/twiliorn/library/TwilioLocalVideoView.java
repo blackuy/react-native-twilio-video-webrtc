@@ -16,6 +16,7 @@ import android.util.Log;
 
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
+import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.uimanager.ThemedReactContext;
 
@@ -28,6 +29,7 @@ import tvi.webrtc.Camera2Enumerator;
 
 
 public class TwilioLocalVideoView extends RNVideoViewGroup {
+    private final ReactContext context;
     public String trackId = "";
     public boolean enabled = false;
     private final SnapshotVideoSink snapshotSink = new SnapshotVideoSink();
@@ -35,6 +37,7 @@ public class TwilioLocalVideoView extends RNVideoViewGroup {
 
     public TwilioLocalVideoView(ThemedReactContext context) {
         super(context);
+        this.context = context;
         logCameras(getAvaliableCameras(context));
         logTracks(getAvaliableLocalVideoTracks());
     }
@@ -56,7 +59,7 @@ public class TwilioLocalVideoView extends RNVideoViewGroup {
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
         Log.i(TAG,  "onDetachedFromWindow: Attempting to clean up");
-        setEnabled(this.enabled);
+        this.setEnabled(this.enabled);
     }
 
     public void setEnabled(boolean enabled)
@@ -66,11 +69,12 @@ public class TwilioLocalVideoView extends RNVideoViewGroup {
         {
             Log.i(TAG, "Skipping setEnabled because trackId not set");
         }
-        if(this.enabled)
-            this.addSinks();
-        else
-            this.removeSinks();
-
+        if(this.enabled) {
+            CustomTwilioVideoView.publishLocalVideo(this.trackId, this.context);
+            addSinks();
+        } else {
+            CustomTwilioVideoView.unpublishLocalVideo(this.trackId);
+        }
         CustomTwilioVideoView.setLocalVideoTrackStatus(this.trackId, this.enabled);
     }
 

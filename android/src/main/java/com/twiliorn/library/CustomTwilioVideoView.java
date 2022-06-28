@@ -41,9 +41,9 @@ import android.media.AudioManager;
 import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
-import android.support.annotation.NonNull;
-import android.support.annotation.RequiresApi;
-import android.support.annotation.StringDef;
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+import androidx.annotation.StringDef;
 import android.util.Log;
 import android.view.View;
 
@@ -195,7 +195,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
             e.printStackTrace();
         }
         v2c.dispose();
-        
+        track.enabled(false)
         track.release();
     }
 
@@ -818,23 +818,24 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         LocalVideoTrack track = getOrCreateLocalVideoTrackByTrackId(trackId, context);
         Log.d(TAG, "[publishLocalVideo] Attempting to publish local track: " + trackId);
         if (localParticipant != null && track == null) {
-            Log.d(TAG, "[publishLocalVideo] Track not found - Recreating");
+            Log.d(TAG, "[publishLocalVideo] Track not found");
+            Log.d(TAG, "[publishLocalVideo] Recreating");
             if(track == null) {
                 Log.e(TAG, "[publishLocalVideo] Track unable to be recreated");
                 return;
             }
-            Log.d(TAG, "[publishLocalVideo] Track not found - Recreating - done");
-            localParticipant.publishTrack(track);
-            Log.d(TAG, "[publishLocalVideo] Track published");
+            Log.d(TAG, "[publishLocalVideo] Recreating - done");
         }
+        localParticipant.publishTrack(track);
+        Log.d(TAG, "[publishLocalVideo] Track published");
     }
 
     public static void unpublishLocalVideo(String trackId) {
-        // LocalVideoTrack track = getTrackFromList(localVideoTracks, trackId);
-        // if (localParticipant != null && track != null) {
-        //     localParticipant.unpublishTrack(track);
-        //     releaseLocalVideoIfExistsByTrackId(trackId);
-        // }
+        LocalVideoTrack track = getTrackFromList(localVideoTracks, trackId);
+        if (localParticipant != null && track != null) {
+            localParticipant.unpublishTrack(track);
+            releaseLocalVideoIfExistsByTrackId(trackId);
+        }
     }
 
 

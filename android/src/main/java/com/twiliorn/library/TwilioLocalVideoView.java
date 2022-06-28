@@ -73,10 +73,10 @@ public class TwilioLocalVideoView extends RNVideoViewGroup {
         if(this.enabled) {
             CustomTwilioVideoView.publishLocalVideo(this.trackId, this.context);
             addSinks();
+            CustomTwilioVideoView.setLocalVideoTrackStatus(this.trackId, this.enabled);
         } else {
             CustomTwilioVideoView.unpublishLocalVideo(this.trackId);
         }
-        CustomTwilioVideoView.setLocalVideoTrackStatus(this.trackId, this.enabled);
     }
 
     public void takeSnapshot(Callback<ImageFileReference> callback) {

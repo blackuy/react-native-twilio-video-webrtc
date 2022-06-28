@@ -58,7 +58,7 @@ public class TwilioLocalVideoView extends RNVideoViewGroup {
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
-        Log.i(TAG,  "onDetachedFromWindow: Attempting to clean up");
+        Log.i(TAG,  "onAttachedToWindow: Attempting to set enabled to: " + this.enabled ? "True": "False");
         this.setEnabled(this.enabled);
     }
 

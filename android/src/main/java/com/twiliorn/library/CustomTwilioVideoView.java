@@ -290,7 +290,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     private static PatchedVideoView thumbnailVideoView;
     private static LocalVideoTrack localVideoTrack;
     private static List<LocalVideoTrack> localVideoTracks = new ArrayList<>();
-    private Map<String, Camera2Capturer> sources;
+    private static Map<String, Camera2Capturer> sources;
     private static Map<String, DeviceInfo> trackAliases;
     private String[] preloadCameraIds;
 
@@ -391,7 +391,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
                     camera2Capturer,
                     trackId);
 
-            sources.add(camera2Capturer);
+            CustomTwilioVideoView.sources.add(camera2Capturer);
             return track;
         } catch (Exception e) {
             Log.d(TAG, "unable to get camera");
@@ -422,7 +422,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     @RequiresApi(api = Build.VERSION_CODES.N)
     private void releaseCamera2CapturerIfExistsByTrackIf(String trackId) {
         Log.d(TAG, "[releaseCamera]: Attempting to release capturer: " + trackId);
-        Camera2Capturer camera2Capturer = this.sources.getOrDefault(trackId, null);
+        Camera2Capturer camera2Capturer = CustomTwilioVideoView.sources.getOrDefault(trackId, null);
 
         if (camera2Capturer != null) {
             Log.d(TAG, "[releaseCamera]: unable to find capturer " + trackId);

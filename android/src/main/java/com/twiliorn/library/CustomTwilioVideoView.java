@@ -195,7 +195,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
             e.printStackTrace();
         }
         v2c.dispose();
-        track.enabled(false)
+        track.enable(false);
         track.release();
     }
 

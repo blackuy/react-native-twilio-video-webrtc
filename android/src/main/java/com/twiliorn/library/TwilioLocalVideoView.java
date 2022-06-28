@@ -58,7 +58,7 @@ public class TwilioLocalVideoView extends RNVideoViewGroup {
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
-        Log.i(TAG,  "onAttachedToWindow: Attempting to set enabled to: " + this.enabled ? "True": "False");
+        Log.i(TAG,  "onAttachedToWindow: Attempting to set enabled to: " + (this.enabled ? "True": "False"));
         this.setEnabled(this.enabled);
     }
 
@@ -70,14 +70,13 @@ public class TwilioLocalVideoView extends RNVideoViewGroup {
             Log.i(TAG, "Skipping setEnabled because trackId not set");
         }
         
-        CustomTwilioVideoView.setLocalVideoTrackStatus(this.trackId, this.enabled);
-        
         if(this.enabled) {
             CustomTwilioVideoView.publishLocalVideo(this.trackId, this.context);
             addSinks();
         } else {
             CustomTwilioVideoView.unpublishLocalVideo(this.trackId);
         }
+        CustomTwilioVideoView.setLocalVideoTrackStatus(this.trackId, this.enabled);
     }
 
     public void takeSnapshot(Callback<ImageFileReference> callback) {

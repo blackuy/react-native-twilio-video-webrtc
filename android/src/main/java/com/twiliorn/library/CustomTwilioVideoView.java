@@ -383,7 +383,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
 
         try {
             String cameraId = getFirstKeyByValue(trackAliases, trackId);
-            Log.d(TAG, "Create Local Video track tId: "+ trackId + " cameraId: "+ cameraId);
+            Log.d(TAG, "[recreate] Create local video track tId: "+ trackId + " cameraId: "+ cameraId);
             Camera2Capturer camera2Capturer = createCameraCapturer(context, cameraId);
             track = createLocalVideo(
                     context,
@@ -391,11 +391,11 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
                     camera2Capturer,
                     trackId);
 
-            CustomTwilioVideoView.sources.add(camera2Capturer);
+            CustomTwilioVideoView.sources.put(trackId, camera2Capturer);
             return track;
         } catch (Exception e) {
-            Log.d(TAG, "unable to get camera");
-            Log.d(TAG, "Reason: " + e.getMessage());
+            Log.d(TAG, "[recreate] unable to get camera");
+            Log.d(TAG, "[recreate] Reason: " + e.getMessage());
         }
         return null;
     }

@@ -420,7 +420,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     @RequiresApi(api = Build.VERSION_CODES.N)
     private void releaseCamera2CapturerIfExistsByTrackIf(String trackId) {
         Log.d(TAG, "[releaseCamera]: Attempting to release capturer: " + trackId);
-        Camera2Capturer camera2Capturer = CustomTwilioVideoView.sources.getOrDefault(trackId, null);
+        Camera2Capturer camera2Capturer = this.sources.getOrDefault(trackId, null);
 
         if (camera2Capturer != null) {
             Log.d(TAG, "[releaseCamera]: unable to find capturer " + trackId);

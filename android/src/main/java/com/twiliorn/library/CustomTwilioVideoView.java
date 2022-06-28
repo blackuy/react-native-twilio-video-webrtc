@@ -414,25 +414,6 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         localVideoTracks.removeIf(x -> x.getName().equals(trackId));
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
-    private static void releaseCamera2CapturerIfExistsByTrackIf(String trackId) {
-        Log.d(TAG, "[releaseCamera]: Attempting to release capturer: " + trackId);
-        Camera2Capturer camera2Capturer = CustomTwilioVideoView.sources.getOrDefault(trackId, null);
-
-        if (camera2Capturer != null) {
-            Log.d(TAG, "[releaseCamera]: unable to find capturer " + trackId);
-            return;
-        }
-
-        Log.d(TAG, "[releaseCamera]: Found capturer" + trackId);
-
-        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.N) {
-            return;
-        }
-
-        camera2Capturer.stopCapture();
-        camera2Capturer.dispose();
-    }
     // ===== SETUP =================================================================================
 
     private static VideoFormat buildVideoFormat() {

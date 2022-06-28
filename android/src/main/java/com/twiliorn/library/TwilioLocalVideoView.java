@@ -69,13 +69,15 @@ public class TwilioLocalVideoView extends RNVideoViewGroup {
         {
             Log.i(TAG, "Skipping setEnabled because trackId not set");
         }
+        
+        CustomTwilioVideoView.setLocalVideoTrackStatus(this.trackId, this.enabled);
+        
         if(this.enabled) {
             CustomTwilioVideoView.publishLocalVideo(this.trackId, this.context);
             addSinks();
         } else {
             CustomTwilioVideoView.unpublishLocalVideo(this.trackId);
         }
-        CustomTwilioVideoView.setLocalVideoTrackStatus(this.trackId, this.enabled);
     }
 
     public void takeSnapshot(Callback<ImageFileReference> callback) {
@@ -102,11 +104,6 @@ public class TwilioLocalVideoView extends RNVideoViewGroup {
     private void addSinks() {
         CustomTwilioVideoView.addLocalSink(this.getSurfaceViewRenderer(), this.trackId);
         CustomTwilioVideoView.addSnapshotSink(this.snapshotSink, this.trackId);
-    }
-
-    private void removeSinks() {
-        CustomTwilioVideoView.removeLocalSink(this.getSurfaceViewRenderer(), this.trackId);
-        CustomTwilioVideoView.removeSnapshotSink(this.snapshotSink, this.trackId);
     }
 
     private void logCameras(String[] strings) {

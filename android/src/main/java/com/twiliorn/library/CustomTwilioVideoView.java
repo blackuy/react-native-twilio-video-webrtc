@@ -195,6 +195,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
             e.printStackTrace();
         }
         v2c.dispose();
+        
         track.release();
     }
 
@@ -289,6 +290,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     private static PatchedVideoView thumbnailVideoView;
     private static LocalVideoTrack localVideoTrack;
     private static List<LocalVideoTrack> localVideoTracks = new ArrayList<>();
+    private Map<String, Camera2Capturer> sources;
     private static Map<String, DeviceInfo> trackAliases;
     private String[] preloadCameraIds;
 
@@ -345,6 +347,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         dataTrackMessageThreadHandler = new Handler(dataTrackMessageThread.getLooper());
 
         trackAliases = new HashMap<>();
+        sources = new HashMap<>();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -412,6 +415,26 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
 
         releaseTrack(track);
         localVideoTracks.removeIf(x -> x.getName().equals(trackId));
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private void releaseCamera2CapturerIfExistsByTrackIf(String trackId) {
+        Log.d(TAG, "[releaseCamera]: Attempting to release capturer: " + trackId);
+        Camera2Capturer camera2Capturer = CustomTwilioVideoView.sources.getOrDefault(trackId, null);
+
+        if (camera2Capturer != null) {
+            Log.d(TAG, "[releaseCamera]: unable to find capturer " + trackId);
+            return;
+        }
+
+        Log.d(TAG, "[releaseCamera]: Found capturer" + trackId);
+
+        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.N) {
+            return;
+        }
+
+        camera2Capturer.stopCapture();
+        camera2Capturer.dispose();
     }
 
     // ===== SETUP =================================================================================
@@ -806,11 +829,11 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     }
 
     public static void unpublishLocalVideo(String trackId) {
-        LocalVideoTrack track = getTrackFromList(localVideoTracks, trackId);
-        if (localParticipant != null && track != null) {
-            localParticipant.unpublishTrack(track);
-            releaseLocalVideoIfExistsByTrackId(trackId);
-        }
+        // LocalVideoTrack track = getTrackFromList(localVideoTracks, trackId);
+        // if (localParticipant != null && track != null) {
+        //     localParticipant.unpublishTrack(track);
+        //     releaseLocalVideoIfExistsByTrackId(trackId);
+        // }
     }
 
 

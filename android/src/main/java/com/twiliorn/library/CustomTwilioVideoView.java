@@ -411,7 +411,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         }
 
         releaseTrack(track);
-        localVideoTracks.removeIf(x -> x.getName() == trackId);
+        localVideoTracks.removeIf(x -> x.getName().equals(trackId));
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)

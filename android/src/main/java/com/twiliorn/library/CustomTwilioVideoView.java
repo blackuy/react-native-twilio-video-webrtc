@@ -370,7 +370,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         return localTracks.toArray(new LocalVideoTrack[0]);
     }
 
-    private static LocalVideoTrack recreateLocalVideoByTrackIdIfNonExists(String trackId, @NonNull ReactContext context) {
+    private static LocalVideoTrack getOrCreateLocalVideoTrackByTrackId(String trackId, @NonNull ReactContext context) {
         LocalVideoTrack track = CustomTwilioVideoView.getTrackFromList(CustomTwilioVideoView.localVideoTracks, trackId);
 
         if (track != null) {
@@ -383,7 +383,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
 
         try {
             String cameraId = getFirstKeyByValue(trackAliases, trackId);
-            Log.d(TAG, "[recreate] Create local video track tId: "+ trackId + " cameraId: "+ cameraId);
+            Log.d(TAG, "[getOrCreateLTrack] Create local video track tId: "+ trackId + " cameraId: "+ cameraId);
             Camera2Capturer camera2Capturer = createCameraCapturer(context, cameraId);
             track = createLocalVideo(
                     context,
@@ -394,8 +394,8 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
             CustomTwilioVideoView.sources.put(trackId, camera2Capturer);
             return track;
         } catch (Exception e) {
-            Log.d(TAG, "[recreate] unable to get camera");
-            Log.d(TAG, "[recreate] Reason: " + e.getMessage());
+            Log.d(TAG, "[getOrCreateLTrack] unable to get camera");
+            Log.d(TAG, "[getOrCreateLTrack] Reason: " + e.getMessage());
         }
         return null;
     }
@@ -815,11 +815,10 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     }
 
     public static void publishLocalVideo(String trackId, @NonNull ReactContext context) {
-        LocalVideoTrack track = getTrackFromList(localVideoTracks, trackId);
+        LocalVideoTrack track = getOrCreateLocalVideoTrackByTrackId(trackId, context);
         Log.d(TAG, "[publishLocalVideo] Attempting to publish local track: " + trackId);
         if (localParticipant != null && track == null) {
             Log.d(TAG, "[publishLocalVideo] Track not found - Recreating");
-            track = recreateLocalVideoByTrackIdIfNonExists(trackId, context);
             if(track == null) {
                 Log.e(TAG, "[publishLocalVideo] Track unable to be recreated");
                 return;

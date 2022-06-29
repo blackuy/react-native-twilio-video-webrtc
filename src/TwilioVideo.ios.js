@@ -195,6 +195,15 @@ export default class TwilioVideo extends Component {
     return Promise.resolve(enabled)
   }
 
+    /**
+     * Specifies the priority a remote participants video track should get
+     * @param {*} trackSid the SID of the track setting the priority for
+     * @param {*} trackPriority the priority of the track. Can be low, standard, high or null
+     */
+    setTrackPriority (trackSid, trackPriority) {
+      //TWVideoModule.setTrackPriority(trackSid, trackPriority) //not implemented on ios native yet
+    }
+
   /**
    * Enable or disable local video
    */

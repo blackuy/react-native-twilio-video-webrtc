@@ -151,6 +151,7 @@ declare module "react-native-twilio-video-webrtc" {
     maintainVideoTrackInBackground?: boolean;
   };
 
+  export type TrackPriority = "LOW" | "STANDARD" | "HIGH" | "NULL";
   class TwilioVideo extends React.Component<TwilioVideoProps> {
     setLocalVideoEnabled: (enabled: boolean) => Promise<boolean>;
     setLocalAudioEnabled: (enabled: boolean) => Promise<boolean>;
@@ -166,6 +167,7 @@ declare module "react-native-twilio-video-webrtc" {
     publishLocalVideo: () => void;
     unpublishLocalVideo: () => void;
     sendString: (message: string) => void;
+    setTrackPriority: (trackSid: string, trackPriority: TrackPriority) => void;
   }
 
   class TwilioVideoLocalView extends React.Component<
@@ -177,4 +179,13 @@ declare module "react-native-twilio-video-webrtc" {
   > {}
 
   export { TwilioVideoLocalView, TwilioVideoParticipantView, TwilioVideo };
+  export class TwilioStereoTonePlayer {
+    preload: (filename: string) => Promise<boolean>;
+    play: (filename: string, isLooping: boolean, volume: number, playbackSpeed: number) => Promise<void>;
+    pause: () => void;
+    setVolume: (volume: number) => void;
+    setPlaybackSpeed: (speed: number) => void;
+    release: (filename: string) => void;
+    terminate: () => void;
+  }
 }

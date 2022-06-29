@@ -60,6 +60,7 @@ public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilio
     private static final int SEND_STRING = 12;
     private static final int PUBLISH_VIDEO = 13;
     private static final int PUBLISH_AUDIO = 14;
+    private static final int SET_TRACK_PRIORITY = 15;
 
     @Override
     public String getName() {
@@ -143,6 +144,11 @@ public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilio
             case PUBLISH_AUDIO:
                 view.publishLocalAudio(args.getBoolean(0));
                 break;
+            case SET_TRACK_PRIORITY:
+                String trackSid = args.getString(0);
+                String trackPriorityString = args.getString(1);
+                view.setTrackPriority(trackSid, trackPriorityString);
+                break;
         }
     }
 
@@ -201,6 +207,7 @@ public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilio
                 .put("toggleRemoteSound", TOGGLE_REMOTE_SOUND)
                 .put("toggleBluetoothHeadset", TOGGLE_BLUETOOTH_HEADSET)
                 .put("sendString", SEND_STRING)
+                .put("setTrackPriority", SET_TRACK_PRIORITY)
                 .build();
     }
 }

@@ -88,6 +88,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.util.Collections;
 import java.util.List;
 
+import com.twiliorn.library.niceday.NDExtra;
+
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_AUDIO_CHANGED;
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_CAMERA_SWITCHED;
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_CONNECTED;
@@ -126,6 +128,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     private boolean maintainVideoTrackInBackground = false;
     private String cameraType = "";
     private boolean enableH264Codec = false;
+    private final NDExtra ndExtra =new NDExtra(getContext());
 
     @Retention(RetentionPolicy.SOURCE)
     @StringDef({Events.ON_CAMERA_SWITCHED,
@@ -425,7 +428,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         // Quit the data track message thread
         dataTrackMessageThread.quit();
 
-
+        ndExtra.cleanUp();
     }
 
     public void releaseResource() {
@@ -551,7 +554,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
                     NetworkQualityVerbosity.NETWORK_QUALITY_VERBOSITY_MINIMAL,
                     NetworkQualityVerbosity.NETWORK_QUALITY_VERBOSITY_MINIMAL));
         }
-
+        ndExtra.applyExtraParamsTo(connectOptionsBuilder);
         room = Video.connect(getContext(), connectOptionsBuilder.build(), roomListener());
     }
 
@@ -561,8 +564,9 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         for (int i = 0; i < devicesInfo.length; i++) {
             int deviceType = devicesInfo[i].getType();
             if (
-                deviceType == AudioDeviceInfo.TYPE_WIRED_HEADSET ||
-                deviceType == AudioDeviceInfo.TYPE_WIRED_HEADPHONES
+                deviceType == AudioDeviceInfo.TYPE_WIRED_HEADSET ||	
+                deviceType == AudioDeviceInfo.TYPE_WIRED_HEADPHONES ||	
+                deviceType == AudioDeviceInfo.TYPE_USB_HEADSET
             ) {
                 hasNonSpeakerphoneDevice = true;
             }
@@ -666,6 +670,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
             cameraCapturer.stopCapture();
             cameraCapturer = null;
         }
+        ndExtra.cleanUp();
     }
 
     // ===== SEND STRING ON DATA TRACK ======================================================================
@@ -1337,5 +1342,16 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
                 pushEvent(CustomTwilioVideoView.this, ON_DATATRACK_MESSAGE_RECEIVED, event);
             }
         };
+    }
+
+    public void setTrackPriority(String trackSid, String trackPriorityString) {	
+        ndExtra.setTrackPriority(trackSid, trackPriorityString, room);	
+    }	
+    /**	
+     * only available on iOS	
+     * @param enabled	
+     */	
+    public void toggleStereo(boolean enabled) {	
+        Log.d("RNTwilioVideo", "toggleStereo only available on iOS");	
     }
 }

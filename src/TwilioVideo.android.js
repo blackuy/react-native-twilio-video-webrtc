@@ -249,6 +249,10 @@ class CustomTwilioVideoView extends Component {
     return Promise.resolve(enabled)
   }
 
+  setTrackPriority (trackSid, priority) {
+    this.runCommand(nativeEvents.setTrackPriority, [trackSid, priority])
+  }
+  
   getStats () {
     this.runCommand(nativeEvents.getStats, [])
   }

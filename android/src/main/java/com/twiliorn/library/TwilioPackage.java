@@ -13,6 +13,7 @@ import com.facebook.react.bridge.JavaScriptModule;
 import com.facebook.react.bridge.NativeModule;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.uimanager.ViewManager;
+import com.twiliorn.library.niceday.TwilioStereoTonePlayer;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -21,7 +22,7 @@ import java.util.List;
 public class TwilioPackage implements ReactPackage {
     @Override
     public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
-        return Collections.emptyList();
+        return Collections.singletonList(new TwilioStereoTonePlayer(reactContext));
     }
 
     // Deprecated by RN 0.47

@@ -7,7 +7,7 @@
 
 package com.twiliorn.library;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.common.MapBuilder;
@@ -32,16 +32,16 @@ public class TwilioVideoPreviewManager extends SimpleViewManager<TwilioVideoPrev
 
     @ReactProp(name = "scaleType")
     public void setScaleType(TwilioVideoPreview view, @Nullable String scaleType) {
-      if (scaleType.equals("fit")) {
-        view.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FIT);
-      } else {
-        view.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FILL);
-      }
+        if (scaleType.equals("fit")) {
+            view.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FIT);
+        } else {
+            view.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FILL);
+        }
     }
 
     @ReactProp(name = "applyZOrder", defaultBoolean = true)
     public void setApplyZOrder(TwilioVideoPreview view, boolean applyZOrder) {
-      view.applyZOrder(applyZOrder);
+        view.applyZOrder(applyZOrder);
     }
 
     @Override

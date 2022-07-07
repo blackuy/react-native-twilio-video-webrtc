@@ -9,8 +9,10 @@ package com.twiliorn.library;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import android.util.Log;
 
 import com.facebook.react.bridge.ReactContext;
@@ -50,26 +52,24 @@ public class TwilioLocalVideoView extends RNVideoViewGroup {
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-        Log.i(TAG,  "onDetachedFromWindow: Attempting to clean up");
+        Log.i(TAG, "onDetachedFromWindow: Attempting to clean up");
         this.setEnabled(false);
     }
 
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
-        Log.i(TAG,  "onAttachedToWindow: Attempting to set enabled to: " + (this.enabled ? "True": "False"));
+        Log.i(TAG, "onAttachedToWindow: Attempting to set enabled to: " + (this.enabled ? "True" : "False"));
         this.setEnabled(this.enabled);
     }
 
-    public void setEnabled(boolean enabled)
-    {
+    public void setEnabled(boolean enabled) {
         this.enabled = enabled;
-        if(trackId == null )
-        {
+        if (trackId == null) {
             Log.i(TAG, "Skipping setEnabled because trackId not set");
         }
-        
-        if(this.enabled) {
+
+        if (this.enabled) {
             CustomTwilioVideoView.publishLocalVideo(this.trackId, this.context);
             addSinks();
             CustomTwilioVideoView.setLocalVideoTrackStatus(this.trackId, this.enabled);
@@ -91,7 +91,7 @@ public class TwilioLocalVideoView extends RNVideoViewGroup {
                         bitmap.getWidth(),
                         bitmap.getHeight());
                 callback.invoke(reference);
-            }  catch (FileNotFoundException e) {
+            } catch (FileNotFoundException e) {
                 e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -106,14 +106,14 @@ public class TwilioLocalVideoView extends RNVideoViewGroup {
 
     private void logCameras(String[] strings) {
         Log.i(TAG, "Available Cameras");
-        for (String str: strings){
+        for (String str : strings) {
             Log.i(TAG, "\tCamera: " + str);
         }
     }
 
     private void logTracks(String[] strings) {
         Log.i(TAG, "Available Tracks");
-        for (String str: strings){
+        for (String str : strings) {
             Log.i(TAG, "\tTrack: " + str);
         }
     }

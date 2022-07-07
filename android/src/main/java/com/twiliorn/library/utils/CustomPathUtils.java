@@ -19,7 +19,7 @@ public class CustomPathUtils {
         return getCacheDirPath(this.context) + "/stethoscope.wave";
     }
 
-    private static  String getCacheDirPath(Context ctx) {
+    private static String getCacheDirPath(Context ctx) {
         File dir = ctx.getCacheDir();
         if (dir != null) return dir.getAbsolutePath();
         return "";

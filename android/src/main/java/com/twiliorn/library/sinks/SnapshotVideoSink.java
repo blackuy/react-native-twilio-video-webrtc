@@ -48,7 +48,7 @@ public class SnapshotVideoSink implements VideoSink {
     private Bitmap toBitmap(VideoFrame videoFrame) {
         VideoFrame.Buffer buffer = videoFrame.getBuffer();
         VideoFrame.I420Buffer i420Buffer;
-        if(buffer instanceof VideoFrame.TextureBuffer) {
+        if (buffer instanceof VideoFrame.TextureBuffer) {
             YuvConverter yuvConverter = new YuvConverter();
             VideoFrame.I420Buffer temp = yuvConverter.convert((VideoFrame.TextureBuffer) buffer);
             yuvConverter.release();
@@ -59,7 +59,7 @@ public class SnapshotVideoSink implements VideoSink {
         YuvImage yuvImage = i420ToYuvImage(i420Buffer, buffer.getHeight(), buffer.getWidth());
 
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        Rect rect = new Rect(0,0,yuvImage.getWidth(), yuvImage.getHeight());
+        Rect rect = new Rect(0, 0, yuvImage.getWidth(), yuvImage.getHeight());
         yuvImage.compressToJpeg(rect, 100, stream);
 
         byte[] imageBytes = stream.toByteArray();
@@ -105,14 +105,14 @@ public class SnapshotVideoSink implements VideoSink {
         tmp = ByteBuffer.wrap(tmpBytes, 0, width / 2 * height / 2);
         copyPlane(yuvPlanes[2], tmp);
         for (int row = 0; row < height / 2; row++) {
-            for (int col = 0; col < width /2; col++) {
+            for (int col = 0; col < width / 2; col++) {
                 bytes[width * height + row * width + col * 2] =
                         tmpBytes[row * width / 2 + col];
             }
         }
         copyPlane(yuvPlanes[1], tmp);
-        for (int row = 0; row < height /2; row++) {
-            for (int col = 0; col < width/2; col++) {
+        for (int row = 0; row < height / 2; row++) {
+            for (int col = 0; col < width / 2; col++) {
                 bytes[width * height + row * width + col * 2 + 1] =
                         tmpBytes[row * width / 2 + col];
             }
@@ -125,7 +125,7 @@ public class SnapshotVideoSink implements VideoSink {
         byte[] bytes = new byte[width * height * 3 / 2];
         int i = 0;
         for (int row = 0; row < height; row++) {
-            for (int col = 0; col < width; col++ ) {
+            for (int col = 0; col < width; col++) {
                 bytes[i++] = yuvPlanes[0].get(col + row * yuvStrides[0]);
             }
         }

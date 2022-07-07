@@ -7,7 +7,8 @@
 
 package com.twiliorn.library;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
+
 import android.util.Log;
 
 import com.facebook.react.bridge.ReactMethod;
@@ -41,23 +42,23 @@ public class TwilioLocalVideoViewManager extends SimpleViewManager<TwilioLocalVi
     @ReactMethod
     public void setScaleType(TwilioRemotePreview view, @Nullable String scaleType) {
 
-      if (scaleType.equals("fit")) {
-        view.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FIT);
-      } else {
-        view.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FILL);
-      }
+        if (scaleType.equals("fit")) {
+            view.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FIT);
+        } else {
+            view.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FILL);
+        }
     }
 
     @ReactProp(name = "trackId")
     public void setTrackId(TwilioLocalVideoView view, @Nullable String trackId) {
         Log.i(REACT_CLASS, "Initialize Twilio Local video");
-        Log.i(REACT_CLASS, "\tTrackId: " + trackId + " Enabled: " + (_enabled ? "True" : "False") );
+        Log.i(REACT_CLASS, "\tTrackId: " + trackId + " Enabled: " + (_enabled ? "True" : "False"));
         view.setTrackId(trackId, _enabled);
     }
 
     @ReactProp(name = "enabled")
     public void setEnabled(TwilioLocalVideoView view, @Nullable boolean enabled) {
-        Log.i(REACT_CLASS,  "Attempting to set video Enabled");
+        Log.i(REACT_CLASS, "Attempting to set video Enabled");
         this._enabled = enabled;
         view.setEnabled(enabled);
     }
@@ -69,14 +70,14 @@ public class TwilioLocalVideoViewManager extends SimpleViewManager<TwilioLocalVi
 
     @Override
     public Map getExportedCustomBubblingEventTypeConstants() {
-      return MapBuilder.builder()
-          .put(
-            ON_FRAME_DIMENSIONS_CHANGED,
-              MapBuilder.of(
-                  "phasedRegistrationNames",
-                  MapBuilder.of("bubbled", ON_FRAME_DIMENSIONS_CHANGED)))
-                  .build();
-  }
+        return MapBuilder.builder()
+                .put(
+                        ON_FRAME_DIMENSIONS_CHANGED,
+                        MapBuilder.of(
+                                "phasedRegistrationNames",
+                                MapBuilder.of("bubbled", ON_FRAME_DIMENSIONS_CHANGED)))
+                .build();
+    }
 
     @Override
     public void receiveCommand(@Nonnull TwilioLocalVideoView root, int commandId, @Nullable ReadableArray args) {
@@ -103,6 +104,7 @@ public class TwilioLocalVideoViewManager extends SimpleViewManager<TwilioLocalVi
                 TAKE_SNAPSHOT
         );
     }
+
     @Nullable
     @Override
     public Map getExportedCustomDirectEventTypeConstants() {

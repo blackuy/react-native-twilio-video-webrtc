@@ -9,8 +9,10 @@
 package com.twiliorn.library;
 
 import android.os.Build;
-import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
+
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.annotation.Nullable;
 
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
@@ -75,8 +77,7 @@ public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilio
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     @ReactProp(name = "preloadCameras")
-    public  void setTrackAliases(CustomTwilioVideoView view, @Nullable ReadableArray sources)
-    {
+    public void setTrackAliases(CustomTwilioVideoView view, @Nullable ReadableArray sources) {
         view.setTrackAliases(sources);
     }
 
@@ -96,17 +97,17 @@ public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilio
                 ReadableMap encodingParameters = args.getMap(9);
                 boolean enableH264Codec = encodingParameters.hasKey("enableH264Codec") ? encodingParameters.getBoolean("enableH264Codec") : false;
                 view.connectToRoomWrapper(
-                    roomName,
-                    accessToken,
-                    enableAudio,
-                    enableVideo,
-                    enableRemoteAudio,
-                    enableNetworkQualityReporting,
-                    dominantSpeakerEnabled,
-                    maintainVideoTrackInBackground,
-                    cameraType,
-                    enableH264Codec
-                  );
+                        roomName,
+                        accessToken,
+                        enableAudio,
+                        enableVideo,
+                        enableRemoteAudio,
+                        enableNetworkQualityReporting,
+                        dominantSpeakerEnabled,
+                        maintainVideoTrackInBackground,
+                        cameraType,
+                        enableH264Codec
+                );
                 break;
             case DISCONNECT:
                 view.disconnect();

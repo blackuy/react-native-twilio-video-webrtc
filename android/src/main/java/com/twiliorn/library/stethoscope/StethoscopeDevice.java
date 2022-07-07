@@ -48,8 +48,7 @@ public class StethoscopeDevice {
     public void stop(SafePromise promise) {
         try {
             stethoscopeDeviceStartPromise = null;
-            if(stethoscopeDeviceThread == null)
-            {
+            if (stethoscopeDeviceThread == null) {
                 promise.resolve(null);
                 return;
             }
@@ -67,8 +66,8 @@ public class StethoscopeDevice {
     }
 
     public void recordToFile(String path, int timeout, SafePromise<String> promise) {
-        Thread thread = new Thread(() ->{
-            int retV       = -1;
+        Thread thread = new Thread(() -> {
+            int retV = -1;
             String command = buildWriteToFileCommand(path, timeout);
 
             try {
@@ -76,7 +75,7 @@ public class StethoscopeDevice {
                 process.waitFor();
                 retV = process.exitValue();
 
-                if(retV != 0) {
+                if (retV != 0) {
                     BufferedReader in = new BufferedReader(new InputStreamReader(process.getErrorStream()));
                     promise.reject(String.valueOf(retV), in.readLine());
                 }
@@ -95,7 +94,7 @@ public class StethoscopeDevice {
 
                 retV = process.exitValue();
 
-                if(retV != 0) {
+                if (retV != 0) {
                     BufferedReader in = new BufferedReader(new InputStreamReader(process.getErrorStream()));
                     promise.reject(String.valueOf(retV), in.readLine());
                 }
@@ -107,7 +106,7 @@ public class StethoscopeDevice {
                 promise.reject(String.valueOf(-1), e.getMessage());
             }
 
-            if(retV == 0) {
+            if (retV == 0) {
                 promise.resolve(path);
             } else {
                 promise.reject("-1", "Something went wrong");
@@ -127,8 +126,8 @@ public class StethoscopeDevice {
     private Runnable stethoscopeDeviceRunnable = new Runnable() {
         @Override
         public void run() {
-            int retV       = -1;
-            String path    = getPath();
+            int retV = -1;
+            String path = getPath();
             String command = buildWriteToPipeCommand(path);
 
             Process recordingProcess = null;
@@ -136,7 +135,7 @@ public class StethoscopeDevice {
 
             try {
                 recordingProcess = Runtime.getRuntime().exec(command);
-                if(retV != 0) {
+                if (retV != 0) {
                     BufferedReader in = new BufferedReader(new InputStreamReader(recordingProcess.getErrorStream()));
                     stethoscopeDeviceStartPromise.reject(String.valueOf(retV), in.readLine());
                 }
@@ -145,12 +144,12 @@ public class StethoscopeDevice {
                 chmodProcess.waitFor();
 
                 retV = chmodProcess.exitValue();
-                if(retV != 0) {
+                if (retV != 0) {
                     BufferedReader in = new BufferedReader(new InputStreamReader(chmodProcess.getErrorStream()));
                     stethoscopeDeviceStartPromise.reject(String.valueOf(retV), in.readLine());
                 }
 
-                if(retV == 0) {
+                if (retV == 0) {
                     stethoscopeDeviceStartPromise.resolve(path);
                 }
 
@@ -159,14 +158,14 @@ public class StethoscopeDevice {
                 e.printStackTrace();
                 stethoscopeDeviceStartPromise.reject(String.valueOf(-1), e.getMessage());
 
-                if(recordingProcess != null) recordingProcess.destroy();
-                if(chmodProcess != null) chmodProcess.destroy();
+                if (recordingProcess != null) recordingProcess.destroy();
+                if (chmodProcess != null) chmodProcess.destroy();
             } catch (InterruptedException e) {
                 e.printStackTrace();
                 stethoscopeDeviceStartPromise.reject(String.valueOf(-1), e.getMessage());
 
-                if(recordingProcess != null) recordingProcess.destroy();
-                if(chmodProcess != null) chmodProcess.destroy();
+                if (recordingProcess != null) recordingProcess.destroy();
+                if (chmodProcess != null) chmodProcess.destroy();
             }
         }
 

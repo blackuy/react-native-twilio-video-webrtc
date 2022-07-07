@@ -42,9 +42,11 @@ import android.media.AudioManager;
 import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
-import android.annotation.NonNull;
-import android.annotation.RequiresApi;
-import android.annotation.StringDef;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+import androidx.annotation.StringDef;
+
 import android.util.Log;
 import android.view.View;
 
@@ -65,6 +67,7 @@ import com.twilio.video.BaseTrackStats;
 import com.twilio.video.Camera2Capturer;
 import com.twilio.video.CameraCapturer;
 import com.twilio.video.ConnectOptions;
+import com.twilio.video.H264Codec;
 import com.twilio.video.LocalAudioTrack;
 import com.twilio.video.LocalAudioTrackPublication;
 import com.twilio.video.LocalAudioTrackStats;
@@ -119,7 +122,10 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import tvi.webrtc.Camera2Enumerator;
+import tvi.webrtc.HardwareVideoDecoderFactory;
+import tvi.webrtc.HardwareVideoEncoderFactory;
 import tvi.webrtc.VideoCapturer;
+import tvi.webrtc.VideoCodecInfo;
 import tvi.webrtc.VideoSink;
 
 public class CustomTwilioVideoView extends View implements LifecycleEventListener, AudioManager.OnAudioFocusChangeListener {
@@ -269,7 +275,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         String ON_STATS_RECEIVED = "onStatsReceived";
         String ON_NETWORK_QUALITY_LEVELS_CHANGED = "onNetworkQualityLevelsChanged";
         String ON_DOMINANT_SPEAKER_CHANGED = "onDominantSpeakerDidChange";
-        String ON_LOCAL_PARTICIPANT_SUPPORTED_CODECS = "onLocalParticipantSupportedCodecs"
+        String ON_LOCAL_PARTICIPANT_SUPPORTED_CODECS = "onLocalParticipantSupportedCodecs";
     }
 
     private final ThemedReactContext themedReactContext;
@@ -547,6 +553,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
 
     // ====== CONNECTING ===========================================================================
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     public void connectToRoomWrapper(
             String roomName,
             String accessToken,
@@ -679,6 +686,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
 
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     public void setAudioType() {
         AudioDeviceInfo[] devicesInfo = audioManager.getDevices(AudioManager.GET_DEVICES_OUTPUTS);
         boolean hasNonSpeakerphoneDevice = false;
@@ -703,6 +711,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     }
 
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     private void setAudioFocus(boolean focus) {
         if (focus) {
             previousAudioMode = audioManager.getMode();
@@ -756,6 +765,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     }
 
     private class BecomingNoisyReceiver extends BroadcastReceiver {
+        @RequiresApi(api = Build.VERSION_CODES.M)
         @Override
         public void onReceive(Context context, Intent intent) {
 //            audioManager.setSpeakerphoneOn(true);
@@ -772,6 +782,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
 
     // ====== DISCONNECTING ========================================================================
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     public void disconnect() {
         if (room != null) {
             room.disconnect();
@@ -1094,6 +1105,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
 
             }
 
+            @RequiresApi(api = Build.VERSION_CODES.M)
             @Override
             public void onDisconnected(Room room, TwilioException e) {
                 WritableMap event = new WritableNativeMap();

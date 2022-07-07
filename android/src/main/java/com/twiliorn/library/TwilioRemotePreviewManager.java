@@ -7,7 +7,8 @@
 
 package com.twiliorn.library;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
+
 import android.util.Log;
 
 import com.facebook.react.common.MapBuilder;
@@ -34,11 +35,11 @@ public class TwilioRemotePreviewManager extends SimpleViewManager<TwilioRemotePr
     @ReactProp(name = "scaleType")
     public void setScaleType(TwilioRemotePreview view, @Nullable String scaleType) {
 
-      if (scaleType.equals("fit")) {
-        view.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FIT);
-      } else {
-        view.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FILL);
-      }
+        if (scaleType.equals("fit")) {
+            view.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FIT);
+        } else {
+            view.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FILL);
+        }
     }
 
     @ReactProp(name = "trackSid")
@@ -52,7 +53,7 @@ public class TwilioRemotePreviewManager extends SimpleViewManager<TwilioRemotePr
 
     @ReactProp(name = "applyZOrder", defaultBoolean = false)
     public void setApplyZOrder(TwilioRemotePreview view, boolean applyZOrder) {
-      view.applyZOrder(applyZOrder);
+        view.applyZOrder(applyZOrder);
     }
 
     @Override
@@ -62,12 +63,12 @@ public class TwilioRemotePreviewManager extends SimpleViewManager<TwilioRemotePr
 
     @Override
     public Map getExportedCustomBubblingEventTypeConstants() {
-      return MapBuilder.builder()
-          .put(
-            ON_FRAME_DIMENSIONS_CHANGED,
-              MapBuilder.of(
-                  "phasedRegistrationNames",
-                  MapBuilder.of("bubbled", ON_FRAME_DIMENSIONS_CHANGED)))
-                  .build();
-  }
+        return MapBuilder.builder()
+                .put(
+                        ON_FRAME_DIMENSIONS_CHANGED,
+                        MapBuilder.of(
+                                "phasedRegistrationNames",
+                                MapBuilder.of("bubbled", ON_FRAME_DIMENSIONS_CHANGED)))
+                .build();
+    }
 }

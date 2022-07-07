@@ -46,7 +46,7 @@ public class CustomAudioDevice implements AudioDevice {
     private static final short BUFFER_SIZE_FACTOR = 2;
     private static final short WAV_FILE_HEADER_SIZE = 44;
 
-    private static final int  BUFFERS_PER_SECOND = 1000 / CALLBACK_BUFFER_SIZE_MS;
+    private static final int BUFFERS_PER_SECOND = 1000 / CALLBACK_BUFFER_SIZE_MS;
 
     private final CustomPathUtils utils;
 
@@ -83,7 +83,7 @@ public class CustomAudioDevice implements AudioDevice {
     }
 
     public void switchInputToFile() {
-        if(capturerHandler == null) {
+        if (capturerHandler == null) {
             Log.d(TAG, "CapturerHandler is null - noop");
             return;
         }
@@ -95,7 +95,7 @@ public class CustomAudioDevice implements AudioDevice {
     }
 
     public void switchInputToMic() {
-        if(capturerHandler == null) {
+        if (capturerHandler == null) {
             Log.d(TAG, "CapturerHandler is null - noop");
             return;
         }
@@ -114,7 +114,7 @@ public class CustomAudioDevice implements AudioDevice {
     public boolean onInitCapturer() {
         int bytesPerFrame = 2 * (BITS_PER_SAMPLE / 8);
         AudioFormat capturerFormat = getCapturerFormat();
-        int  framesPerBuffer = capturerFormat.getSampleRate() / BUFFERS_PER_SECOND;
+        int framesPerBuffer = capturerFormat.getSampleRate() / BUFFERS_PER_SECOND;
         // Calculate the minimum buffer size required for the successful creation of
         // an AudioRecord object, in byte units.
         int channelConfig = inChannelCountToConfiguration(capturerFormat.getChannelCount());
@@ -256,9 +256,9 @@ public class CustomAudioDevice implements AudioDevice {
         Log.d(TAG, "Remove any pending posts of fileCapturerRunnable that are in the message queue");
         capturerHandler.removeCallbacks(fileCapturerRunnable);
         try {
-            if(dataInputStream != null)
+            if (dataInputStream != null)
                 dataInputStream.close();
-            if(inputStream != null)
+            if (inputStream != null)
                 inputStream.close();
         } catch (IOException e) {
             e.printStackTrace();
@@ -320,13 +320,13 @@ public class CustomAudioDevice implements AudioDevice {
             Process.setThreadPriority(Process.THREAD_PRIORITY_URGENT_AUDIO);
             int bytesRead = 0;
             try {
-                if(dataInputStream == null) {
+                if (dataInputStream == null) {
                     capturerHandler.postDelayed(this, CALLBACK_BUFFER_SIZE_MS);
                     return;
                 }
 
                 bytesRead = dataInputStream.read(fileWriteByteBuffer.array(), 0, writeBufferSize);
-                if ( bytesRead > -1) {
+                if (bytesRead > -1) {
                     if (bytesRead == fileWriteByteBuffer.capacity()) {
                         AudioDevice.audioDeviceWriteCaptureData(capturingAudioDeviceContext,
                                 fileWriteByteBuffer

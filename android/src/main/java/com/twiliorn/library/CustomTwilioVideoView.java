@@ -168,19 +168,17 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
 
         this.trackAliases = Arrays
                 .stream(deviceInfo)
-                .collect(Collectors.toMap(x -> x.physicalId, x-> x));
+                .collect(Collectors.toMap(x -> x.physicalId, x -> x));
     }
 
     private DeviceInfo[] buildDeviceInfoFrom(ReadableArray array) {
         ArrayList<DeviceInfo> deviceInfos = new ArrayList<>(array.size());
-        for (int i = 0; i < array.size(); i++)
-        {
+        for (int i = 0; i < array.size(); i++) {
             ReadableType type = array.getType(i);
-            switch (type)
-            {
+            switch (type) {
                 case Map:
                     DeviceInfo device = getDeviceInfoFromReadableMap(array.getMap(i));
-                    if(device != null) {
+                    if (device != null) {
                         deviceInfos.add(device);
                     }
             }
@@ -189,8 +187,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     }
 
     private static void releaseTrack(@NonNull LocalVideoTrack track) {
-        for(VideoSink sink : track.getSinks())
-        {
+        for (VideoSink sink : track.getSinks()) {
             track.removeSink(sink);
         }
 
@@ -354,7 +351,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     @RequiresApi(api = Build.VERSION_CODES.N)
     private LocalVideoTrack[] createPreloadedVideoTracks(String[] cameras) {
         List<VideoTrack> localTracks = new ArrayList<>();
-        for(String camera : cameras) {
+        for (String camera : cameras) {
             try {
                 Camera2Capturer camera2Capturer = createCameraCapturer(themedReactContext, camera);
                 VideoTrack track = this.createLocalVideo(
@@ -384,7 +381,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
 
         try {
             String cameraId = getFirstKeyByValue(trackAliases, trackId);
-            Log.d(TAG, "[getOrCreateLTrack] Create local video track tId: "+ trackId + " cameraId: "+ cameraId);
+            Log.d(TAG, "[getOrCreateLTrack] Create local video track tId: " + trackId + " cameraId: " + cameraId);
             Camera2Capturer camera2Capturer = createCameraCapturer(context, cameraId);
             track = createLocalVideo(
                     context,
@@ -594,9 +591,9 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             Log.i(TAG, "[AudioDevices]: Printing audio devices");
             AudioDeviceInfo[] audioDevices = audioManager.getDevices(AudioManager.GET_DEVICES_INPUTS);
-            for(AudioDeviceInfo info: audioDevices) {
+            for (AudioDeviceInfo info : audioDevices) {
                 Log.i(TAG, "[AudioDevices]:\tName:" + info.getProductName());
-                Log.i(TAG, "[AudioDevices]:\tId:"+ info.getId());
+                Log.i(TAG, "[AudioDevices]:\tId:" + info.getId());
                 info.getId();
                 info.getProductName();
             }
@@ -648,7 +645,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
 
         WritableArray supportedCodecs = new WritableNativeArray();
 
-        VideoCodec videoCodec =  new Vp8Codec();
+        VideoCodec videoCodec = new Vp8Codec();
         // VP8 is supported on all android devices by default
         supportedCodecs.pushString(videoCodec.toString());
 
@@ -666,7 +663,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         connectOptionsBuilder.preferVideoCodecs(Collections.singletonList(videoCodec));
 
         connectOptionsBuilder.enableDominantSpeaker(this.dominantSpeakerEnabled);
-        List<VideoCodec> codecs =  Arrays.asList(
+        List<VideoCodec> codecs = Arrays.asList(
                 new Vp8Codec()
         );
         connectOptionsBuilder.preferVideoCodecs(codecs);
@@ -681,21 +678,21 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         room = Video.connect(getContext(), connectOptionsBuilder.build(), roomListener());
 
     }
-    
+
     public void setAudioType() {
         AudioDeviceInfo[] devicesInfo = audioManager.getDevices(AudioManager.GET_DEVICES_OUTPUTS);
         boolean hasNonSpeakerphoneDevice = false;
         for (int i = 0; i < devicesInfo.length; i++) {
             int deviceType = devicesInfo[i].getType();
             if (
-                deviceType == AudioDeviceInfo.TYPE_WIRED_HEADSET ||
-                deviceType == AudioDeviceInfo.TYPE_WIRED_HEADPHONES
+                    deviceType == AudioDeviceInfo.TYPE_WIRED_HEADSET ||
+                            deviceType == AudioDeviceInfo.TYPE_WIRED_HEADPHONES
             ) {
                 hasNonSpeakerphoneDevice = true;
             }
             if (
-                deviceType == AudioDeviceInfo.TYPE_BLUETOOTH_A2DP ||
-                deviceType == AudioDeviceInfo.TYPE_BLUETOOTH_SCO
+                    deviceType == AudioDeviceInfo.TYPE_BLUETOOTH_A2DP ||
+                            deviceType == AudioDeviceInfo.TYPE_BLUETOOTH_SCO
             ) {
                 audioManager.startBluetoothSco();
                 audioManager.setBluetoothScoOn(true);
@@ -704,7 +701,6 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         }
         audioManager.setSpeakerphoneOn(!hasNonSpeakerphoneDevice);
     }
-
 
 
     private void setAudioFocus(boolean focus) {
@@ -764,7 +760,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         public void onReceive(Context context, Intent intent) {
 //            audioManager.setSpeakerphoneOn(true);
             if (Intent.ACTION_HEADSET_PLUG.equals(intent.getAction())) {
-               setAudioType();
+                setAudioType();
             }
         }
     }
@@ -780,7 +776,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         if (room != null) {
             room.disconnect();
         }
-        if(localAudioTrack != null || localVideoTrack != null)
+        if (localAudioTrack != null || localVideoTrack != null)
             audioManager.stopBluetoothSco();
 
         if (localAudioTrack != null) {
@@ -840,9 +836,9 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         }
     }
 
-    public void toggleSoundSetup(boolean speaker){
+    public void toggleSoundSetup(boolean speaker) {
         AudioManager audioManager = (AudioManager) getContext().getSystemService(Context.AUDIO_SERVICE);
-        if(speaker){
+        if (speaker) {
             audioManager.setSpeakerphoneOn(true);
         } else {
             audioManager.setSpeakerphoneOn(false);
@@ -861,7 +857,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
 
     public void toggleBluetoothHeadset(boolean enabled) {
         AudioManager audioManager = (AudioManager) getContext().getSystemService(Context.AUDIO_SERVICE);
-        if(enabled){
+        if (enabled) {
             audioManager.startBluetoothSco();
         } else {
             audioManager.stopBluetoothSco();
@@ -871,9 +867,9 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     public void toggleRemoteAudio(boolean enabled) {
         if (room != null) {
             for (RemoteParticipant rp : room.getRemoteParticipants()) {
-                for(AudioTrackPublication at : rp.getAudioTracks()) {
-                    if(at.getAudioTrack() != null) {
-                        ((RemoteAudioTrack)at.getAudioTrack()).enablePlayback(enabled);
+                for (AudioTrackPublication at : rp.getAudioTracks()) {
+                    if (at.getAudioTrack() != null) {
+                        ((RemoteAudioTrack) at.getAudioTrack()).enablePlayback(enabled);
                     }
                 }
             }
@@ -896,7 +892,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         if (localParticipant != null && track == null) {
             Log.d(TAG, "[publishLocalVideo] Track not found");
             Log.d(TAG, "[publishLocalVideo] Recreating");
-            if(track == null) {
+            if (track == null) {
                 Log.e(TAG, "[publishLocalVideo] Track unable to be recreated");
                 return;
             }
@@ -1398,8 +1394,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         participantMap.putString("identity", participant.getIdentity());
         participantMap.putString("sid", participant.getSid());
         WritableArray tracksArray = Arguments.createArray();
-        for(LocalVideoTrack track : tracks)
-        {
+        for (LocalVideoTrack track : tracks) {
             String id = track.getName();
             tracksArray.pushString(id);
         }
@@ -1487,8 +1482,8 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     private static LocalVideoTrack getTrackFromList(List<LocalVideoTrack> list, String trackId) {
         Log.i(TAG, "getTrackFromList: Searching for track: " + trackId);
         printTracks(list);
-        for (LocalVideoTrack track: list) {
-            if(track.getName().equals(trackId)) {
+        for (LocalVideoTrack track : list) {
+            if (track.getName().equals(trackId)) {
                 return track;
             }
         }
@@ -1498,7 +1493,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
 
     private static void printTracks(List<LocalVideoTrack> list) {
         Log.i(TAG, "printTracks: Printing tracks");
-        for(LocalVideoTrack track: list) {
+        for (LocalVideoTrack track : list) {
             Log.i(TAG, "printTracks:\t" + track.getName());
         }
         Log.i(TAG, "printTracks: Done");
@@ -1541,17 +1536,14 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         Log.i(TAG, "removeLocalSink: Unable to find the track");
     }
 
-    public static void setLocalVideoTrackStatus(String trackId, boolean enabled)
-    {
+    public static void setLocalVideoTrackStatus(String trackId, boolean enabled) {
         LocalVideoTrack track = CustomTwilioVideoView.getTrackFromList(localVideoTracks, trackId);
-        if(track == null)
-        {
+        if (track == null) {
             Log.i(TAG, "setLocalVideoTrackStatus: Track is null");
             return;
         }
 
-        if(track.isEnabled() == enabled)
-        {
+        if (track.isEnabled() == enabled) {
             Log.i(TAG, "setLocalVideoTrackStatus: Track is already set to the correct status: " + (track.isEnabled() ? "true" : "false"));
             return;
         }
@@ -1561,7 +1553,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
 
     public static String[] getAvailableLocalTracks() {
         ArrayList<String> trackNames = new ArrayList<>();
-        for (LocalVideoTrack track: localVideoTracks) {
+        for (LocalVideoTrack track : localVideoTracks) {
             trackNames.add(track.getName());
         }
         return trackNames.toArray(new String[0]);
@@ -1616,11 +1608,12 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
             return null;
         }
     }
+
     @RequiresApi(api = Build.VERSION_CODES.N)
     private static String getTrackNameOrDefault(Map<String, DeviceInfo> map, String key, String defaultValue) {
-        if(!map.containsKey(key)) return defaultValue;
+        if (!map.containsKey(key)) return defaultValue;
         DeviceInfo value = map.getOrDefault(key, null);
-        if(value == null) return defaultValue;
+        if (value == null) return defaultValue;
         return value.name;
     }
 
@@ -1641,13 +1634,13 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     }
 
     public static void startStethoscope(SafePromise<String> promise) {
-        if(CustomTwilioVideoView.customAudioDevice == null) {
+        if (CustomTwilioVideoView.customAudioDevice == null) {
             Log.d(TAG, "customAudioDevice is null");
             promise.reject("-1", "customAudioDevice is null");
             return;
         }
 
-        if(CustomTwilioVideoView.stethoscopeDevice == null) {
+        if (CustomTwilioVideoView.stethoscopeDevice == null) {
             Log.d(TAG, "stethoscopeDevice is null");
             promise.reject("-1", "stethoscopeDevice is null");
             return;
@@ -1658,13 +1651,13 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     }
 
     public static void stopStethoscope(SafePromise promise) {
-        if(CustomTwilioVideoView.customAudioDevice == null) {
+        if (CustomTwilioVideoView.customAudioDevice == null) {
             Log.d(TAG, "customAudioDevice is null");
             promise.reject("-1", "customAudioDevice is null");
             return;
         }
 
-        if(CustomTwilioVideoView.stethoscopeDevice == null) {
+        if (CustomTwilioVideoView.stethoscopeDevice == null) {
             Log.d(TAG, "stethoscopeDevice is null");
             promise.reject("-1", "stethoscopeDevice is null");
             return;

@@ -1,9 +1,11 @@
-package com.twiliorn.library;
+package com.twiliorn.library.stethoscope;
 
 import android.content.Context;
 import android.util.Log;
 
-import com.facebook.react.bridge.Promise;
+import com.twiliorn.library.utils.CustomAudioDevice;
+import com.twiliorn.library.utils.CustomPathUtils;
+import com.twiliorn.library.utils.SafePromise;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -12,7 +14,7 @@ import java.io.InputStreamReader;
 import tvi.webrtc.ThreadUtils;
 
 public class StethoscopeDevice {
-    public static final String TAG = CustomAudioDevice.class.getClass().getSimpleName();
+    public static final String TAG = StethoscopeDevice.class.getClass().getSimpleName();
 
     private static final long THREAD_JOIN_TIMEOUT_MS = 2000;
     private static final String PROGRAM_COMMAND = "su -c ./rec_steth";

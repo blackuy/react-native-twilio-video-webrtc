@@ -16,6 +16,7 @@ import com.facebook.react.common.MapBuilder;
 import com.facebook.react.uimanager.SimpleViewManager;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.annotations.ReactProp;
+import com.twiliorn.library.events.TakeSnapshotReturnedEvent;
 
 import java.util.Map;
 

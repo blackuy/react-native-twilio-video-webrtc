@@ -1,4 +1,4 @@
-package com.twiliorn.library;
+package com.twiliorn.library.utils;
 
 public class ImageFileReference {
     private final String uri;

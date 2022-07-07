@@ -1,4 +1,4 @@
-package com.twiliorn.library;
+package com.twiliorn.library.utils;
 
 import android.content.Context;
 import android.media.AudioManager;
@@ -13,7 +13,6 @@ import android.os.Process;
 
 import android.util.Log;
 
-import com.facebook.react.uimanager.ThemedReactContext;
 import com.twilio.video.AudioDevice;
 import com.twilio.video.AudioDeviceContext;
 import com.twilio.video.AudioFormat;
@@ -30,7 +29,7 @@ import java.nio.ByteBuffer;
 
 import tvi.webrtc.ThreadUtils;
 
-class CustomAudioDevice implements AudioDevice {
+public class CustomAudioDevice implements AudioDevice {
     public static final String TAG = CustomAudioDevice.class.getClass().getSimpleName();
 
     // TIMEOUT for rendererThread and capturerThread to wait for successful call to join()
@@ -79,7 +78,7 @@ class CustomAudioDevice implements AudioDevice {
     private boolean keepAliveRendererRunnable;
     private boolean isFilePlaying;
 
-    CustomAudioDevice(Context context) {
+    public CustomAudioDevice(Context context) {
         utils = new CustomPathUtils(context);
     }
 

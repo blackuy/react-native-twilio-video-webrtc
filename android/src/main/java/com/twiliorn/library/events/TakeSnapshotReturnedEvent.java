@@ -1,4 +1,4 @@
-package com.twiliorn.library;
+package com.twiliorn.library.events;
 
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
@@ -7,6 +7,7 @@ import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.uimanager.events.Event;
 import com.facebook.react.uimanager.events.RCTEventEmitter;
+import com.twiliorn.library.utils.ImageFileReference;
 
 public class TakeSnapshotReturnedEvent extends Event<TakeSnapshotReturnedEvent> {
 

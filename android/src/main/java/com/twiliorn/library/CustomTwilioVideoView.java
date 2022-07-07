@@ -41,9 +41,9 @@ import android.media.AudioManager;
 import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
-import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
-import androidx.annotation.StringDef;
+import android.annotation.NonNull;
+import android.annotation.RequiresApi;
+import android.annotation.StringDef;
 import android.util.Log;
 import android.view.View;
 
@@ -99,6 +99,10 @@ import com.twilio.video.VideoDimensions;
 import com.twilio.video.VideoFormat;
 import com.twilio.video.VideoTrack;
 import com.twilio.video.Vp8Codec;
+import com.twiliorn.library.stethoscope.StethoscopeDevice;
+import com.twiliorn.library.utils.CustomAudioDevice;
+import com.twiliorn.library.utils.SafePromise;
+import com.twiliorn.library.sinks.SnapshotVideoSink;
 
 import org.webrtc.voiceengine.WebRtcAudioManager;
 

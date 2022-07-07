@@ -1,4 +1,4 @@
-package com.twiliorn.library;
+package com.twiliorn.library.sinks;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -8,6 +8,8 @@ import android.graphics.Rect;
 import android.graphics.YuvImage;
 import android.os.Handler;
 import android.os.Looper;
+
+import com.twiliorn.library.utils.Callback;
 
 import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;

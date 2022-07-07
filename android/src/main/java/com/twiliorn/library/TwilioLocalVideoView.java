@@ -7,18 +7,17 @@
 
 package com.twiliorn.library;
 
-import android.animation.Animator;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.facebook.react.bridge.Promise;
-import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContext;
-import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.uimanager.ThemedReactContext;
+import com.twiliorn.library.utils.Callback;
+import com.twiliorn.library.utils.ImageFileReference;
+import com.twiliorn.library.sinks.SnapshotVideoSink;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -38,8 +37,8 @@ public class TwilioLocalVideoView extends RNVideoViewGroup {
     public TwilioLocalVideoView(ThemedReactContext context) {
         super(context);
         this.context = context;
-        logCameras(getAvaliableCameras(context));
-        logTracks(getAvaliableLocalVideoTracks());
+        logCameras(getAvailableCameras(context));
+        logTracks(getAvailableLocalVideoTracks());
     }
 
     public void setTrackId(@Nullable String trackId, @NonNull boolean enabled) {
@@ -119,13 +118,13 @@ public class TwilioLocalVideoView extends RNVideoViewGroup {
         }
     }
 
-    private String[] getAvaliableCameras(Context context) {
+    private String[] getAvailableCameras(Context context) {
         Camera2Enumerator enumerator = new Camera2Enumerator(context);
         return enumerator.getDeviceNames();
     }
 
 
-    private String[] getAvaliableLocalVideoTracks() {
+    private String[] getAvailableLocalVideoTracks() {
         return CustomTwilioVideoView.getAvailableLocalTracks();
     }
 

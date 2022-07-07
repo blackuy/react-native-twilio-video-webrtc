@@ -14,6 +14,9 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.module.annotations.ReactModule;
+import com.twiliorn.library.stethoscope.StethoscopeDevice;
+import com.twiliorn.library.utils.CustomAudioDevice;
+import com.twiliorn.library.utils.SafePromise;
 
 import javax.annotation.Nonnull;
 

@@ -17,20 +17,8 @@ declare module "react-native-twilio-video-webrtc" {
   }
 
   interface TwilioVideoLocalViewProps extends ViewProps {
-    enabled: boolean;
-    ref?: React.Ref<any>;
-    scaleType?: scaleType;
-  }
-
-  interface TwilioVideoLocalView2Props extends ViewProps {
-    cameraId: string;
-    ref?: React.Ref<any>;
-    scaleType?: scaleType;
-  }
-
-  interface TwilioVideoLocalView3Props extends ViewProps {
     trackId: string;
-    enabled?: boolean;
+    enabled: boolean;
     ref?: React.Ref<any>;
     scaleType?: scaleType;
   }
@@ -101,6 +89,14 @@ declare module "react-native-twilio-video-webrtc" {
     d: DominantSpeakerChangedEventArgs
   ) => void;
 
+  export type LocalParticipantSupportedCodecsCbEventArgs = {
+    supportedCodecs: Array<string>;
+  };
+
+  export type LocalParticipantSupportedCodecsCb = (
+    d: LocalParticipantSupportedCodecsCbEventArgs
+  ) => void;
+
   export type TwilioVideoProps = ViewProps & {
     onCameraDidStart?: () => void;
     onCameraDidStopRunning?: (err: any) => void;
@@ -122,10 +118,13 @@ declare module "react-native-twilio-video-webrtc" {
     onRoomParticipantDidConnect?: ParticipantEventCb;
     onRoomParticipantDidDisconnect?: ParticipantEventCb;
     onNetworkQualityLevelsChanged?: NetworkLevelChangeEventCb;
+    onLocalParticipantSupportedCodecs?: LocalParticipantSupportedCodecsCb;
 
     onStatsReceived?: (data: any) => void;
     onDataTrackMessageReceived?: DataTrackEventCb;
     preloadCameras: { id: string; physicalId: string; name: string }[];
+    // iOS only
+    autoInitializeCamera?: boolean;
     ref?: React.Ref<any>;
   };
 
@@ -153,6 +152,9 @@ declare module "react-native-twilio-video-webrtc" {
     enableAudio?: boolean;
     enableVideo?: boolean;
     enableRemoteAudio?: boolean;
+    encodingParameters?: {
+      enableH264Codec?: boolean;
+    };
     enableNetworkQualityReporting?: boolean;
     maintainVideoTrackInBackground?: boolean;
   };
@@ -175,9 +177,6 @@ declare module "react-native-twilio-video-webrtc" {
   }
 
   class TwilioVideoLocalView extends React.Component<TwilioVideoLocalViewProps> {}
-
-  class TwilioVideoLocalView2 extends React.Component<TwilioVideoLocalView2Props> {}
-  class TwilioVideoLocalView3 extends React.Component<TwilioVideoLocalView3Props> {}
 
   class TwilioVideoParticipantView extends React.Component<TwilioVideoParticipantViewProps> {}
 

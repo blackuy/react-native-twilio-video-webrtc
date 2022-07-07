@@ -26,7 +26,10 @@ class TwilioRemotePreview extends React.Component {
     importantForAccessibility: PropTypes.string,
     accessibilityLabel: PropTypes.string,
     nativeID: PropTypes.string,
-    testID: PropTypes.string
+    testID: PropTypes.string,
+    // Whether to apply Z ordering to this view.  Setting this to true will cause
+    // this view to appear above other Twilio Video views.
+    applyZOrder: PropTypes.bool
   }
 
   buildNativeEventWrappers () {

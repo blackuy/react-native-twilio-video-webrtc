@@ -13,23 +13,24 @@ import {
 import PropTypes from "prop-types";
 import React from "react";
 
+const propTypes = {
+  ...View.propTypes,
+  // Whether to apply Z ordering to this view.  Setting this to true will cause
+  // this view to appear above other Twilio Video views.
+  applyZOrder: PropTypes.bool,
+  /**
+   * How the video stream should be scaled to fit its
+   * container.
+   */
+  scaleType: PropTypes.oneOf(["fit", "fill"]),
+
+  trackId: PropTypes.string.isRequired,
+  enabled: PropTypes.bool,
+};
+
 class TwilioLocalVideoView extends React.Component {
   _nextRequestId = 1;
   _requestMap = new Map();
-
-  static propTypes = {
-    trackId: PropTypes.string.isRequired,
-    enabled: PropTypes.bool,
-    onFrameDimensionsChanged: PropTypes.func,
-    renderToHardwareTextureAndroid: PropTypes.string,
-    onLayout: PropTypes.string,
-    accessibilityLiveRegion: PropTypes.string,
-    accessibilityComponentType: PropTypes.string,
-    importantForAccessibility: PropTypes.string,
-    accessibilityLabel: PropTypes.string,
-    nativeID: PropTypes.string,
-    testID: PropTypes.string,
-  };
 
   _onDataReturned = (event) => {
     // We grab the relevant data out of our event.
@@ -46,18 +47,6 @@ class TwilioLocalVideoView extends React.Component {
     // Finally, we clean up our request map.
     this._requestMap.delete(requestId);
   };
-
-  buildNativeEventWrappers() {
-    return ["onFrameDimensionsChanged"].reduce((wrappedEvents, eventName) => {
-      if (this.props[eventName]) {
-        return {
-          ...wrappedEvents,
-          [eventName]: (data) => this.props[eventName](data.nativeEvent),
-        };
-      }
-      return wrappedEvents;
-    }, {});
-  }
 
   async takeSnapshot() {
     // Grab a new request ID and our request map.
@@ -89,7 +78,6 @@ class TwilioLocalVideoView extends React.Component {
         {...this.props}
         enabled={this.props.enabled ?? false}
         ref={(ref) => (this._ref = ref)}
-        {...this.buildNativeEventWrappers()}
         onDataReturned={this._onDataReturned}
       />
     );
@@ -100,5 +88,7 @@ const NativeTwilioLocalVideoView = requireNativeComponent(
   "RNTwilioLocalVideoView",
   TwilioLocalVideoView
 );
+
+NativeTwilioLocalVideoView.propTypes = propTypes;
 
 module.exports = TwilioLocalVideoView;

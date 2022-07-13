@@ -23,19 +23,11 @@ class TwilioModule {
     }
   };
 
-  static startStethoscope = async () => {
-    const path = await RNTwilioModule.startStethoscope();
-    return path;
-  };
+  static streamAudioFile = async (path) =>
+    await RNTwilioModule.streamAudioFile(path);
 
-  static stopStethoscope = async () => {
-    await RNTwilioModule.stopStethoscope();
-  };
-
-  static stethoscopeRecordToFile = async (path, timeout) => {
-    const retV = await RNTwilioModule.stethoscopeRecordToFile(path, timeout);
-    return retV;
-  };
+  static streamAudioFile = async (path) =>
+    await RNTwilioModule.streamDefaultMic(path);
 }
 
 export default TwilioModule;

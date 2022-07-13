@@ -28,4 +28,8 @@ public class TwilioRemotePreview extends RNVideoViewGroup {
     public void applyZOrder(boolean applyZOrder) {
         this.getSurfaceViewRenderer().applyZOrder(applyZOrder);
     }
+
+    public void mirror(boolean mirror) {
+        this.getSurfaceViewRenderer().setMirror(mirror);
+    }
 }

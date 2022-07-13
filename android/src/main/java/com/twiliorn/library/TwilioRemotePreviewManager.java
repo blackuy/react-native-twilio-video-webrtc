@@ -55,6 +55,11 @@ public class TwilioRemotePreviewManager extends SimpleViewManager<TwilioRemotePr
       view.applyZOrder(applyZOrder);
     }
 
+    @ReactProp(name = "mirror", defaultBoolean = true)
+    public void setMirror(TwilioRemotePreview view, boolean mirror) {
+      view.mirror(mirror);
+    }
+
     @Override
     protected TwilioRemotePreview createViewInstance(ThemedReactContext reactContext) {
         return new TwilioRemotePreview(reactContext, myTrackSid);

@@ -1309,6 +1309,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
                     } else {
                         track.removeSink(v);
                     }
+                    v.setMirror(true);
                 }
             }
         }

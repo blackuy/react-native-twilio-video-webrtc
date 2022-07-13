@@ -44,6 +44,11 @@ public class TwilioVideoPreviewManager extends SimpleViewManager<TwilioVideoPrev
       view.applyZOrder(applyZOrder);
     }
 
+    @ReactProp(name = "mirror", defaultBoolean = true)
+    public void setMirror(TwilioVideoPreview view, boolean mirror) {
+      view.mirror(mirror);
+    }
+
     @Override
     @Nullable
     public Map getExportedCustomDirectEventTypeConstants() {

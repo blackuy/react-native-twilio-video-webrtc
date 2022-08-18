@@ -14,12 +14,22 @@ declare module "react-native-twilio-video-webrtc" {
     trackIdentifier: TrackIdentifier;
     ref?: React.Ref<any>;
     scaleType?: scaleType;
+    /**
+     * Whether to apply Z ordering to this view.  Setting this to true will cause
+     * this view to appear above other Twilio Video views. 
+     */
+     applyZOrder?: boolean | undefined;
   }
 
   interface TwilioVideoLocalViewProps extends ViewProps {
     enabled: boolean;
     ref?: React.Ref<any>;
     scaleType?: scaleType;
+    /**
+     * Whether to apply Z ordering to this view.  Setting this to true will cause
+     * this view to appear above other Twilio Video views. 
+     */
+    applyZOrder?: boolean | undefined;
   }
 
   interface Participant {

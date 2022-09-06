@@ -6,11 +6,11 @@
 //
 //
 
-import { Component } from "react";
-import PropTypes from "prop-types";
-import { NativeModules, NativeEventEmitter, View } from "react-native";
+import { Component } from 'react'
+import PropTypes from 'prop-types'
+import { NativeModules, NativeEventEmitter, View } from 'react-native'
 
-const { TWVideoModule } = NativeModules;
+const { TWVideoModule } = NativeModules
 
 export default class TwilioVideo extends Component {
   static propTypes = {
@@ -152,85 +152,85 @@ export default class TwilioVideo extends Component {
      * camera will require calling `_startLocalVideo`.
      */
     autoInitializeCamera: PropTypes.bool,
-    ...View.propTypes,
+    ...View.propTypes
   };
 
-  constructor(props) {
-    super(props);
+  constructor (props) {
+    super(props)
 
-    this._subscriptions = [];
-    this._eventEmitter = new NativeEventEmitter(TWVideoModule);
+    this._subscriptions = []
+    this._eventEmitter = new NativeEventEmitter(TWVideoModule)
   }
 
-  componentDidMount() {
-    this._registerEvents();
+  componentDidMount () {
+    this._registerEvents()
     if (this.props.autoInitializeCamera !== false) {
-      this._startLocalVideo();
+      this._startLocalVideo()
     }
-    this._startLocalAudio();
+    this._startLocalAudio()
   }
 
-  componentWillUnmount() {
-    this._unregisterEvents();
-    this._stopLocalVideo();
-    this._stopLocalAudio();
+  componentWillUnmount () {
+    this._unregisterEvents()
+    this._stopLocalVideo()
+    this._stopLocalAudio()
   }
 
   /**
    * Locally mute/ unmute all remote audio tracks from a given participant
    */
-  setRemoteAudioPlayback({ participantSid, enabled }) {
-    TWVideoModule.setRemoteAudioPlayback(participantSid, enabled);
+  setRemoteAudioPlayback ({ participantSid, enabled }) {
+    TWVideoModule.setRemoteAudioPlayback(participantSid, enabled)
   }
 
-  setRemoteAudioEnabled(enabled) {
-    return Promise.resolve(enabled);
+  setRemoteAudioEnabled (enabled) {
+    return Promise.resolve(enabled)
   }
 
-  setBluetoothHeadsetConnected(enabled) {
-    return Promise.resolve(enabled);
+  setBluetoothHeadsetConnected (enabled) {
+    return Promise.resolve(enabled)
   }
 
   /**
    * Enable or disable local video
    */
-  setLocalVideoEnabled(enabled) {
-    return TWVideoModule.setLocalVideoEnabled(enabled);
+  setLocalVideoEnabled (enabled) {
+    return TWVideoModule.setLocalVideoEnabled(enabled)
   }
 
   /**
    * Enable or disable local audio
    */
-  setLocalAudioEnabled(enabled) {
-    return TWVideoModule.setLocalAudioEnabled(enabled);
+  setLocalAudioEnabled (enabled) {
+    return TWVideoModule.setLocalAudioEnabled(enabled)
   }
 
   /**
    * Filp between the front and back camera
    */
-  flipCamera() {
-    TWVideoModule.flipCamera();
+  flipCamera () {
+    TWVideoModule.flipCamera()
   }
 
   /**
    * Toggle screen sharing
    */
-  toggleScreenSharing(status) {
-    TWVideoModule.toggleScreenSharing(status);
+  toggleScreenSharing (status) {
+    TWVideoModule.toggleScreenSharing(status)
   }
 
   /**
    * Toggle audio setup from speaker (default) and headset
    */
-  toggleSoundSetup(speaker) {
-    TWVideoModule.toggleSoundSetup(speaker);
+  toggleSoundSetup (speaker) {
+    TWVideoModule.toggleSoundSetup(speaker)
   }
 
   /**
    * Get connection stats
    */
-  getStats() {
-    TWVideoModule.getStats();
+  getStats () {
+    TWVideoModule.getStats()
   }
 
   /**
@@ -240,15 +240,15 @@ export default class TwilioVideo extends Component {
    * @param  {String} encodingParameters Control Encoding config
    * @param  {Boolean} enableNetworkQualityReporting Report network quality of participants
    */
-  connect({
+  connect ({
     roomName,
     accessToken,
-    cameraType = "front",
+    cameraType = 'front',
     enableAudio = true,
     enableVideo = true,
     encodingParameters = null,
     enableNetworkQualityReporting = false,
-    dominantSpeakerEnabled = false,
+    dominantSpeakerEnabled = false
   }) {
     TWVideoModule.connect(
       accessToken,
@@ -259,202 +259,202 @@ export default class TwilioVideo extends Component {
       enableNetworkQualityReporting,
       dominantSpeakerEnabled,
       cameraType
-    );
+    )
   }
 
   /**
    * Disconnect from current room
    */
-  disconnect() {
-    TWVideoModule.disconnect();
+  disconnect () {
+    TWVideoModule.disconnect()
   }
 
   /**
    * Publish a local audio track
    */
-  publishLocalAudio() {
-    TWVideoModule.publishLocalAudio();
+  publishLocalAudio () {
+    TWVideoModule.publishLocalAudio()
   }
 
   /**
    * Publish a local video track
    */
-  publishLocalVideo() {
-    TWVideoModule.publishLocalVideo();
+  publishLocalVideo () {
+    TWVideoModule.publishLocalVideo()
   }
 
   /**
    * Unpublish a local audio track
    */
-  unpublishLocalAudio() {
-    TWVideoModule.unpublishLocalAudio();
+  unpublishLocalAudio () {
+    TWVideoModule.unpublishLocalAudio()
   }
 
   /**
    * Unpublish a local video track
    */
-  unpublishLocalVideo() {
-    TWVideoModule.unpublishLocalVideo();
+  unpublishLocalVideo () {
+    TWVideoModule.unpublishLocalVideo()
   }
 
   /**
    * SendString to datatrack
    * @param  {String} message    The message string to send
    */
-  sendString(message) {
-    TWVideoModule.sendString(message);
+  sendString (message) {
+    TWVideoModule.sendString(message)
   }
 
-  _startLocalVideo() {
-    TWVideoModule.startLocalVideo();
+  _startLocalVideo () {
+    TWVideoModule.startLocalVideo()
   }
 
-  _stopLocalVideo() {
-    TWVideoModule.stopLocalVideo();
+  _stopLocalVideo () {
+    TWVideoModule.stopLocalVideo()
   }
 
-  _startLocalAudio() {
-    TWVideoModule.startLocalAudio();
+  _startLocalAudio () {
+    TWVideoModule.startLocalAudio()
   }
 
-  _stopLocalAudio() {
-    TWVideoModule.stopLocalAudio();
+  _stopLocalAudio () {
+    TWVideoModule.stopLocalAudio()
   }
 
-  _unregisterEvents() {
-    TWVideoModule.changeListenerStatus(false);
-    this._subscriptions.forEach((e) => e.remove());
-    this._subscriptions = [];
+  _unregisterEvents () {
+    TWVideoModule.changeListenerStatus(false)
+    this._subscriptions.forEach((e) => e.remove())
+    this._subscriptions = []
   }
 
-  _registerEvents() {
-    TWVideoModule.changeListenerStatus(true);
+  _registerEvents () {
+    TWVideoModule.changeListenerStatus(true)
     this._subscriptions = [
-      this._eventEmitter.addListener("roomDidConnect", (data) => {
+      this._eventEmitter.addListener('roomDidConnect', (data) => {
         if (this.props.onRoomDidConnect) {
-          this.props.onRoomDidConnect(data);
+          this.props.onRoomDidConnect(data)
         }
       }),
-      this._eventEmitter.addListener("roomDidDisconnect", (data) => {
+      this._eventEmitter.addListener('roomDidDisconnect', (data) => {
         if (this.props.onRoomDidDisconnect) {
-          this.props.onRoomDidDisconnect(data);
+          this.props.onRoomDidDisconnect(data)
         }
       }),
-      this._eventEmitter.addListener("roomDidFailToConnect", (data) => {
+      this._eventEmitter.addListener('roomDidFailToConnect', (data) => {
         if (this.props.onRoomDidFailToConnect) {
-          this.props.onRoomDidFailToConnect(data);
+          this.props.onRoomDidFailToConnect(data)
         }
       }),
-      this._eventEmitter.addListener("roomParticipantDidConnect", (data) => {
+      this._eventEmitter.addListener('roomParticipantDidConnect', (data) => {
         if (this.props.onRoomParticipantDidConnect) {
-          this.props.onRoomParticipantDidConnect(data);
+          this.props.onRoomParticipantDidConnect(data)
         }
       }),
-      this._eventEmitter.addListener("roomParticipantDidDisconnect", (data) => {
+      this._eventEmitter.addListener('roomParticipantDidDisconnect', (data) => {
         if (this.props.onRoomParticipantDidDisconnect) {
-          this.props.onRoomParticipantDidDisconnect(data);
+          this.props.onRoomParticipantDidDisconnect(data)
         }
       }),
-      this._eventEmitter.addListener("participantAddedVideoTrack", (data) => {
+      this._eventEmitter.addListener('participantAddedVideoTrack', (data) => {
         if (this.props.onParticipantAddedVideoTrack) {
-          this.props.onParticipantAddedVideoTrack(data);
+          this.props.onParticipantAddedVideoTrack(data)
         }
       }),
-      this._eventEmitter.addListener("participantAddedDataTrack", (data) => {
+      this._eventEmitter.addListener('participantAddedDataTrack', (data) => {
         if (this.props.onParticipantAddedDataTrack) {
-          this.props.onParticipantAddedDataTrack(data);
+          this.props.onParticipantAddedDataTrack(data)
         }
       }),
-      this._eventEmitter.addListener("participantRemovedDataTrack", (data) => {
+      this._eventEmitter.addListener('participantRemovedDataTrack', (data) => {
         if (this.props.onParticipantRemovedDataTrack) {
-          this.props.onParticipantRemovedDataTrack(data);
+          this.props.onParticipantRemovedDataTrack(data)
         }
       }),
-      this._eventEmitter.addListener("participantRemovedVideoTrack", (data) => {
+      this._eventEmitter.addListener('participantRemovedVideoTrack', (data) => {
         if (this.props.onParticipantRemovedVideoTrack) {
-          this.props.onParticipantRemovedVideoTrack(data);
+          this.props.onParticipantRemovedVideoTrack(data)
         }
       }),
-      this._eventEmitter.addListener("participantAddedAudioTrack", (data) => {
+      this._eventEmitter.addListener('participantAddedAudioTrack', (data) => {
         if (this.props.onParticipantAddedAudioTrack) {
-          this.props.onParticipantAddedAudioTrack(data);
+          this.props.onParticipantAddedAudioTrack(data)
         }
       }),
-      this._eventEmitter.addListener("participantRemovedAudioTrack", (data) => {
+      this._eventEmitter.addListener('participantRemovedAudioTrack', (data) => {
         if (this.props.onParticipantRemovedAudioTrack) {
-          this.props.onParticipantRemovedAudioTrack(data);
+          this.props.onParticipantRemovedAudioTrack(data)
         }
       }),
-      this._eventEmitter.addListener("participantEnabledVideoTrack", (data) => {
+      this._eventEmitter.addListener('participantEnabledVideoTrack', (data) => {
         if (this.props.onParticipantEnabledVideoTrack) {
-          this.props.onParticipantEnabledVideoTrack(data);
+          this.props.onParticipantEnabledVideoTrack(data)
         }
       }),
       this._eventEmitter.addListener(
-        "participantDisabledVideoTrack",
+        'participantDisabledVideoTrack',
         (data) => {
           if (this.props.onParticipantDisabledVideoTrack) {
-            this.props.onParticipantDisabledVideoTrack(data);
+            this.props.onParticipantDisabledVideoTrack(data)
           }
         }
       ),
-      this._eventEmitter.addListener("participantEnabledAudioTrack", (data) => {
+      this._eventEmitter.addListener('participantEnabledAudioTrack', (data) => {
         if (this.props.onParticipantEnabledAudioTrack) {
-          this.props.onParticipantEnabledAudioTrack(data);
+          this.props.onParticipantEnabledAudioTrack(data)
         }
       }),
       this._eventEmitter.addListener(
-        "participantDisabledAudioTrack",
+        'participantDisabledAudioTrack',
         (data) => {
           if (this.props.onParticipantDisabledAudioTrack) {
-            this.props.onParticipantDisabledAudioTrack(data);
+            this.props.onParticipantDisabledAudioTrack(data)
           }
         }
       ),
-      this._eventEmitter.addListener("dataTrackMessageReceived", (data) => {
+      this._eventEmitter.addListener('dataTrackMessageReceived', (data) => {
         if (this.props.onDataTrackMessageReceived) {
-          this.props.onDataTrackMessageReceived(data);
+          this.props.onDataTrackMessageReceived(data)
         }
       }),
-      this._eventEmitter.addListener("cameraDidStart", (data) => {
+      this._eventEmitter.addListener('cameraDidStart', (data) => {
         if (this.props.onCameraDidStart) {
-          this.props.onCameraDidStart(data);
+          this.props.onCameraDidStart(data)
         }
       }),
-      this._eventEmitter.addListener("cameraWasInterrupted", (data) => {
+      this._eventEmitter.addListener('cameraWasInterrupted', (data) => {
         if (this.props.onCameraWasInterrupted) {
-          this.props.onCameraWasInterrupted(data);
+          this.props.onCameraWasInterrupted(data)
         }
       }),
-      this._eventEmitter.addListener("cameraInterruptionEnded", (data) => {
+      this._eventEmitter.addListener('cameraInterruptionEnded', (data) => {
         if (this.props.onCameraInterruptionEnded) {
-          this.props.onCameraInterruptionEnded(data);
+          this.props.onCameraInterruptionEnded(data)
         }
       }),
-      this._eventEmitter.addListener("cameraDidStopRunning", (data) => {
+      this._eventEmitter.addListener('cameraDidStopRunning', (data) => {
         if (this.props.onCameraDidStopRunning) {
-          this.props.onCameraDidStopRunning(data);
+          this.props.onCameraDidStopRunning(data)
         }
       }),
-      this._eventEmitter.addListener("statsReceived", (data) => {
+      this._eventEmitter.addListener('statsReceived', (data) => {
         if (this.props.onStatsReceived) {
-          this.props.onStatsReceived(data);
+          this.props.onStatsReceived(data)
         }
       }),
-      this._eventEmitter.addListener("networkQualityLevelsChanged", (data) => {
+      this._eventEmitter.addListener('networkQualityLevelsChanged', (data) => {
         if (this.props.onNetworkQualityLevelsChanged) {
-          this.props.onNetworkQualityLevelsChanged(data);
+          this.props.onNetworkQualityLevelsChanged(data)
         }
       }),
-      this._eventEmitter.addListener("onDominantSpeakerDidChange", (data) => {
+      this._eventEmitter.addListener('onDominantSpeakerDidChange', (data) => {
         if (this.props.onDominantSpeakerDidChange) {
-          this.props.onDominantSpeakerDidChange(data);
+          this.props.onDominantSpeakerDidChange(data)
         }
-      }),
-    ];
+      })
+    ]
   }
 
-  render() {
-    return this.props.children || null;
+  render () {
+    return this.props.children || null
   }
 }

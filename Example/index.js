@@ -24,6 +24,7 @@ const styles = StyleSheet.create(styleSheet);
 const Example = (props) => {
   const [isAudioEnabled, setIsAudioEnabled] = useState(true);
   const [isVideoEnabled, setIsVideoEnabled] = useState(true);
+  const [isScreenShareEnabled, setIsScreenShareEnabled] = useState(false);
   const [status, setStatus] = useState("disconnected");
   const [participants, setParticipants] = useState(new Map());
   const [videoTracks, setVideoTracks] = useState(new Map());
@@ -35,7 +36,11 @@ const Example = (props) => {
       await _requestAudioPermission();
       await _requestCameraPermission();
     }
-    twilioVideo.current.connect({ accessToken: token, enableNetworkQualityReporting: true, dominantSpeakerEnabled: true});
+    twilioVideo.current.connect({
+      accessToken: token,
+      enableNetworkQualityReporting: true,
+      dominantSpeakerEnabled: true,
+    });
     setStatus("connecting");
   };
 
@@ -47,6 +52,11 @@ const Example = (props) => {
     twilioVideo.current
       .setLocalAudioEnabled(!isAudioEnabled)
       .then((isEnabled) => setIsAudioEnabled(isEnabled));
+  };
+
+  const _onShareButtonPressed = () => {
+    twilioVideo.current.toggleScreenSharing(!isSharing);
+    setIsSharing(!isSharing);
   };
 
   const _onFlipButtonPress = () => {
@@ -93,11 +103,24 @@ const Example = (props) => {
   };
 
   const _onNetworkLevelChanged = ({ participant, isLocalUser, quality }) => {
-    console.log("Participant", participant, "isLocalUser", isLocalUser, "quality", quality);
+    console.log(
+      "Participant",
+      participant,
+      "isLocalUser",
+      isLocalUser,
+      "quality",
+      quality
+    );
   };
 
   const _onDominantSpeakerDidChange = ({ roomName, roomSid, participant }) => {
-    console.log("onDominantSpeakerDidChange", `roomName: ${roomName}`, `roomSid: ${roomSid}`, "participant:", participant);
+    console.log(
+      "onDominantSpeakerDidChange",
+      `roomName: ${roomName}`,
+      `roomSid: ${roomSid}`,
+      "participant:",
+      participant
+    );
   };
 
   const _requestAudioPermission = () => {
@@ -176,6 +199,14 @@ const Example = (props) => {
               onPress={_onFlipButtonPress}
             >
               <Text style={{ fontSize: 12 }}>Flip</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.optionButton}
+              onPress={_onShareButtonPressed}
+            >
+              <Text style={{ fontSize: 12 }}>
+                {isSharing ? "Stop Sharing" : "Start Sharing"}
+              </Text>
             </TouchableOpacity>
             <TwilioVideoLocalView enabled={true} style={styles.localVideo} />
           </View>

@@ -15,10 +15,6 @@ const { TWVideoModule } = NativeModules
 export default class TwilioVideo extends Component {
   static propTypes = {
     /**
-     * Flag that enables screen sharing RCTRootView instead of camera capture
-     */
-    screenShare: PropTypes.bool,
-    /**
      * Called when the room has connected
      *
      * @param {{roomName, participants}}
@@ -157,7 +153,7 @@ export default class TwilioVideo extends Component {
      */
     autoInitializeCamera: PropTypes.bool,
     ...View.propTypes
-  }
+  };
 
   constructor (props) {
     super(props)
@@ -217,6 +213,13 @@ export default class TwilioVideo extends Component {
   }
 
   /**
+   * Toggle screen sharing
+   */
+  toggleScreenSharing (status) {
+    TWVideoModule.toggleScreenSharing(status)
+  }
+
+  /**
    * Toggle audio setup from speaker (default) and headset
    */
   toggleSoundSetup (speaker) {
@@ -247,7 +250,8 @@ export default class TwilioVideo extends Component {
     enableNetworkQualityReporting = false,
     dominantSpeakerEnabled = false
   }) {
-    TWVideoModule.connect(accessToken,
+    TWVideoModule.connect(
+      accessToken,
       roomName,
       enableAudio,
       enableVideo,
@@ -319,124 +323,130 @@ export default class TwilioVideo extends Component {
 
   _unregisterEvents () {
     TWVideoModule.changeListenerStatus(false)
-    this._subscriptions.forEach(e => e.remove())
+    this._subscriptions.forEach((e) => e.remove())
     this._subscriptions = []
   }
 
   _registerEvents () {
     TWVideoModule.changeListenerStatus(true)
     this._subscriptions = [
-      this._eventEmitter.addListener('roomDidConnect', data => {
+      this._eventEmitter.addListener('roomDidConnect', (data) => {
         if (this.props.onRoomDidConnect) {
           this.props.onRoomDidConnect(data)
         }
       }),
-      this._eventEmitter.addListener('roomDidDisconnect', data => {
+      this._eventEmitter.addListener('roomDidDisconnect', (data) => {
         if (this.props.onRoomDidDisconnect) {
           this.props.onRoomDidDisconnect(data)
         }
       }),
-      this._eventEmitter.addListener('roomDidFailToConnect', data => {
+      this._eventEmitter.addListener('roomDidFailToConnect', (data) => {
         if (this.props.onRoomDidFailToConnect) {
           this.props.onRoomDidFailToConnect(data)
         }
       }),
-      this._eventEmitter.addListener('roomParticipantDidConnect', data => {
+      this._eventEmitter.addListener('roomParticipantDidConnect', (data) => {
         if (this.props.onRoomParticipantDidConnect) {
           this.props.onRoomParticipantDidConnect(data)
         }
       }),
-      this._eventEmitter.addListener('roomParticipantDidDisconnect', data => {
+      this._eventEmitter.addListener('roomParticipantDidDisconnect', (data) => {
         if (this.props.onRoomParticipantDidDisconnect) {
           this.props.onRoomParticipantDidDisconnect(data)
         }
       }),
-      this._eventEmitter.addListener('participantAddedVideoTrack', data => {
+      this._eventEmitter.addListener('participantAddedVideoTrack', (data) => {
         if (this.props.onParticipantAddedVideoTrack) {
           this.props.onParticipantAddedVideoTrack(data)
         }
       }),
-      this._eventEmitter.addListener('participantAddedDataTrack', data => {
+      this._eventEmitter.addListener('participantAddedDataTrack', (data) => {
         if (this.props.onParticipantAddedDataTrack) {
           this.props.onParticipantAddedDataTrack(data)
         }
       }),
-      this._eventEmitter.addListener('participantRemovedDataTrack', data => {
+      this._eventEmitter.addListener('participantRemovedDataTrack', (data) => {
         if (this.props.onParticipantRemovedDataTrack) {
           this.props.onParticipantRemovedDataTrack(data)
         }
       }),
-      this._eventEmitter.addListener('participantRemovedVideoTrack', data => {
+      this._eventEmitter.addListener('participantRemovedVideoTrack', (data) => {
         if (this.props.onParticipantRemovedVideoTrack) {
           this.props.onParticipantRemovedVideoTrack(data)
         }
       }),
-      this._eventEmitter.addListener('participantAddedAudioTrack', data => {
+      this._eventEmitter.addListener('participantAddedAudioTrack', (data) => {
         if (this.props.onParticipantAddedAudioTrack) {
           this.props.onParticipantAddedAudioTrack(data)
         }
       }),
-      this._eventEmitter.addListener('participantRemovedAudioTrack', data => {
+      this._eventEmitter.addListener('participantRemovedAudioTrack', (data) => {
         if (this.props.onParticipantRemovedAudioTrack) {
           this.props.onParticipantRemovedAudioTrack(data)
         }
       }),
-      this._eventEmitter.addListener('participantEnabledVideoTrack', data => {
+      this._eventEmitter.addListener('participantEnabledVideoTrack', (data) => {
         if (this.props.onParticipantEnabledVideoTrack) {
           this.props.onParticipantEnabledVideoTrack(data)
         }
       }),
-      this._eventEmitter.addListener('participantDisabledVideoTrack', data => {
-        if (this.props.onParticipantDisabledVideoTrack) {
-          this.props.onParticipantDisabledVideoTrack(data)
+      this._eventEmitter.addListener(
+        'participantDisabledVideoTrack',
+        (data) => {
+          if (this.props.onParticipantDisabledVideoTrack) {
+            this.props.onParticipantDisabledVideoTrack(data)
+          }
         }
-      }),
-      this._eventEmitter.addListener('participantEnabledAudioTrack', data => {
+      ),
+      this._eventEmitter.addListener('participantEnabledAudioTrack', (data) => {
         if (this.props.onParticipantEnabledAudioTrack) {
           this.props.onParticipantEnabledAudioTrack(data)
         }
       }),
-      this._eventEmitter.addListener('participantDisabledAudioTrack', data => {
-        if (this.props.onParticipantDisabledAudioTrack) {
-          this.props.onParticipantDisabledAudioTrack(data)
+      this._eventEmitter.addListener(
+        'participantDisabledAudioTrack',
+        (data) => {
+          if (this.props.onParticipantDisabledAudioTrack) {
+            this.props.onParticipantDisabledAudioTrack(data)
+          }
         }
-      }),
-      this._eventEmitter.addListener('dataTrackMessageReceived', data => {
+      ),
+      this._eventEmitter.addListener('dataTrackMessageReceived', (data) => {
         if (this.props.onDataTrackMessageReceived) {
           this.props.onDataTrackMessageReceived(data)
         }
       }),
-      this._eventEmitter.addListener('cameraDidStart', data => {
+      this._eventEmitter.addListener('cameraDidStart', (data) => {
         if (this.props.onCameraDidStart) {
           this.props.onCameraDidStart(data)
         }
       }),
-      this._eventEmitter.addListener('cameraWasInterrupted', data => {
+      this._eventEmitter.addListener('cameraWasInterrupted', (data) => {
         if (this.props.onCameraWasInterrupted) {
           this.props.onCameraWasInterrupted(data)
         }
       }),
-      this._eventEmitter.addListener('cameraInterruptionEnded', data => {
+      this._eventEmitter.addListener('cameraInterruptionEnded', (data) => {
         if (this.props.onCameraInterruptionEnded) {
           this.props.onCameraInterruptionEnded(data)
         }
       }),
-      this._eventEmitter.addListener('cameraDidStopRunning', data => {
+      this._eventEmitter.addListener('cameraDidStopRunning', (data) => {
         if (this.props.onCameraDidStopRunning) {
           this.props.onCameraDidStopRunning(data)
         }
       }),
-      this._eventEmitter.addListener('statsReceived', data => {
+      this._eventEmitter.addListener('statsReceived', (data) => {
         if (this.props.onStatsReceived) {
           this.props.onStatsReceived(data)
         }
       }),
-      this._eventEmitter.addListener('networkQualityLevelsChanged', data => {
+      this._eventEmitter.addListener('networkQualityLevelsChanged', (data) => {
         if (this.props.onNetworkQualityLevelsChanged) {
           this.props.onNetworkQualityLevelsChanged(data)
         }
       }),
-      this._eventEmitter.addListener('onDominantSpeakerDidChange', data => {
+      this._eventEmitter.addListener('onDominantSpeakerDidChange', (data) => {
         if (this.props.onDominantSpeakerDidChange) {
           this.props.onDominantSpeakerDidChange(data)
         }

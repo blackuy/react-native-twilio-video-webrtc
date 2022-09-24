@@ -10,7 +10,7 @@ import android.content.Context;
 import android.graphics.Point;
 import android.view.View;
 import android.view.ViewGroup;
-import android.support.annotation.StringDef;
+import androidx.annotation.StringDef;
 
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeMap;

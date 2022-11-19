@@ -113,13 +113,14 @@ project(':react-native-twilio-video-webrtc').projectDir = new File(rootProject.p
 ```
 
 And include the library in your dependencies in `android/app/build.gradle`:
+(if using gradle 4 or lower, replace `implementation` with `compile` below)
 
 ```
 dependencies {
     .....
     .....
     .....
-    compile project(':react-native-twilio-video-webrtc')
+    implementation project(':react-native-twilio-video-webrtc')
 }
 ```
 

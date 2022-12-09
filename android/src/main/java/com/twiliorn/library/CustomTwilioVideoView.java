@@ -748,8 +748,10 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         AudioManager audioManager = (AudioManager) getContext().getSystemService(Context.AUDIO_SERVICE);
         if (enabled) {
             audioManager.startBluetoothSco();
+            audioManager.setSpeakerphoneOn(false);
         } else {
             audioManager.stopBluetoothSco();
+            audioManager.setSpeakerphoneOn(true);
         }
     }
 

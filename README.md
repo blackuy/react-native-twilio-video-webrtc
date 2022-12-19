@@ -211,7 +211,7 @@ import {
 Here you can see a complete example of a simple application that uses almost all the apis:
 
 ````javascript
-import React, { Component, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   TwilioVideoLocalView,
   TwilioVideoParticipantView,
@@ -221,6 +221,7 @@ import {
 const Example = (props) => {
   const [isAudioEnabled, setIsAudioEnabled] = useState(true);
   const [isVideoEnabled, setIsVideoEnabled] = useState(true);
+  const [isScreenShareEnabled, setIsScreenShareEnabled] = useState(false);
   const [status, setStatus] = useState('disconnected');
   const [participants, setParticipants] = useState(new Map());
   const [videoTracks, setVideoTracks] = useState(new Map());
@@ -231,7 +232,7 @@ const Example = (props) => {
     twilioRef.current.connect({ accessToken: token });
     setStatus('connecting');
   }
-  
+
   const _onEndButtonPress = () => {
     twilioRef.current.disconnect();
   };
@@ -241,6 +242,14 @@ const Example = (props) => {
       .setLocalAudioEnabled(!isAudioEnabled)
       .then(isEnabled => setIsAudioEnabled(isEnabled));
   };
+
+  const _onShareButtonPressed = () => {
+    twilioRef.current.setScreenShareEnabled(!isScreenShareEnabled);
+  };
+
+  const _onScreenShareChanged = ({screenShareEnabled = false}) => {
+    setIsScreenShareEnabled(screenShareEnabled);
+  }
 
   const _onFlipButtonPress = () => {
     twilioRef.current.flipCamera();
@@ -310,21 +319,21 @@ const Example = (props) => {
       }
 
       {
-        (status === 'connected' || status === 'connecting') &&
-          <View style={styles.callContainer}>
+        (status === 'connected' || status === 'connecting') && 
+        <View style={styles.callContainer}>
           {
             status === 'connected' &&
             <View style={styles.remoteGrid}>
               {
                 Array.from(videoTracks, ([trackSid, trackIdentifier]) => {
-                  return (
-                    <TwilioVideoParticipantView
-                      style={styles.remoteVideo}
-                      key={trackSid}
-                      trackIdentifier={trackIdentifier}
-                    />
-                  )
-                })
+                return (
+                  <TwilioVideoParticipantView
+                    style={styles.remoteVideo}
+                    key={trackSid}
+                    trackIdentifier={trackIdentifier}
+                  />
+                )
+              })
               }
             </View>
           }
@@ -345,10 +354,17 @@ const Example = (props) => {
               onPress={_onFlipButtonPress}>
               <Text style={{fontSize: 12}}>Flip</Text>
             </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.optionButton}
+              onPress={_onShareButtonPressed}>
+              <Text style={{ fontSize: 12 }}>
+                {isScreenShareEnabled ? "Stop Screen Sharing" : "Start Screen Sharing"}
+              </Text>
+            </TouchableOpacity>
             <TwilioVideoLocalView
               enabled={true}
               style={styles.localVideo}
-            />
+              />
           </View>
         </View>
       }
@@ -357,6 +373,7 @@ const Example = (props) => {
         ref={ twilioRef }
         onRoomDidConnect={ _onRoomDidConnect }
         onRoomDidDisconnect={ _onRoomDidDisconnect }
+        onScreenShareChanged={ _onScreenShareChanged}
         onRoomDidFailToConnect= { _onRoomDidFailToConnect }
         onParticipantAddedVideoTrack={ _onParticipantAddedVideoTrack }
         onParticipantRemovedVideoTrack= { _onParticipantRemovedVideoTrack }

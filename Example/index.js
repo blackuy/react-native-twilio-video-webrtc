@@ -55,9 +55,12 @@ const Example = (props) => {
   };
 
   const _onShareButtonPressed = () => {
-    twilioVideo.current.toggleScreenSharing(!isSharing);
-    setIsSharing(!isSharing);
+    twilioVideo.current.setScreenShareEnabled(!isScreenShareEnabled);
   };
+
+  const _onScreenShareChanged = ({screenShareEnabled = false}) => {
+    setIsScreenShareEnabled(screenShareEnabled);
+  }
 
   const _onFlipButtonPress = () => {
     twilioVideo.current.flipCamera();
@@ -205,7 +208,7 @@ const Example = (props) => {
               onPress={_onShareButtonPressed}
             >
               <Text style={{ fontSize: 12 }}>
-                {isSharing ? "Stop Sharing" : "Start Sharing"}
+                {isScreenShareEnabled ? "Stop Screen Sharing" : "Start Screen Sharing"}
               </Text>
             </TouchableOpacity>
             <TwilioVideoLocalView enabled={true} style={styles.localVideo} />
@@ -217,6 +220,7 @@ const Example = (props) => {
         ref={twilioVideo}
         onRoomDidConnect={_onRoomDidConnect}
         onRoomDidDisconnect={_onRoomDidDisconnect}
+        onScreenShareChanged={_onScreenShareChanged}
         onRoomDidFailToConnect={_onRoomDidFailToConnect}
         onParticipantAddedVideoTrack={_onParticipantAddedVideoTrack}
         onParticipantRemovedVideoTrack={_onParticipantRemovedVideoTrack}

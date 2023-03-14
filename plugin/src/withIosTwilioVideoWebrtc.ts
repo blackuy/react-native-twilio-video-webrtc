@@ -1,9 +1,17 @@
-import { ConfigPlugin, withInfoPlist } from "expo/config-plugins";
+import {
+  ConfigPlugin,
+  ExportedConfigWithProps,
+  withInfoPlist,
+} from "expo/config-plugins";
 import { withBuildProperties } from "expo-build-properties";
 
 import { WithTwilioVideoWebRtcProps } from "./withTwilioVideoWebrtc";
 
-const addPermission = (conf, permission, message) => {
+const addPermission = (
+  conf: ExportedConfigWithProps,
+  permission: string,
+  message?: string
+) => {
   if (!conf.modResults[permission] && !!message) {
     conf.modResults[permission] = message;
   }
@@ -21,7 +29,7 @@ const withIosTwilioVideoWebrtc: ConfigPlugin<WithTwilioVideoWebRtcProps> = (
   });
 
   // 2. Camera / Microphone Permission on Info.plist
-  config = withInfoPlist(config, (conf) => {
+  config = withInfoPlist(config, (conf: ExportedConfigWithProps) => {
     addPermission(conf, "NSCameraUsageDescription", cameraPermission);
     addPermission(conf, "NSMicrophoneUsageDescription", microphonePermission);
 

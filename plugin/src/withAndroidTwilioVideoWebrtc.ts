@@ -1,6 +1,7 @@
 import {
   AndroidConfig,
   ConfigPlugin,
+  ExportedConfigWithProps,
   withAppBuildGradle,
 } from "expo/config-plugins";
 import { withBuildProperties } from "expo-build-properties";
@@ -16,7 +17,7 @@ const withAndroidTwilioVideoWebrtc: ConfigPlugin = (config) => {
   ]);
 
   // 2. Java 1.8 compatibility
-  config = withAppBuildGradle(config, (conf) => {
+  config = withAppBuildGradle(config, (conf: ExportedConfigWithProps) => {
     if (conf.modResults.contents.includes(`compileOptions`)) {
       return conf;
     }

@@ -5,7 +5,7 @@ import {
 } from "expo/config-plugins";
 import { withBuildProperties } from "expo-build-properties";
 
-import { WithTwilioVideoWebRtcProps } from "./withTwilioVideoWebrtc";
+import { WithTwilioVideoWebRtcProps } from ".";
 
 const addPermission = (
   conf: ExportedConfigWithProps,

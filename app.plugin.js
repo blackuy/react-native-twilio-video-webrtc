@@ -1,1 +1,1 @@
-module.exports = require("./plugin/build/withTwilioVideoWebrtc");
+module.exports = require("./plugin/build");

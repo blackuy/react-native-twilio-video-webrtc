@@ -47,6 +47,20 @@ To use this library with [`Expo`](https://expo.dev) we recommend using our confi
 }
 ```
 
+Also you will need to install `expo-build-properties` package:
+
+#### NPM
+
+```bash
+npm i expo-build-properties
+```
+
+#### Yarn
+
+```bash
+yarn add expo-build-properties
+```
+
 #### Expo Config Plugin Props
 
 The plugin support the following properties:

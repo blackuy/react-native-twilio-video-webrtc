@@ -22,11 +22,11 @@ const withIosTwilioVideoWebrtc: ConfigPlugin<WithTwilioVideoWebRtcProps> = (
   { cameraPermission, microphonePermission }
 ) => {
   // 1. Deployment target (iOS 11.0+)
-  config = withBuildProperties(config, {
-    ios: {
-      deploymentTarget: "11.0",
-    },
-  });
+  // config = withBuildProperties(config, {
+  //  ios: {
+  //    deploymentTarget: "11.0",
+  //  },
+  // });
 
   // 2. Camera / Microphone Permission on Info.plist
   config = withInfoPlist(config, (conf: ExportedConfigWithProps) => {

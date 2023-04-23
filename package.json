@@ -12,8 +12,8 @@
     "build": "expo-module build",
     "clean": "expo-module clean",
     "test": "expo-module test",
-    "lint": "standard 'src/**/*.js'",
-    "lint:fix": "standard 'src/**/*.js' --fix",
+    "lint": "prettier -c 'src/**/*.js'",
+    "lint:fix": "prettier -w 'src/**/*.js'",
     "ci": "yarn lint"
   },
   "standard": {
@@ -38,8 +38,8 @@
     "gulp-load-plugins": "^1.5.0",
     "gulp-react-docs": "^0.1.3",
     "gulp-tap": "^1.0.1",
-    "react-docgen": "^2.15.0",
-    "standard": "^13.1.0"
+    "prettier": "^2.8.8",
+    "react-docgen": "^2.15.0"
   },
   "peerDependencies": {
     "expo": ">=47.0.0",

@@ -33,7 +33,7 @@
     "expo": "^47.0.0",
     "expo-build-properties": "^0.5.1",
     "expo-module-scripts": "^3.0.7",
-    "gulp": "^3.9.1",
+    "gulp": "^4.0.2",
     "gulp-concat": "^2.6.1",
     "gulp-load-plugins": "^1.5.0",
     "gulp-react-docs": "^0.1.3",

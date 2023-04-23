@@ -6,7 +6,7 @@ attach_workspace: &attach_workspace
 
 docker_defaults: &docker_defaults
   docker:
-    - image: circleci/python:3.6.4-stretch-node-browsers
+    - image: circleci/python:3.10.11-node
   working_directory: ~/react-native-twilio-video-webrtc
 
 jobs:

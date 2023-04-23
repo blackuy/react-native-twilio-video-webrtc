@@ -5,9 +5,9 @@
  *   Jonathan Chang <slycoder@gmail.com>
  */
 
-import { requireNativeComponent } from 'react-native'
-import PropTypes from 'prop-types'
-import React from 'react'
+import { requireNativeComponent } from "react-native";
+import PropTypes from "prop-types";
+import React from "react";
 
 class TwilioRemotePreview extends React.Component {
   static propTypes = {
@@ -15,7 +15,7 @@ class TwilioRemotePreview extends React.Component {
       /**
        * The participant's video track you want to render in the view.
        */
-      videoTrackSid: PropTypes.string.isRequired
+      videoTrackSid: PropTypes.string.isRequired,
     }),
     onFrameDimensionsChanged: PropTypes.func,
     trackSid: PropTypes.string,
@@ -29,38 +29,36 @@ class TwilioRemotePreview extends React.Component {
     testID: PropTypes.string,
     // Whether to apply Z ordering to this view.  Setting this to true will cause
     // this view to appear above other Twilio Video views.
-    applyZOrder: PropTypes.bool
-  }
+    applyZOrder: PropTypes.bool,
+  };
 
-  buildNativeEventWrappers () {
-    return [
-      'onFrameDimensionsChanged'
-    ].reduce((wrappedEvents, eventName) => {
+  buildNativeEventWrappers() {
+    return ["onFrameDimensionsChanged"].reduce((wrappedEvents, eventName) => {
       if (this.props[eventName]) {
         return {
           ...wrappedEvents,
-          [eventName]: data => this.props[eventName](data.nativeEvent)
-        }
+          [eventName]: (data) => this.props[eventName](data.nativeEvent),
+        };
       }
-      return wrappedEvents
-    }, {})
+      return wrappedEvents;
+    }, {});
   }
 
-  render () {
-    const { trackIdentifier } = this.props
+  render() {
+    const { trackIdentifier } = this.props;
     return (
       <NativeTwilioRemotePreview
         trackSid={trackIdentifier && trackIdentifier.videoTrackSid}
         {...this.props}
         {...this.buildNativeEventWrappers()}
       />
-    )
+    );
   }
 }
 
 const NativeTwilioRemotePreview = requireNativeComponent(
-  'RNTwilioRemotePreview',
+  "RNTwilioRemotePreview",
   TwilioRemotePreview
-)
+);
 
-module.exports = TwilioRemotePreview
+module.exports = TwilioRemotePreview;

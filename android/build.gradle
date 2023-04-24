@@ -51,8 +51,8 @@ dependencies {
     def coreVersion = rootProject.hasProperty("coreVersion")  ? rootProject.coreVersion : DEFAULT_ANDROID_CORE_VERSION
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    // implementation "com.android.support:appcompat-v7:$androidSupportVersion"
-    implementation "androidx.core:core:$coreVersion"
-    implementation "com.twilio:video-android:7.3.1"
+
+    implementation "com.android.support:appcompat-v7:$androidSupportVersion"
+    implementation "com.twilio:video-android:7.6.1"
     implementation "com.facebook.react:react-native:+"  // From node_modules
 }

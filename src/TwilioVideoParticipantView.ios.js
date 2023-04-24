@@ -6,9 +6,9 @@
 //
 //
 
-import React, { Component } from 'react'
-import PropTypes from 'prop-types'
-import { requireNativeComponent } from 'react-native'
+import React, { Component } from "react";
+import PropTypes from "prop-types";
+import { requireNativeComponent } from "react-native";
 
 class TwilioVideoParticipantView extends Component {
   static propTypes = {
@@ -20,23 +20,23 @@ class TwilioVideoParticipantView extends Component {
       /**
        * The participant's video track sid you want to render in the view.
        */
-      videoTrackSid: PropTypes.string.isRequired
-    })
-  }
+      videoTrackSid: PropTypes.string.isRequired,
+    }),
+  };
 
-  render () {
-    const scalesType = this.props.scaleType === 'fit' ? 1 : 2
+  render() {
+    const scalesType = this.props.scaleType === "fit" ? 1 : 2;
     return (
       <RCTTWRemoteVideoView scalesType={scalesType} {...this.props}>
         {this.props.children}
       </RCTTWRemoteVideoView>
-    )
+    );
   }
 }
 
 const RCTTWRemoteVideoView = requireNativeComponent(
-  'RCTTWRemoteVideoView',
+  "RCTTWRemoteVideoView",
   TwilioVideoParticipantView
-)
+);
 
-module.exports = TwilioVideoParticipantView
+module.exports = TwilioVideoParticipantView;

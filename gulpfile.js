@@ -7,29 +7,14 @@ var gulp = require('gulp'),
     doctoc = require('doctoc/lib/transform'),
     del = require('del'),
     $ = require('gulp-load-plugins')(),
-    reactDocsPlugin = require('gulp-react-docs');
+    log = require('fancy-log'),
+    reactDocsPlugin = require('gulp-react-docs'),
+    child_process = require('child_process');
 
 // Helper vars
 var docsDest = 'docs';
 
 // Tasks
-gulp.task('default', ['react-docs']);
-
-gulp.task('clean', function(cb) { del(docsDest, cb) });
-
-gulp.task('check:docs', ['docs'], function(cb) {
-    exec('git diff --name-only docs/', function(err, diffFiles) {
-        if (diffFiles.indexOf('.md') > -1) {
-            $.util.log('Automatically generated documentation is not up to \
-date with the changes in the codebase. Please run `gulp` and commit the changes.');
-            process.exit(1);
-        } else {
-            $.util.log('Automatically generated documentation is up to date!');
-        }
-        cb();
-    });
-});
-
 gulp.task('react-docs', function() {
     var mdTitle = '# React Component Reference';
 
@@ -45,3 +30,20 @@ gulp.task('react-docs', function() {
         }))
         .pipe(gulp.dest(docsDest));
 });
+
+gulp.task('default', gulp.series('react-docs'));
+
+gulp.task('clean', function(cb) { del(docsDest, cb) });
+
+gulp.task('check:docs', gulp.series('react-docs', function(cb) {
+    child_process.exec('git diff --name-only docs/', function(err, diffFiles) {
+        if (diffFiles.indexOf('.md') > -1) {
+            log('Automatically generated documentation is not up to \
+date with the changes in the codebase. Please run `gulp` and commit the changes.');
+            cb(new Error('Docs not up to date!'));
+        } else {
+            log('Automatically generated documentation is up to date!');
+        }
+        cb();
+    });
+}));

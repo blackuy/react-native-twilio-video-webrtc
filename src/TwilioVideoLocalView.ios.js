@@ -6,9 +6,9 @@
 //
 //
 
-import React, { Component } from 'react'
-import PropTypes from 'prop-types'
-import { requireNativeComponent } from 'react-native'
+import React, { Component } from "react";
+import PropTypes from "prop-types";
+import { requireNativeComponent } from "react-native";
 
 class TwilioVideoLocalView extends Component {
   static propTypes = {
@@ -20,22 +20,22 @@ class TwilioVideoLocalView extends Component {
      * How the video stream should be scaled to fit its
      * container.
      */
-    scaleType: PropTypes.oneOf(['fit', 'fill'])
-  }
+    scaleType: PropTypes.oneOf(["fit", "fill"]),
+  };
 
-  render () {
-    const scalesType = this.props.scaleType === 'fit' ? 1 : 2
+  render() {
+    const scalesType = this.props.scaleType === "fit" ? 1 : 2;
     return (
       <RCTTWLocalVideoView scalesType={scalesType} {...this.props}>
         {this.props.children}
       </RCTTWLocalVideoView>
-    )
+    );
   }
 }
 
 const RCTTWLocalVideoView = requireNativeComponent(
-  'RCTTWLocalVideoView',
+  "RCTTWLocalVideoView",
   TwilioVideoLocalView
-)
+);
 
-module.exports = TwilioVideoLocalView
+module.exports = TwilioVideoLocalView;

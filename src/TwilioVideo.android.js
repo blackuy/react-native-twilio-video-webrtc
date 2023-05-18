@@ -253,7 +253,6 @@ class CustomTwilioVideoView extends Component {
       participantSid,
       enabled,
     ]);
-    return Promise.resolve(enabled);
   }
 
   getStats() {

@@ -7,6 +7,7 @@
 
 #import <Foundation/Foundation.h>
 #import "RCTTWFrameCaptureRenderer.h"
+#import "RCTTWImageUtils.h"
 
 // https://github.com/twilio/twilio-video-ios/issues/184#issuecomment-828655941 - overall idea inspiration
 // https://github.com/twilio/video-quickstart-ios/pull/286/files - more in depth implementation?
@@ -27,7 +28,8 @@
 
     // do frame image conversion and save to file system
     CIImage *ciImg = [CIImage imageWithCVImageBuffer:frame.imageBuffer];
-    UIImage *img = [UIImage imageWithCIImage:ciImg];
+    UIImage *rawImg = [UIImage imageWithCIImage:ciImg];
+    UIImage *img = [rawImg rotate:90];
     NSData *imageData = UIImagePNGRepresentation(img);
     NSURL *url = [NSFileManager.defaultManager URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask].firstObject;
     NSUUID *uuid = [NSUUID UUID];
@@ -44,5 +46,7 @@
 
 - (void)updateVideoSize:(CMVideoDimensions)videoSize orientation:(TVIVideoOrientation)orientation {
 }
+
+
 
 @end

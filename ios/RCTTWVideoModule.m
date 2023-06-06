@@ -9,6 +9,7 @@
 #import "RCTTWVideoModule.h"
 
 #import "RCTTWSerializable.h"
+#import "RCTTWFrameCaptureRenderer.h"
 
 static NSString* roomDidConnect               = @"roomDidConnect";
 static NSString* roomDidDisconnect            = @"roomDidDisconnect";
@@ -36,6 +37,7 @@ static NSString* cameraInterruptionEnded      = @"cameraInterruptionEnded";
 static NSString* cameraDidStopRunning         = @"cameraDidStopRunning";
 static NSString* statsReceived                = @"statsReceived";
 static NSString* networkQualityLevelsChanged  = @"networkQualityLevelsChanged";
+static NSString* onFrameCaptured = @"onFrameCaptured";
 
 static const CMVideoDimensions kRCTTWVideoAppCameraSourceDimensions = (CMVideoDimensions){900, 720};
 
@@ -58,6 +60,7 @@ TVIVideoFormat *RCTTWVideoModuleCameraSourceSelectVideoFormatBySize(AVCaptureDev
             break;
         }
     }
+
     return selectedFormat;
 }
 
@@ -73,6 +76,7 @@ TVIVideoFormat *RCTTWVideoModuleCameraSourceSelectVideoFormatBySize(AVCaptureDev
 @property (strong, nonatomic) TVIRoom *room;
 @property (strong, nonatomic) NSString *videoTrackName;
 @property (nonatomic) BOOL listening;
+@property (strong, nonatomic) RCTTWFrameCaptureRenderer *captureRenderer;
 
 @end
 
@@ -115,15 +119,23 @@ RCT_EXPORT_MODULE();
     cameraInterruptionEnded,
     statsReceived,
     networkQualityLevelsChanged,
-    dominantSpeakerDidChange
+    dominantSpeakerDidChange,
+    onFrameCaptured
   ];
 }
 
 - (void)addLocalView:(TVIVideoView *)view {
-  if (self.localVideoTrack != nil) {
-    [self.localVideoTrack addRenderer:view];
-  }
-  [self updateLocalViewMirroring:view];
+    if (self.localVideoTrack != nil) {
+        self.captureRenderer = [[RCTTWFrameCaptureRenderer alloc]init];
+        [self.localVideoTrack addRenderer:view];
+        // NOTE: this is where add renderer for capturing frames!
+        [self.localVideoTrack addRenderer:self.captureRenderer];
+    }
+    [self updateLocalViewMirroring:view];
+    
+    // add notification center listener for frame captured events
+    NSNotificationCenter *notiCenter = NSNotificationCenter.defaultCenter;
+    [notiCenter addObserver:self selector:@selector(receiveFrameCapturedNotification:) name:@"onFrameCaptured" object:self.captureRenderer];
 }
 
 - (void)updateLocalViewMirroring:(TVIVideoView *)view {
@@ -133,13 +145,28 @@ RCT_EXPORT_MODULE();
 }
 
 - (void)removeLocalView:(TVIVideoView *)view {
-  if (self.localVideoTrack != nil) {
-    [self.localVideoTrack removeRenderer:view];
-  }
+    if (self.localVideoTrack != nil) {
+        [self.localVideoTrack removeRenderer:view];
+        [self.localVideoTrack removeRenderer:self.captureRenderer];
+    }
+    
+    // remove notification center listener for frame captured events
+    NSNotificationCenter *notiCenter = NSNotificationCenter.defaultCenter;
+    [notiCenter removeObserver:self name:@"onFrameCaptured" object:self.captureRenderer];
 }
 
 - (void)removeParticipantView:(TVIVideoView *)view sid:(NSString *)sid trackSid:(NSString *)trackSid {
   // TODO: Implement this nicely
+}
+
+// notification handler from frame capturer
+- (void) receiveFrameCapturedNotification:(NSNotification *) notification
+{
+    if (![[notification name] isEqualToString:@"onFrameCaptured"]) {
+        return;
+    }
+    NSString *filename = [notification.userInfo objectForKey:@"filename"];
+    [self sendEventCheckingListenerWithName:@"onFrameCaptured" body:@{@"filename": filename}];
 }
 
 - (void)addParticipantView:(TVIVideoView *)view sid:(NSString *)sid trackSid:(NSString *)trackSid {
@@ -152,6 +179,10 @@ RCT_EXPORT_MODULE();
        }
      }
   }
+}
+
+RCT_EXPORT_METHOD(captureFrame) {
+    [self.captureRenderer captureFrame];
 }
 
 RCT_EXPORT_METHOD(changeListenerStatus:(BOOL)value) {
@@ -208,14 +239,25 @@ RCT_EXPORT_METHOD(startLocalVideo) {
   }
 
   NSLog(@"[RNTwilioVideo] Starting camera: %@", cameraType);
+  
+  // specify the desired dimensions we want to capture frames at
+  CMVideoDimensions targetSize;
+  targetSize.width = 1280;
+  targetSize.height = 720;
 
-  [self.camera startCaptureWithDevice:captureDevice completion:^(AVCaptureDevice *device,
+  TVIVideoFormat *format = RCTTWVideoModuleCameraSourceSelectVideoFormatBySize(captureDevice, targetSize);
+  
+  [self.camera startCaptureWithDevice:captureDevice format:format completion:^(AVCaptureDevice *device,
           TVIVideoFormat *startFormat,
           NSError *error) {
       if (!error) {
-          NSLog(@"[RNTwilioVideo] Camera did start");
+          NSLog(@"[RNTwilioVideo] Camera successfully started");
+          NSLog(@"[RNTwilioVideo] selected format w x h at fps = %d x %d at %lu", startFormat.dimensions.width, startFormat.dimensions.height, (unsigned long)startFormat.frameRate);
           for (TVIVideoView *renderer in self.localVideoTrack.renderers) {
-            [self updateLocalViewMirroring:renderer];
+              // need to type check renderer class since multiple renderers are used.
+              if ([renderer isKindOfClass:[TVIVideoView class]]) {
+                  [self updateLocalViewMirroring:renderer];
+              }
           }
           [self sendEventCheckingListenerWithName:cameraDidStart body:nil];
       } else {
@@ -323,7 +365,9 @@ RCT_EXPORT_METHOD(flipCamera) {
                 NSError *error) {
             if (!error) {
                 for (TVIVideoView *renderer in self.localVideoTrack.renderers) {
-                    renderer.mirror = mirror;
+                    if ([renderer isKindOfClass:[TVIVideoView class]]) {
+                        renderer.mirror = mirror;
+                    }
                 }
             }
         }];

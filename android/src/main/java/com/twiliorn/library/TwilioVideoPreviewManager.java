@@ -7,6 +7,7 @@
 
 package com.twiliorn.library;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.facebook.react.bridge.ReadableArray;
@@ -21,6 +22,8 @@ import tvi.webrtc.RendererCommon;
 
 import static com.twiliorn.library.RNVideoViewGroup.Events.ON_FRAME_DIMENSIONS_CHANGED;
 
+import android.util.Log;
+
 public class TwilioVideoPreviewManager extends SimpleViewManager<TwilioVideoPreview> {
 
     public static final String REACT_CLASS = "RNTwilioVideoPreview";
@@ -32,16 +35,16 @@ public class TwilioVideoPreviewManager extends SimpleViewManager<TwilioVideoPrev
 
     @ReactProp(name = "scaleType")
     public void setScaleType(TwilioVideoPreview view, @Nullable String scaleType) {
-      if (scaleType.equals("fit")) {
-        view.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FIT);
-      } else {
-        view.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FILL);
-      }
+        if (scaleType.equals("fit")) {
+            view.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FIT);
+        } else {
+            view.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FILL);
+        }
     }
 
     @ReactProp(name = "applyZOrder", defaultBoolean = true)
     public void setApplyZOrder(TwilioVideoPreview view, boolean applyZOrder) {
-      view.applyZOrder(applyZOrder);
+        view.applyZOrder(applyZOrder);
     }
 
     @Override

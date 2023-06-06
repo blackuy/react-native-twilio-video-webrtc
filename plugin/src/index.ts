@@ -3,7 +3,7 @@ import { ConfigPlugin, createRunOncePlugin } from "expo/config-plugins";
 import withAndroidTwilioVideoWebrtc from "./withAndroidTwilioVideoWebrtc";
 import withIosTwilioVideoWebrtc from "./withIosTwilioVideoWebrtc";
 
-const pkg = require("react-native-twilio-video-webrtc/package.json");
+const pkg = require("../../package.json");
 
 export type WithTwilioVideoWebRtcProps = {
   cameraPermission?: string;

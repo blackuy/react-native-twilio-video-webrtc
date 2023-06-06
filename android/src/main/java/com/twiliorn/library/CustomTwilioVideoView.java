@@ -114,7 +114,7 @@ import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_DOMINANT_SPEA
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_LOCAL_PARTICIPANT_SUPPORTED_CODECS;
 
 public class CustomTwilioVideoView extends View implements LifecycleEventListener, AudioManager.OnAudioFocusChangeListener {
-    private static final String TAG = "CustomTwilioVideoView";
+    private static final String TAG = "rntwilio";
     private static final String DATA_TRACK_MESSAGE_THREAD_NAME = "DataTrackMessages";
     private static final String FRONT_CAMERA_TYPE = "front";
     private static final String BACK_CAMERA_TYPE = "back";
@@ -128,6 +128,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     private String cameraType = "";
     private boolean enableH264Codec = false;
     private String videoTrackName = "camera";
+    private static CustomVideoProcessor videoProcessor = new CustomVideoProcessor();
 
     @Retention(RetentionPolicy.SOURCE)
     @StringDef({Events.ON_CAMERA_SWITCHED,
@@ -245,13 +246,12 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         // Start the thread where data messages are received
         dataTrackMessageThread.start();
         dataTrackMessageThreadHandler = new Handler(dataTrackMessageThread.getLooper());
-
     }
 
     // ===== SETUP =================================================================================
 
     private VideoFormat buildVideoFormat() {
-        return new VideoFormat(VideoDimensions.CIF_VIDEO_DIMENSIONS, 15);
+        return new VideoFormat(VideoDimensions.HD_720P_VIDEO_DIMENSIONS, 30);
     }
 
     private CameraCapturer createCameraCaputer(Context context, String cameraId) {
@@ -339,6 +339,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
 
         Log.i(TAG, "Creating LocalVideoTrack with name: " + videoTrackName);
         localVideoTrack = LocalVideoTrack.create(getContext(), enableVideo, cameraCapturer, buildVideoFormat(), videoTrackName);
+        localVideoTrack.getVideoSource().setVideoProcessor(videoProcessor);
 
         if (thumbnailVideoView != null && localVideoTrack != null) {
             localVideoTrack.addSink(thumbnailVideoView);
@@ -362,6 +363,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
             if (cameraCapturer != null && localVideoTrack == null) {
                 Log.i(TAG, "OnHostResume, Creating LocalVideoTrack with name: " + videoTrackName);
                 localVideoTrack = LocalVideoTrack.create(getContext(), isVideoEnabled, cameraCapturer, buildVideoFormat(), videoTrackName);
+                localVideoTrack.getVideoSource().setVideoProcessor(videoProcessor);
             }
 
             if (localVideoTrack != null) {
@@ -819,6 +821,14 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         if (cameraCapturer != null) {
             cameraCapturer.stopCapture();
             cameraCapturer = null;
+        }
+    }
+
+    public void captureFrame() {
+        if (videoProcessor != null) {
+            videoProcessor.captureFrame();
+        } else {
+            Log.e(TAG, "Failed to call captureFrame. Video processor is not initialized");
         }
     }
 
@@ -1353,8 +1363,11 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
 
     public static void registerThumbnailVideoView(PatchedVideoView v) {
         thumbnailVideoView = v;
+        videoProcessor.setVideoView(v);
+        videoProcessor.setContext(v.getContext().getApplicationContext());
         if (localVideoTrack != null) {
             localVideoTrack.addSink(v);
+            localVideoTrack.getVideoSource().setVideoProcessor(videoProcessor);
         }
         setThumbnailMirror();
     }

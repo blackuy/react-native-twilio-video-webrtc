@@ -62,6 +62,7 @@ public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilio
     private static final int PUBLISH_VIDEO = 13;
     private static final int PUBLISH_AUDIO = 14;
     private static final int PREPARE_TO_REBUILD_LOCAL_VIDEO_TRACK = 15;
+    private static final int CAPTURE_FRAME = 16;
 
 
     @Override
@@ -157,6 +158,9 @@ public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilio
             case PREPARE_TO_REBUILD_LOCAL_VIDEO_TRACK:
                 view.prepareToRebuildLocalVideoTrack(args.getString(0));
                 break;
+            case CAPTURE_FRAME:
+                view.captureFrame();
+                break;
         }
     }
 
@@ -222,6 +226,7 @@ public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilio
                 .put("publishVideo", PUBLISH_VIDEO)
                 .put("publishAudio", PUBLISH_AUDIO)
                 .put("prepareToRebuildLocalVideoTrack", PREPARE_TO_REBUILD_LOCAL_VIDEO_TRACK)
+                .put("captureFrame", CAPTURE_FRAME)
                 .build();
     }
 }

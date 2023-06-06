@@ -19,6 +19,9 @@ import java.util.Collections;
 import java.util.List;
 
 public class TwilioPackage implements ReactPackage {
+
+    public static final String TAG = "rntwilio";
+
     @Override
     public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
         return Collections.emptyList();

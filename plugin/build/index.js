@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const config_plugins_1 = require("expo/config-plugins");
 const withAndroidTwilioVideoWebrtc_1 = __importDefault(require("./withAndroidTwilioVideoWebrtc"));
 const withIosTwilioVideoWebrtc_1 = __importDefault(require("./withIosTwilioVideoWebrtc"));
-const pkg = require("react-native-twilio-video-webrtc/package.json");
+const pkg = require("../../package.json");
 const withTwilioVideoWebrtc = (config, props) => {
     config = (0, withAndroidTwilioVideoWebrtc_1.default)(config);
     config = (0, withIosTwilioVideoWebrtc_1.default)(config, props);

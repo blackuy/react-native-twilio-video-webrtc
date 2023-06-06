@@ -20,7 +20,7 @@ import {
 } from 'react-native';
 import * as FileSystem from 'expo-file-system';
 
-import { TOKENS, LOG_FILES } from './env';
+import { TOKENS, LOG_FILES_INTERVAL_SEC } from './env';
 
 const token = Platform.OS === 'android' ? TOKENS[0] : TOKENS[1];
 
@@ -50,14 +50,13 @@ const Example = (props: any) => {
       FileSystem.readDirectoryAsync(FileSystem.documentDirectory!).then(
         (files) => {
           // files that begin with rntframe- are the captured video frames
-          if (LOG_FILES)
-            console.log(
-              'Saved frames: ' + Platform.OS,
-              files.filter((f) => f.startsWith('rntframe-')),
-            );
+          console.log(
+            'Saved frames: ' + Platform.OS,
+            files.filter((f) => f.startsWith('rntframe-')),
+          );
         },
       );
-    }, 1000 * 60);
+    }, 1000 * LOG_FILES_INTERVAL_SEC);
 
     return () => clearInterval(intervalId);
   }, []);

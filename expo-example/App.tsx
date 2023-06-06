@@ -13,6 +13,7 @@ import {
   TouchableOpacity,
   Platform,
   PermissionsAndroid,
+  ScrollView,
 } from 'react-native';
 
 import { tokens } from './tokens';
@@ -28,7 +29,6 @@ const Example = (props: any) => {
   const [videoTracks, setVideoTracks] = useState(new Map());
   // const [token, setToken] = useState('');
   const twilioVideo = useRef<TwilioVideo>(null);
-  console.log({ status, participants: participants.size });
 
   const _onConnectButtonPress = async () => {
     if (Platform.OS === 'android') {
@@ -156,6 +156,10 @@ const Example = (props: any) => {
     });
   };
 
+  const onCaptureFrame = () => {
+    console.log('onCaptureFrame');
+  };
+
   return (
     <View style={styles.container}>
       {status === 'disconnected' && (
@@ -186,7 +190,7 @@ const Example = (props: any) => {
               })}
             </View>
           )}
-          <View style={styles.optionsContainer}>
+          <ScrollView style={styles.optionsContainer} horizontal>
             <TouchableOpacity
               style={styles.optionButton}
               onPress={_onEndButtonPress}
@@ -215,8 +219,15 @@ const Example = (props: any) => {
                 {isScreenShareEnabled ? 'Stop Sharing' : 'Start Sharing'}
               </Text>
             </TouchableOpacity>
-            <TwilioVideoLocalView enabled={true} style={styles.localVideo} />
-          </View>
+
+            <TouchableOpacity
+              style={styles.optionButton}
+              onPress={onCaptureFrame}
+            >
+              <Text style={{ fontSize: 12 }}>Capture Frame</Text>
+            </TouchableOpacity>
+          </ScrollView>
+          <TwilioVideoLocalView enabled={true} style={styles.localVideo} />
         </View>
       )}
 
@@ -270,7 +281,7 @@ const styles = StyleSheet.create({
     height: 250,
     position: 'absolute',
     right: 10,
-    bottom: 10,
+    bottom: 100,
   },
   remoteGrid: {
     flex: 1,
@@ -291,8 +302,8 @@ const styles = StyleSheet.create({
     right: 0,
     height: 100,
     backgroundColor: 'blue',
-    flexDirection: 'row',
-    alignItems: 'center',
+    // flexDirection: 'row',
+    // alignItems: 'center',
   },
   optionButton: {
     width: 60,

@@ -7,7 +7,10 @@
 package com.twiliorn.library;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
+import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.graphics.YuvImage;
 import android.os.Handler;
@@ -115,7 +118,8 @@ public class PatchedVideoView extends VideoView {
         YuvImage yuvImage = new YuvImage(nv21Data, ImageFormat.NV21, width, height, null);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         yuvImage.compressToJpeg(new Rect(0, 0, width, height), 100, out);
-        byte[] imageBytes = out.toByteArray();
+        byte[] rawImageBytes = out.toByteArray();
+        byte[] imageBytes = rotateJPEGByteArray(rawImageBytes, 90f);
         try (FileOutputStream fos = context.openFileOutput(filename, Context.MODE_PRIVATE)) {
             // write image to disk
             fos.write(imageBytes);
@@ -131,6 +135,33 @@ public class PatchedVideoView extends VideoView {
         } finally {
             frame.release();
         }
+    }
+
+    private byte[] rotateJPEGByteArray(
+            byte[] data,
+            float rotation
+    ) {
+        if (rotation == 0f) {
+            return data;
+        }
+         else {
+            Bitmap sourceBitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+            Bitmap rotatedBitmap = rotateBitmap(sourceBitmap, rotation);
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+            sourceBitmap.recycle();
+            rotatedBitmap.recycle();
+            return byteArrayOutputStream.toByteArray();
+        }
+    }
+
+    private Bitmap rotateBitmap(
+            Bitmap sourceBitmap,
+            float rotation
+    ) {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(rotation);
+        return Bitmap.createBitmap(sourceBitmap, 0, 0, sourceBitmap.getWidth(), sourceBitmap.getHeight(), matrix, true);
     }
 
     public void notifyCaptureFrame() {

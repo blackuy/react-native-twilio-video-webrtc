@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import {
   TwilioVideoLocalView,
   TwilioVideoParticipantView,
@@ -16,11 +16,13 @@ import {
   ScrollView,
   findNodeHandle,
   UIManager,
+  DeviceEventEmitter,
 } from 'react-native';
+import * as FileSystem from 'expo-file-system';
 
-import { tokens } from './tokens';
+import { TOKENS, LOG_FILES } from './env';
 
-const token = Platform.OS === 'android' ? tokens[0] : tokens[1];
+const token = Platform.OS === 'android' ? TOKENS[0] : TOKENS[1];
 
 const Example = (props: any) => {
   const [isAudioEnabled, setIsAudioEnabled] = useState(true);
@@ -32,6 +34,33 @@ const Example = (props: any) => {
   // const [token, setToken] = useState('');
   const twilioVideo = useRef<TwilioVideo>(null);
   const twilioLocalVideoRef = useRef<TwilioVideoLocalView>(null);
+
+  useEffect(() => {
+    const sub = DeviceEventEmitter.addListener('onFrameCaptured', (event) => {
+      console.log('onFrameCaptured', event);
+      // this is where you can use expo-fs or rn-fetch-blob, etc to read the file from the path and do something with it
+    });
+
+    return () => sub.remove();
+  }, []);
+
+  // Logs captured video frames to console
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      FileSystem.readDirectoryAsync(FileSystem.documentDirectory!).then(
+        (files) => {
+          // files that begin with rntframe- are the captured video frames
+          if (LOG_FILES)
+            console.log(
+              'Saved frames: ' + Platform.OS,
+              files.filter((f) => f.startsWith('rntframe-')),
+            );
+        },
+      );
+    }, 1000 * 60);
+
+    return () => clearInterval(intervalId);
+  }, []);
 
   const _onConnectButtonPress = async () => {
     if (Platform.OS === 'android') {
@@ -159,6 +188,12 @@ const Example = (props: any) => {
     });
   };
 
+  /**
+   * Capture frame works by sending an event to the native view.
+   * The native view then captures the frame and saves it to the device's file system,
+   * and emits an event with the path to the file back to the JS side.
+   * Listen to JS event via DeviceEventEmitter.addListener('onFrameCaptured', (event) => { // code here })
+   */
   const onCaptureFrame = () => {
     console.log('sending capture frame event to native module');
     const viewId = findNodeHandle(twilioLocalVideoRef.current!);

@@ -17,4 +17,4 @@ web-build/
 .metro-health-check*
 
 # file to hold twilio tokens
-tokens.ts
+env.ts

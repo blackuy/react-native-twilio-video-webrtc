@@ -14,6 +14,8 @@ import {
   Platform,
   PermissionsAndroid,
   ScrollView,
+  findNodeHandle,
+  UIManager,
 } from 'react-native';
 
 import { tokens } from './tokens';
@@ -29,6 +31,7 @@ const Example = (props: any) => {
   const [videoTracks, setVideoTracks] = useState(new Map());
   // const [token, setToken] = useState('');
   const twilioVideo = useRef<TwilioVideo>(null);
+  const twilioLocalVideoRef = useRef<TwilioVideoLocalView>(null);
 
   const _onConnectButtonPress = async () => {
     if (Platform.OS === 'android') {
@@ -157,7 +160,23 @@ const Example = (props: any) => {
   };
 
   const onCaptureFrame = () => {
-    console.log('onCaptureFrame');
+    console.log('sending capture frame event to native module');
+    const viewId = findNodeHandle(twilioLocalVideoRef.current!);
+    const CAPTURE_FRAME_COMMAND_ID = 1;
+    if (Platform.OS === 'android') {
+      UIManager.dispatchViewManagerCommand(
+        viewId,
+        CAPTURE_FRAME_COMMAND_ID.toString(),
+        [viewId],
+      );
+    } else {
+      UIManager.dispatchViewManagerCommand(
+        viewId,
+        UIManager.getViewManagerConfig('RCTTWLocalVideoView').Commands
+          .captureFrame,
+        [],
+      );
+    }
   };
 
   return (
@@ -227,7 +246,11 @@ const Example = (props: any) => {
               <Text style={{ fontSize: 12 }}>Capture Frame</Text>
             </TouchableOpacity>
           </ScrollView>
-          <TwilioVideoLocalView enabled={true} style={styles.localVideo} />
+          <TwilioVideoLocalView
+            ref={twilioLocalVideoRef}
+            enabled={true}
+            style={styles.localVideo}
+          />
         </View>
       )}
 

@@ -9,6 +9,7 @@
 #import "RCTTWLocalVideoViewManager.h"
 
 #import "RCTTWVideoModule.h"
+#import "RCTTWFrameCaptureRenderer.h"
 
 @interface RCTTWLocalVideoViewManager()
 @end
@@ -27,6 +28,13 @@ RCT_CUSTOM_VIEW_PROPERTY(scalesType, NSInteger, TVIVideoView) {
   inner.autoresizingMask = (UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth);
   [container addSubview:inner];
   return container;
+}
+
+RCT_EXPORT_METHOD(captureFrame:(nonnull NSNumber*) reactTag) {
+    [self.bridge.uiManager addUIBlock:^(RCTUIManager *uiManager, NSDictionary<NSNumber *,UIView *> *viewRegistry) {
+        RCTTWVideoModule *videoModule = [self.bridge moduleForName:@"TWVideoModule"];
+        [videoModule captureFrame];
+    }];
 }
 
 RCT_CUSTOM_VIEW_PROPERTY(enabled, BOOL, TVIVideoView) {

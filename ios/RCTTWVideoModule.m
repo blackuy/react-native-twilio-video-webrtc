@@ -9,7 +9,8 @@
 #import "RCTTWVideoModule.h"
 
 #import "RCTTWSerializable.h"
-
+#import "RCTTWFrameCaptureRenderer.h"
+"
 static NSString* roomDidConnect               = @"roomDidConnect";
 static NSString* roomDidDisconnect            = @"roomDidDisconnect";
 static NSString* roomDidFailToConnect         = @"roomDidFailToConnect";
@@ -35,6 +36,7 @@ static NSString* cameraInterruptionEnded      = @"cameraInterruptionEnded";
 static NSString* cameraDidStopRunning         = @"cameraDidStopRunning";
 static NSString* statsReceived                = @"statsReceived";
 static NSString* networkQualityLevelsChanged  = @"networkQualityLevelsChanged";
+static NSString* onFrameCaptured = @"onFrameCaptured";
 
 static const CMVideoDimensions kRCTTWVideoAppCameraSourceDimensions = (CMVideoDimensions){900, 720};
 
@@ -71,6 +73,7 @@ TVIVideoFormat *RCTTWVideoModuleCameraSourceSelectVideoFormatBySize(AVCaptureDev
 @property (strong, nonatomic) TVILocalParticipant* localParticipant;
 @property (strong, nonatomic) TVIRoom *room;
 @property (nonatomic) BOOL listening;
+@property (strong, nonatomic) RCTTWFrameCaptureRenderer *captureRenderer;
 
 @end
 
@@ -112,15 +115,27 @@ RCT_EXPORT_MODULE();
     cameraInterruptionEnded,
     statsReceived,
     networkQualityLevelsChanged,
-    dominantSpeakerDidChange
+    dominantSpeakerDidChange,
+    onFrameCaptured
   ];
 }
 
 - (void)addLocalView:(TVIVideoView *)view {
-  if (self.localVideoTrack != nil) {
-    [self.localVideoTrack addRenderer:view];
-  }
-  [self updateLocalViewMirroring:view];
+    if (self.localVideoTrack != nil) {
+        self.captureRenderer = [[RCTTWFrameCaptureRenderer alloc]init];
+        [self.localVideoTrack addRenderer:view];
+        // NOTE: this is where add renderer for capturing frames!
+        [self.localVideoTrack addRenderer:self.captureRenderer];
+    }
+    [self updateLocalViewMirroring:view];
+    
+    // add notification center listener for frame captured events
+    NSNotificationCenter *notiCenter = NSNotificationCenter.defaultCenter;
+    [notiCenter addObserver:self selector:@selector(receiveFrameCapturedNotification:) name:@"onFrameCaptured" object:self.captureRenderer];
+}
+
+- (void)captureFrame {
+    [self.captureRenderer captureFrame];
 }
 
 - (void)updateLocalViewMirroring:(TVIVideoView *)view {
@@ -130,13 +145,28 @@ RCT_EXPORT_MODULE();
 }
 
 - (void)removeLocalView:(TVIVideoView *)view {
-  if (self.localVideoTrack != nil) {
-    [self.localVideoTrack removeRenderer:view];
-  }
+    if (self.localVideoTrack != nil) {
+        [self.localVideoTrack removeRenderer:view];
+        [self.localVideoTrack removeRenderer:self.captureRenderer];
+    }
+    
+    // remove notification center listener for frame captured events
+    NSNotificationCenter *notiCenter = NSNotificationCenter.defaultCenter;
+    [notiCenter removeObserver:self name:@"onFrameCaptured" object:self.captureRenderer];
 }
 
 - (void)removeParticipantView:(TVIVideoView *)view sid:(NSString *)sid trackSid:(NSString *)trackSid {
   // TODO: Implement this nicely
+}
+
+// notification handler from frame capturer
+- (void) receiveFrameCapturedNotification:(NSNotification *) notification
+{
+    if (![[notification name] isEqualToString:@"onFrameCaptured"]) {
+        return;
+    }
+    NSString *filename = [notification.userInfo objectForKey:@"filename"];
+    [self sendEventCheckingListenerWithName:@"onFrameCaptured" body:@{@"filename": filename}];
 }
 
 - (void)addParticipantView:(TVIVideoView *)view sid:(NSString *)sid trackSid:(NSString *)trackSid {
@@ -192,7 +222,10 @@ RCT_EXPORT_METHOD(startLocalVideo) {
           NSError *error) {
       if (!error) {
           for (TVIVideoView *renderer in self.localVideoTrack.renderers) {
-            [self updateLocalViewMirroring:renderer];
+              // need to type check renderer class since multiple renderers are used.
+              if ([renderer isKindOfClass:[TVIVideoView class]]) {
+                  [self updateLocalViewMirroring:renderer];
+              }
           }
           [self sendEventCheckingListenerWithName:cameraDidStart body:nil];
       }
@@ -281,7 +314,9 @@ RCT_EXPORT_METHOD(flipCamera) {
                 NSError *error) {
             if (!error) {
                 for (TVIVideoView *renderer in self.localVideoTrack.renderers) {
-                    renderer.mirror = mirror;
+                    if ([renderer isKindOfClass:[TVIVideoView class]]) {
+                        renderer.mirror = mirror;
+                    }
                 }
             }
         }];

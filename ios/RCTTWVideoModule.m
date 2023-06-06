@@ -10,7 +10,7 @@
 
 #import "RCTTWSerializable.h"
 #import "RCTTWFrameCaptureRenderer.h"
-"
+
 static NSString* roomDidConnect               = @"roomDidConnect";
 static NSString* roomDidDisconnect            = @"roomDidDisconnect";
 static NSString* roomDidFailToConnect         = @"roomDidFailToConnect";

@@ -21,4 +21,8 @@ public class TwilioVideoPreview extends RNVideoViewGroup {
     public void applyZOrder(boolean applyZOrder) {
         this.getSurfaceViewRenderer().applyZOrder(applyZOrder);
     }
+
+    public void notifyCaptureFrame() {
+        this.getSurfaceViewRenderer().notifyCaptureFrame();
+    }
 }

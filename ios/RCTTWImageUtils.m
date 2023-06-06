@@ -8,6 +8,7 @@
 #import <Foundation/Foundation.h>
 #import "RCTTWImageUtils.h"
 
+// https://stackoverflow.com/a/47402811/5434172
 @implementation UIImage (Rotation)
 
 - (UIImage *)rotate:(float)radians {

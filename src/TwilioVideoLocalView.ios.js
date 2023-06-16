@@ -12,7 +12,6 @@ import { requireNativeComponent, NativeModules } from "react-native";
 
 const { TWVideoModule } = NativeModules;
 
-
 class TwilioVideoLocalView extends Component {
   static propTypes = {
     /**

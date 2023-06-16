@@ -5,7 +5,13 @@
  *   Jonathan Chang <slycoder@gmail.com>
  */
 
-import { requireNativeComponent, View, Platform, UIManager, findNodeHandle } from "react-native";
+import {
+  requireNativeComponent,
+  View,
+  Platform,
+  UIManager,
+  findNodeHandle,
+} from "react-native";
 import React from "react";
 import PropTypes from "prop-types";
 

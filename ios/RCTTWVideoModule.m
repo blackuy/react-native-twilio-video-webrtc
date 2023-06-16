@@ -134,10 +134,6 @@ RCT_EXPORT_MODULE();
     [notiCenter addObserver:self selector:@selector(receiveFrameCapturedNotification:) name:@"onFrameCaptured" object:self.captureRenderer];
 }
 
-- (void)captureFrame {
-    [self.captureRenderer captureFrame];
-}
-
 - (void)updateLocalViewMirroring:(TVIVideoView *)view {
   if (self.camera && self.camera.device.position == AVCaptureDevicePositionFront) {
     view.mirror = true;
@@ -179,6 +175,10 @@ RCT_EXPORT_MODULE();
        }
      }
   }
+}
+
+RCT_EXPORT_METHOD(captureFrame) {
+    [self.captureRenderer captureFrame];
 }
 
 RCT_EXPORT_METHOD(changeListenerStatus:(BOOL)value) {

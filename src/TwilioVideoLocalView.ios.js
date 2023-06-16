@@ -8,7 +8,10 @@
 
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { requireNativeComponent } from "react-native";
+import { requireNativeComponent, NativeModules } from "react-native";
+
+const { TWVideoModule } = NativeModules;
+
 
 class TwilioVideoLocalView extends Component {
   static propTypes = {
@@ -22,6 +25,10 @@ class TwilioVideoLocalView extends Component {
      */
     scaleType: PropTypes.oneOf(["fit", "fill"]),
   };
+
+  captureFrame() {
+    TWVideoModule.captureFrame();
+  }
 
   render() {
     const scalesType = this.props.scaleType === "fit" ? 1 : 2;

@@ -180,7 +180,20 @@ declare module "react-native-twilio-video-webrtc" {
 
   class TwilioVideoLocalView extends React.Component<
     TwilioVideoLocalViewProps
-  > {}
+  > {
+       /**
+         * Send a capture frame request to the native `TwilioVideoLocalView`.
+         * 
+         * The native view then captures the frame and saves it to the apps document directory as a `.jpeg` file w/ filename structure of `rntframe-${uuid}.jpeg`.
+         * 
+         * An event is emitted to JS when the captured frame is saved.
+         * 
+         * Listen to JS event via `DeviceEventEmitter.addListener('onFrameCaptured', ({filename}) => { // code here })`.
+         * 
+         * `import { DeviceEventEmitter } from 'react-native';`
+        */
+        captureFrame: () => void;
+  }
 
   class TwilioVideoParticipantView extends React.Component<
     TwilioVideoParticipantViewProps

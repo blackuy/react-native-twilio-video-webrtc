@@ -35,10 +35,10 @@ public class TwilioVideoPreviewManager extends SimpleViewManager<TwilioVideoPrev
     }
 
     @Override
-    public void receiveCommand(@NonNull TwilioVideoPreview view, String commandId, @Nullable ReadableArray args) {
+    public void receiveCommand(@NonNull TwilioVideoPreview view, int commandId, @Nullable ReadableArray args) {
         super.receiveCommand(view, commandId, args);
         switch (commandId) {
-            case COMMAND_CAPTURE_FRAME + "":
+            case COMMAND_CAPTURE_FRAME:
                 view.notifyCaptureFrame();
                 break;
         }

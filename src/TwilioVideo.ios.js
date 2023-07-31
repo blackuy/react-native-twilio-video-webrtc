@@ -194,8 +194,8 @@ export default class TwilioVideo extends Component {
   /**
    * Enable or disable local video
    */
-  setLocalVideoEnabled(enabled) {
-    return TWVideoModule.setLocalVideoEnabled(enabled);
+  setLocalVideoEnabled(enabled, videoTrackName = "camera") {
+    return TWVideoModule.setLocalVideoEnabled(enabled, videoTrackName);
   }
 
   /**
@@ -215,8 +215,11 @@ export default class TwilioVideo extends Component {
   /**
    * Toggle screen sharing
    */
-  toggleScreenSharing(status) {
-    TWVideoModule.toggleScreenSharing(status);
+  toggleScreenSharing(status, screenTrackName) {
+    if (screenTrackName === undefined) {
+      screenTrackName = "screen"
+    }
+    TWVideoModule.toggleScreenSharing(status, screenTrackName)
   }
 
   /**
@@ -249,6 +252,7 @@ export default class TwilioVideo extends Component {
     encodingParameters = null,
     enableNetworkQualityReporting = false,
     dominantSpeakerEnabled = false,
+    videoTrackName = "camera",
   }) {
     TWVideoModule.connect(
       accessToken,
@@ -258,7 +262,8 @@ export default class TwilioVideo extends Component {
       encodingParameters,
       enableNetworkQualityReporting,
       dominantSpeakerEnabled,
-      cameraType
+      cameraType,
+      videoTrackName,
     );
   }
 

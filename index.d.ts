@@ -16,9 +16,9 @@ declare module "react-native-twilio-video-webrtc" {
     scaleType?: scaleType;
     /**
      * Whether to apply Z ordering to this view.  Setting this to true will cause
-     * this view to appear above other Twilio Video views. 
+     * this view to appear above other Twilio Video views.
      */
-     applyZOrder?: boolean | undefined;
+    applyZOrder?: boolean | undefined;
   }
 
   interface TwilioVideoLocalViewProps extends ViewProps {
@@ -27,7 +27,7 @@ declare module "react-native-twilio-video-webrtc" {
     scaleType?: scaleType;
     /**
      * Whether to apply Z ordering to this view.  Setting this to true will cause
-     * this view to appear above other Twilio Video views. 
+     * this view to appear above other Twilio Video views.
      */
     applyZOrder?: boolean | undefined;
   }
@@ -85,13 +85,13 @@ declare module "react-native-twilio-video-webrtc" {
   export type RoomErrorEventCb = (t: RoomErrorEventArgs) => void;
 
   export type ParticipantEventCb = (p: ParticipantEventArgs) => void;
-  
+
   export type NetworkLevelChangeEventCb = (p: NetworkLevelChangeEventArgs) => void;
 
   export type DominantSpeakerChangedEventArgs = RoomEventCommonArgs & {
     participant: Participant;
   }
-  
+
   export type DominantSpeakerChangedCb = (d: DominantSpeakerChangedEventArgs) => void;
 
   export type LocalParticipantSupportedCodecsCbEventArgs = {
@@ -126,7 +126,7 @@ declare module "react-native-twilio-video-webrtc" {
     onStatsReceived?: (data: any) => void;
     onDataTrackMessageReceived?: DataTrackEventCb;
     // iOS only
-    autoInitializeCamera?: boolean;    
+    autoInitializeCamera?: boolean;
     ref?: React.Ref<any>;
   };
 
@@ -144,6 +144,7 @@ declare module "react-native-twilio-video-webrtc" {
       videoBitrate?: number;
     };
     enableNetworkQualityReporting?: boolean;
+    videoTrackName?: string;
   };
 
   type androidConnectParams = {
@@ -159,17 +160,18 @@ declare module "react-native-twilio-video-webrtc" {
     };
     enableNetworkQualityReporting?: boolean;
     maintainVideoTrackInBackground?: boolean;
+    videoTrackName?: string;
   };
 
   class TwilioVideo extends React.Component<TwilioVideoProps> {
-    setLocalVideoEnabled: (enabled: boolean) => Promise<boolean>;
+    setLocalVideoEnabled: (enabled: boolean, videoTrackName?: string) => Promise<boolean>;
     setLocalAudioEnabled: (enabled: boolean) => Promise<boolean>;
     setRemoteAudioEnabled: (enabled: boolean) => Promise<boolean>;
     setBluetoothHeadsetConnected: (enabled: boolean) => Promise<boolean>;
     connect: (options: iOSConnectParams | androidConnectParams) => void;
     disconnect: () => void;
     flipCamera: () => void;
-    toggleSoundSetup: (speaker: boolean) => void;
+    toggleScreenSharing: (status: boolean, screenTrackName?: string) => void;
     getStats: () => void;
     publishLocalAudio: () => void;
     unpublishLocalAudio: () => void;

@@ -173,7 +173,11 @@ RCT_EXPORT_METHOD(startLocalVideo) {
   if (self.camera == nil) {
       return;
   }
-  self.localVideoTrack = [TVILocalVideoTrack trackWithSource:self.camera enabled:NO name:@"camera"];
+  if (self.customVideoTrackName != nil) {
+    self.localVideoTrack = [TVILocalVideoTrack trackWithSource:self.camera enabled:NO name:self.customVideoTrackName];
+  } else {
+    self.localVideoTrack = [TVILocalVideoTrack trackWithSource:self.camera enabled:NO name:@"camera"];
+  }
 }
 
 - (void)startCameraCapture:(NSString *)cameraType {
@@ -302,7 +306,7 @@ RCT_EXPORT_METHOD(toggleScreenSharing: (BOOL) value) {
          TVILocalParticipant *localParticipant = self.room.localParticipant;
          [localParticipant publishVideoTrack:self.localVideoTrack];
        }
-       [self.screen startCapture];    
+       [self.screen startCapture];
   } else {
         [self unpublishLocalVideo];
         [self.screen stopCapture];
@@ -421,11 +425,13 @@ RCT_EXPORT_METHOD(getStats) {
   }
 }
 
-RCT_EXPORT_METHOD(connect:(NSString *)accessToken roomName:(NSString *)roomName enableAudio:(BOOL *)enableAudio enableVideo:(BOOL *)enableVideo encodingParameters:(NSDictionary *)encodingParameters enableNetworkQualityReporting:(BOOL *)enableNetworkQualityReporting dominantSpeakerEnabled:(BOOL *)dominantSpeakerEnabled cameraType:(NSString *)cameraType) {
+RCT_EXPORT_METHOD(connect:(NSString *)accessToken roomName:(NSString *)roomName enableAudio:(BOOL *)enableAudio enableVideo:(BOOL *)enableVideo encodingParameters:(NSDictionary *)encodingParameters enableNetworkQualityReporting:(BOOL *)enableNetworkQualityReporting dominantSpeakerEnabled:(BOOL *)dominantSpeakerEnabled cameraType:(NSString *)cameraType videoTrackName:(NSString *)videoTrackName) {
   [self _setLocalVideoEnabled:enableVideo cameraType:cameraType];
   if (self.localAudioTrack) {
     [self.localAudioTrack setEnabled:enableAudio];
   }
+
+  self.customVideoTrackName = videoTrackName;
 
   TVIConnectOptions *connectOptions = [TVIConnectOptions optionsWithToken:accessToken block:^(TVIConnectOptionsBuilder * _Nonnull builder) {
     if (self.localVideoTrack) {

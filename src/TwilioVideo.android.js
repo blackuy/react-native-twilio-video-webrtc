@@ -180,6 +180,7 @@ class CustomTwilioVideoView extends Component {
     dominantSpeakerEnabled = false,
     maintainVideoTrackInBackground = false,
     encodingParameters = {},
+    videoTrackName = "camera",
   }) {
     this.runCommand(nativeEvents.connectToRoom, [
       roomName,
@@ -192,6 +193,7 @@ class CustomTwilioVideoView extends Component {
       maintainVideoTrackInBackground,
       cameraType,
       encodingParameters,
+      videoTrackName,
     ]);
   }
 
@@ -227,8 +229,8 @@ class CustomTwilioVideoView extends Component {
     this.runCommand(nativeEvents.switchCamera, []);
   }
 
-  setLocalVideoEnabled(enabled) {
-    this.runCommand(nativeEvents.toggleVideo, [enabled]);
+  setLocalVideoEnabled(enabled, videoTrackName = "camera") {
+    this.runCommand(nativeEvents.toggleVideo, [enabled, videoTrackName]);
     return Promise.resolve(enabled);
   }
 

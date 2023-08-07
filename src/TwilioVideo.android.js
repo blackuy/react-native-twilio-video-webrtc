@@ -180,6 +180,7 @@ class CustomTwilioVideoView extends Component {
     dominantSpeakerEnabled = false,
     maintainVideoTrackInBackground = false,
     encodingParameters = {},
+    videoTrackName = "camera",
   }) {
     this.runCommand(nativeEvents.connectToRoom, [
       roomName,
@@ -192,6 +193,7 @@ class CustomTwilioVideoView extends Component {
       maintainVideoTrackInBackground,
       cameraType,
       encodingParameters,
+      videoTrackName,
     ]);
   }
 

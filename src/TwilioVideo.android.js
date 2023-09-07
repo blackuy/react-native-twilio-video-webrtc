@@ -149,6 +149,10 @@ const propTypes = {
    * Callback that is called after determining what codecs are supported
    */
   onLocalParticipantSupportedCodecs: PropTypes.func,
+  /**
+   * The name of the local video track.  Defaults to "camera"
+   */
+  localVideoTrackName: PropTypes.string,
 };
 
 const nativeEvents = {
@@ -180,7 +184,6 @@ class CustomTwilioVideoView extends Component {
     dominantSpeakerEnabled = false,
     maintainVideoTrackInBackground = false,
     encodingParameters = {},
-    videoTrackName = "camera",
   }) {
     this.runCommand(nativeEvents.connectToRoom, [
       roomName,
@@ -193,7 +196,6 @@ class CustomTwilioVideoView extends Component {
       maintainVideoTrackInBackground,
       cameraType,
       encodingParameters,
-      videoTrackName,
     ]);
   }
 

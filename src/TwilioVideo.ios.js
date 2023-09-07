@@ -152,6 +152,10 @@ export default class TwilioVideo extends Component {
      * camera will require calling `_startLocalVideo`.
      */
     autoInitializeCamera: PropTypes.bool,
+    /**
+     * The name of the local video track to use.  Defaults to "camera".
+     */
+    localVideoTrackName: PropTypes.string,
     ...View.propTypes,
   };
 
@@ -164,6 +168,8 @@ export default class TwilioVideo extends Component {
 
   componentDidMount() {
     this._registerEvents();
+    this._setLocalVideoTrackName(this.props.localVideoTrackName);
+
     if (this.props.autoInitializeCamera !== false) {
       this._startLocalVideo();
     }
@@ -174,6 +180,12 @@ export default class TwilioVideo extends Component {
     this._unregisterEvents();
     this._stopLocalVideo();
     this._stopLocalAudio();
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.localVideoTrackName !== this.props.localVideoTrackName) {
+      this._setLocalVideoTrackName(this.props.localVideoTrackName);
+    }
   }
 
   /**
@@ -249,7 +261,6 @@ export default class TwilioVideo extends Component {
     encodingParameters = null,
     enableNetworkQualityReporting = false,
     dominantSpeakerEnabled = false,
-    videoTrackName = "camera",
   }) {
     TWVideoModule.connect(
       accessToken,
@@ -259,8 +270,7 @@ export default class TwilioVideo extends Component {
       encodingParameters,
       enableNetworkQualityReporting,
       dominantSpeakerEnabled,
-      cameraType,
-      videoTrackName
+      cameraType
     );
   }
 
@@ -305,6 +315,10 @@ export default class TwilioVideo extends Component {
    */
   sendString(message) {
     TWVideoModule.sendString(message);
+  }
+
+  _setLocalVideoTrackName(name) {
+    TWVideoModule.setLocalVideoTrackName(name);
   }
 
   _startLocalVideo() {

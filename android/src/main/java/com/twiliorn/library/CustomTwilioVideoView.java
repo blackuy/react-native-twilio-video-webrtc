@@ -127,7 +127,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     private boolean maintainVideoTrackInBackground = false;
     private String cameraType = "";
     private boolean enableH264Codec = false;
-    private String customVideoTrackName;
+    private String videoTrackName = "camera";
 
     @Retention(RetentionPolicy.SOURCE)
     @StringDef({Events.ON_CAMERA_SWITCHED,
@@ -297,7 +297,11 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         }
     }
 
-    private boolean createLocalVideo(boolean enableVideo, String cameraType, String trackName) {
+    public void setLocalVideoTrackName(String name) {
+        this.videoTrackName = name != null ? name : "camera";
+    }
+
+    private boolean createLocalVideo(boolean enableVideo, String cameraType) {
         isVideoEnabled = enableVideo;
 
         // Share your camera
@@ -327,13 +331,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
             return false;
         }
 
-        // set the track name for lifecycle events if it exists
-        if (trackName != null) {
-            this.customVideoTrackName = trackName;
-            localVideoTrack = LocalVideoTrack.create(getContext(), enableVideo, cameraCapturer, buildVideoFormat(), trackName);
-        } else {
-            localVideoTrack = LocalVideoTrack.create(getContext(), enableVideo, cameraCapturer, buildVideoFormat());
-        }
+        localVideoTrack = LocalVideoTrack.create(getContext(), enableVideo, cameraCapturer, buildVideoFormat(), videoTrackName);
 
         if (thumbnailVideoView != null && localVideoTrack != null) {
             localVideoTrack.addSink(thumbnailVideoView);
@@ -355,7 +353,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
              * If the local video track was released when the app was put in the background, recreate.
              */
             if (cameraCapturer != null && localVideoTrack == null) {
-                localVideoTrack = LocalVideoTrack.create(getContext(), isVideoEnabled, cameraCapturer, buildVideoFormat(), this.customVideoTrackName);
+                localVideoTrack = LocalVideoTrack.create(getContext(), isVideoEnabled, cameraCapturer, buildVideoFormat(), videoTrackName);
             }
 
             if (localVideoTrack != null) {
@@ -457,8 +455,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
             boolean dominantSpeakerEnabled,
             boolean maintainVideoTrackInBackground,
             String cameraType,
-            boolean enableH264Codec,
-            String videoTrackName
+            boolean enableH264Codec
     ) {
         this.roomName = roomName;
         this.accessToken = accessToken;
@@ -468,14 +465,13 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         this.maintainVideoTrackInBackground = maintainVideoTrackInBackground;
         this.cameraType = cameraType;
         this.enableH264Codec = enableH264Codec;
-        this.customVideoTrackName = videoTrackName;
 
         // Share your microphone
         localAudioTrack = LocalAudioTrack.create(getContext(), enableAudio);
 
         if (cameraCapturer == null && enableVideo) {
-            Log.d("RNTwilioVideo", String.format("Creating local video track %s", videoTrackName));
-            boolean createVideoStatus = createLocalVideo(enableVideo, cameraType, videoTrackName);
+            Log.d("RNTwilioVideo", String.format("Creating local video track with name: %s", videoTrackName));
+            boolean createVideoStatus = createLocalVideo(enableVideo, cameraType);
             if (!createVideoStatus) {
                 Log.d("RNTwilioVideo", "Failed to create local video");
                 // No need to connect to room if video creation failed
@@ -715,10 +711,9 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     }
 
     public void toggleVideo(boolean enabled) {
-
         if (cameraCapturer == null && enabled) {
             String fallbackCameraType = cameraType == null ? CustomTwilioVideoView.FRONT_CAMERA_TYPE : cameraType;
-            boolean createVideoStatus = createLocalVideo(true, fallbackCameraType, this.customVideoTrackName);
+            boolean createVideoStatus = createLocalVideo(true, fallbackCameraType);
             if (!createVideoStatus) {
                 Log.d("RNTwilioVideo", "Failed to create local video");
                 return;

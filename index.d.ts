@@ -125,6 +125,7 @@ declare module "react-native-twilio-video-webrtc" {
 
     onStatsReceived?: (data: any) => void;
     onDataTrackMessageReceived?: DataTrackEventCb;
+    localVideoTrackName?: string;
     // iOS only
     autoInitializeCamera?: boolean;
     ref?: React.Ref<any>;
@@ -144,7 +145,6 @@ declare module "react-native-twilio-video-webrtc" {
       videoBitrate?: number;
     };
     enableNetworkQualityReporting?: boolean;
-    videoTrackName?: string;
   };
 
   type androidConnectParams = {
@@ -160,7 +160,6 @@ declare module "react-native-twilio-video-webrtc" {
     };
     enableNetworkQualityReporting?: boolean;
     maintainVideoTrackInBackground?: boolean;
-    videoTrackName?: string;
   };
 
   class TwilioVideo extends React.Component<TwilioVideoProps> {

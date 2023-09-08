@@ -70,7 +70,7 @@ TVIVideoFormat *RCTTWVideoModuleCameraSourceSelectVideoFormatBySize(AVCaptureDev
 @property (strong, nonatomic) TVIAppScreenSource *screen;
 @property (strong, nonatomic) TVILocalParticipant* localParticipant;
 @property (strong, nonatomic) TVIRoom *room;
-@property (strong, nonatomic) NSString *customVideoTrackName;
+@property (strong, nonatomic) NSString *videoTrackName;
 @property (nonatomic) BOOL listening;
 
 @end
@@ -166,6 +166,11 @@ RCT_EXPORT_METHOD(setRemoteAudioPlayback:(NSString *)participantSid enabled:(BOO
     }
 }
 
+RCT_EXPORT_METHOD(setLocalVideoTrackName:(NSString *)name) {
+  NSLog(@"[RNTwilioVideo] Setting local video track name %@",name);
+  self.videoTrackName = name;
+}
+
 RCT_EXPORT_METHOD(startLocalVideo) {
   TVICameraSourceOptions *options = [TVICameraSourceOptions optionsWithBlock:^(TVICameraSourceOptionsBuilder * _Nonnull builder) {
 
@@ -174,9 +179,12 @@ RCT_EXPORT_METHOD(startLocalVideo) {
   if (self.camera == nil) {
       return;
   }
-  if (self.customVideoTrackName != nil) {
-    self.localVideoTrack = [TVILocalVideoTrack trackWithSource:self.camera enabled:NO name:self.customVideoTrackName];
+
+  if (self.videoTrackName != nil) {
+    NSLog(@"[RNTwilioVideo] Using custom video track name %@",self.videoTrackName);
+    self.localVideoTrack = [TVILocalVideoTrack trackWithSource:self.camera enabled:NO name:self.videoTrackName];
   } else {
+    NSLog(@"[RNTwilioVideo] Using generic video track name camera");
     self.localVideoTrack = [TVILocalVideoTrack trackWithSource:self.camera enabled:NO name:@"camera"];
   }
 }
@@ -426,13 +434,11 @@ RCT_EXPORT_METHOD(getStats) {
   }
 }
 
-RCT_EXPORT_METHOD(connect:(NSString *)accessToken roomName:(NSString *)roomName enableAudio:(BOOL *)enableAudio enableVideo:(BOOL *)enableVideo encodingParameters:(NSDictionary *)encodingParameters enableNetworkQualityReporting:(BOOL *)enableNetworkQualityReporting dominantSpeakerEnabled:(BOOL *)dominantSpeakerEnabled cameraType:(NSString *)cameraType videoTrackName:(NSString *)videoTrackName) {
+RCT_EXPORT_METHOD(connect:(NSString *)accessToken roomName:(NSString *)roomName enableAudio:(BOOL *)enableAudio enableVideo:(BOOL *)enableVideo encodingParameters:(NSDictionary *)encodingParameters enableNetworkQualityReporting:(BOOL *)enableNetworkQualityReporting dominantSpeakerEnabled:(BOOL *)dominantSpeakerEnabled cameraType:(NSString *)cameraType) {
   [self _setLocalVideoEnabled:enableVideo cameraType:cameraType];
   if (self.localAudioTrack) {
     [self.localAudioTrack setEnabled:enableAudio];
   }
-
-  self.customVideoTrackName = videoTrackName;
 
   TVIConnectOptions *connectOptions = [TVIConnectOptions optionsWithToken:accessToken block:^(TVIConnectOptionsBuilder * _Nonnull builder) {
     if (self.localVideoTrack) {

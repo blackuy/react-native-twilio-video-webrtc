@@ -78,6 +78,8 @@ public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilio
 
     @Override
     public void receiveCommand(CustomTwilioVideoView view, int commandId, @Nullable ReadableArray args) {
+        String cameraType = null;
+
         switch (commandId) {
             case CONNECT_TO_ROOM:
                 String roomName = args.getString(0);
@@ -88,7 +90,7 @@ public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilio
                 boolean enableNetworkQualityReporting = args.getBoolean(5);
                 boolean dominantSpeakerEnabled = args.getBoolean(6);
                 boolean maintainVideoTrackInBackground = args.getBoolean(7);
-                String cameraType = args.getString(8);
+                cameraType = args.getString(8);
                 ReadableMap encodingParameters = args.getMap(9);
                 boolean enableH264Codec = encodingParameters.hasKey("enableH264Codec") ? encodingParameters.getBoolean("enableH264Codec") : false;
                 view.connectToRoomWrapper(
@@ -112,7 +114,8 @@ public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilio
                 break;
             case TOGGLE_VIDEO:
                 Boolean videoEnabled = args.getBoolean(0);
-                view.toggleVideo(videoEnabled);
+                cameraType = args.getString(1);
+                view.toggleVideo(videoEnabled, cameraType);
                 break;
             case TOGGLE_SOUND:
                 Boolean audioEnabled = args.getBoolean(0);

@@ -206,8 +206,8 @@ export default class TwilioVideo extends Component {
   /**
    * Enable or disable local video
    */
-  setLocalVideoEnabled(enabled) {
-    return TWVideoModule.setLocalVideoEnabled(enabled);
+  setLocalVideoEnabled(enabled, cameraType) {
+    return TWVideoModule.setLocalVideoEnabled(enabled, cameraType);
   }
 
   /**

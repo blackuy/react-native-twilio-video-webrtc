@@ -276,9 +276,9 @@ RCT_REMAP_METHOD(setLocalAudioEnabled, enabled:(BOOL)enabled setLocalAudioEnable
   return false;
 }
 
-RCT_REMAP_METHOD(setLocalVideoEnabled, enabled:(BOOL)enabled setLocalVideoEnabledWithResolver:(RCTPromiseResolveBlock)resolve
+RCT_REMAP_METHOD(setLocalVideoEnabled, enabled:(BOOL)enabled cameraType:(NSString *)cameraType setLocalVideoEnabledWithResolver:(RCTPromiseResolveBlock)resolve
                  rejecter:(RCTPromiseRejectBlock)reject) {
-  bool result = [self _setLocalVideoEnabled:enabled];
+  bool result = [self _setLocalVideoEnabled:enabled cameraType:cameraType];
   resolve(@(result));
 }
 

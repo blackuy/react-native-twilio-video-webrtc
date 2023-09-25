@@ -268,6 +268,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
                             setThumbnailMirror();
                             WritableMap event = new WritableNativeMap();
                             event.putBoolean("isBackCamera", isCurrentCameraSourceBackFacing());
+                            event.putString("newCameraId", newCameraId);
                             pushEvent(CustomTwilioVideoView.this, ON_CAMERA_SWITCHED, event);
                         }
 
@@ -710,7 +711,9 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         }
     }
 
-    public void toggleVideo(boolean enabled) {
+    public void toggleVideo(boolean enabled, String cameraType) {
+        this.cameraType = cameraType;
+
         if (cameraCapturer == null && enabled) {
             String fallbackCameraType = cameraType == null ? CustomTwilioVideoView.FRONT_CAMERA_TYPE : cameraType;
             boolean createVideoStatus = createLocalVideo(true, fallbackCameraType);

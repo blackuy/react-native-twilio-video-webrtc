@@ -170,6 +170,7 @@ const nativeEvents = {
   sendString: 12,
   publishVideo: 13,
   publishAudio: 14,
+  prepareToRebuildLocalVideoTrack: 15,
 };
 
 class CustomTwilioVideoView extends Component {
@@ -229,6 +230,10 @@ class CustomTwilioVideoView extends Component {
 
   flipCamera() {
     this.runCommand(nativeEvents.switchCamera, []);
+  }
+
+  prepareToRebuildLocalVideoTrack(localVideoTrackName) {
+    this.runCommand(nativeEvents.prepareToRebuildLocalVideoTrack, [localVideoTrackName]);
   }
 
   setLocalVideoEnabled(enabled, cameraType) {

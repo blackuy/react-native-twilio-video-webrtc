@@ -180,6 +180,10 @@ RCT_EXPORT_METHOD(startLocalVideo) {
       return;
   }
 
+  [self initLocalVideoTrack];
+}
+
+- (void)initLocalVideoTrack {
   if (self.videoTrackName != nil) {
     NSLog(@"[RNTwilioVideo] Using custom video track name %@",self.videoTrackName);
     self.localVideoTrack = [TVILocalVideoTrack trackWithSource:self.camera enabled:NO name:self.videoTrackName];
@@ -191,23 +195,29 @@ RCT_EXPORT_METHOD(startLocalVideo) {
 
 - (void)startCameraCapture:(NSString *)cameraType {
   if (self.camera == nil) {
+    NSLog(@"[RNTwilioVideo] No camera...");
     return;
   }
-  AVCaptureDevice *camera;
+  AVCaptureDevice *captureDevice;
     if ([cameraType isEqualToString:@"back"]) {
-    camera = [TVICameraSource captureDeviceForPosition:AVCaptureDevicePositionBack];
+    captureDevice = [TVICameraSource captureDeviceForPosition:AVCaptureDevicePositionBack];
   } else {
-    camera = [TVICameraSource captureDeviceForPosition:AVCaptureDevicePositionFront];
+    captureDevice = [TVICameraSource captureDeviceForPosition:AVCaptureDevicePositionFront];
   }
 
-  [self.camera startCaptureWithDevice:camera completion:^(AVCaptureDevice *device,
+  NSLog(@"[RNTwilioVideo] Starting camera: %@", cameraType);
+
+  [self.camera startCaptureWithDevice:captureDevice completion:^(AVCaptureDevice *device,
           TVIVideoFormat *startFormat,
           NSError *error) {
       if (!error) {
+          NSLog(@"[RNTwilioVideo] Camera did start");
           for (TVIVideoView *renderer in self.localVideoTrack.renderers) {
             [self updateLocalViewMirroring:renderer];
           }
           [self sendEventCheckingListenerWithName:cameraDidStart body:nil];
+      } else {
+        NSLog(@"[RNTwilioVideo] Error starting capture %@", error);
       }
   }];
 }
@@ -216,8 +226,21 @@ RCT_EXPORT_METHOD(startLocalAudio) {
     self.localAudioTrack = [TVILocalAudioTrack trackWithOptions:nil enabled:YES name:@"microphone"];
 }
 
-RCT_EXPORT_METHOD(stopLocalVideo) {
-    [self clearCameraInstance];
+RCT_EXPORT_METHOD(stopLocalVideo:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+    if (self.camera) {
+        NSLog(@"[RNTwilioVideo] Stopping camera via stopLocalVideo");
+        [self.camera stopCaptureWithCompletion:^(NSError *error) {
+            if (!error) {
+                NSLog(@"[RNTwilioVideo] Camera stopped via stopLocalVideo");
+                resolve(@(true));
+            } else {
+                NSLog(@"[RNTwilioVideo] Error stopping camera via stopLocalVideo: %@", error);
+                reject(@"camera_stop_error", @"Error stopping camera", error);
+            }
+        }];
+    } else {
+        NSLog(@"[RNTwilioVideo] No camera to stop explicitly");
+    }
 }
 
 RCT_EXPORT_METHOD(stopLocalAudio) {
@@ -263,14 +286,18 @@ RCT_REMAP_METHOD(setLocalAudioEnabled, enabled:(BOOL)enabled setLocalAudioEnable
 
 - (bool)_setLocalVideoEnabled:(bool)enabled cameraType:(NSString *)cameraType {
   if (self.localVideoTrack != nil) {
+      NSLog(@"[RNTwilioVideo] Setting local video %@", enabled ? @"enabled" : @"disabled");
+
       [self.localVideoTrack setEnabled:enabled];
-      if (self.camera) {
+      if (self.camera != nil) {
           if (enabled) {
             [self startCameraCapture:cameraType];
           } else {
             [self clearCameraInstance];
           }
           return enabled;
+      } else {
+        NSLog(@"[RNTwilioVideo] No camera to %@", enabled ? @"enable" : @"disable");
       }
   }
   return false;
@@ -298,7 +325,32 @@ RCT_EXPORT_METHOD(flipCamera) {
                 }
             }
         }];
-  }
+    }
+}
+
+RCT_EXPORT_METHOD(prepareToRebuildLocalVideoTrack) {
+    NSLog(@"[RNTwilioVideo] Preparing to rebuild local video track");
+    TVIVideoView *currentRenderer;
+
+    if (self.localVideoTrack != nil) {
+        [self.localVideoTrack setEnabled:false];
+        for (TVIVideoView *renderer in self.localVideoTrack.renderers) {
+            currentRenderer = renderer;
+        }
+        if (currentRenderer != nil) {
+            NSLog(@"[RNTwilioVideo] Removing local video track renderer");
+            [self.localVideoTrack removeRenderer:currentRenderer];
+        }
+        self.localVideoTrack = nil;
+    }
+
+    NSLog(@"[RNTwilioVideo] Initializing new local video track");
+    [self initLocalVideoTrack];
+
+    if (currentRenderer != nil) {
+        NSLog(@"[RNTwilioVideo] Adding local video track renderer");
+        [self.localVideoTrack addRenderer:currentRenderer];
+    }
 }
 
 RCT_EXPORT_METHOD(toggleScreenSharing: (BOOL) value) {
@@ -493,7 +545,13 @@ RCT_EXPORT_METHOD(disconnect) {
 - (void)clearCameraInstance {
     // We are done with camera
     if (self.camera) {
-        [self.camera stopCapture];
+        [self.camera stopCaptureWithCompletion:^(NSError *error) {
+            if (!error) {
+                NSLog(@"[RNTwilioVideo] Camera stopped");
+            } else {
+                NSLog(@"[RNTwilioVideo] Error stopping camera: %@", error);
+            }
+        }];
     }
 }
 

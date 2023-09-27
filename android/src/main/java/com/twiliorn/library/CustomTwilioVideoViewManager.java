@@ -60,6 +60,7 @@ public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilio
     private static final int SEND_STRING = 12;
     private static final int PUBLISH_VIDEO = 13;
     private static final int PUBLISH_AUDIO = 14;
+    private static final int PREPARE_TO_REBUILD_LOCAL_VIDEO_TRACK = 15;
 
     @Override
     public String getName() {
@@ -151,6 +152,9 @@ public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilio
             case PUBLISH_AUDIO:
                 view.publishLocalAudio(args.getBoolean(0));
                 break;
+            case PREPARE_TO_REBUILD_LOCAL_VIDEO_TRACK:
+                view.prepareToRebuildLocalVideoTrack(args.getString(0));
+                break;
         }
     }
 
@@ -209,6 +213,9 @@ public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilio
                 .put("toggleRemoteSound", TOGGLE_REMOTE_SOUND)
                 .put("toggleBluetoothHeadset", TOGGLE_BLUETOOTH_HEADSET)
                 .put("sendString", SEND_STRING)
+                .put("publishVideo", PUBLISH_VIDEO)
+                .put("publishAudio", PUBLISH_AUDIO)
+                .put("prepareToRebuildLocalVideoTrack", PREPARE_TO_REBUILD_LOCAL_VIDEO_TRACK)
                 .build();
     }
 }

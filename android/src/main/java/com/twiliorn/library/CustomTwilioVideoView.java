@@ -255,12 +255,14 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     private CameraCapturer createCameraCaputer(Context context, String cameraId) {
         CameraCapturer newCameraCapturer = null;
         try {
+            Log.i(TAG, "Creating new CameraCapturer, cameraId: " + cameraId);
             newCameraCapturer = new CameraCapturer(
                     context,
                     cameraId,
                     new CameraCapturer.Listener() {
                         @Override
                         public void onFirstFrameAvailable() {
+                            Log.i(TAG, "CameraCapturer.onFirstFrameAvailable");
                         }
 
                         @Override
@@ -274,7 +276,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
 
                         @Override
                         public void onError(int i) {
-                            Log.i("CustomTwilioVideoView", "Error getting camera");
+                            Log.i(TAG, "Error getting camera");
                         }
                     }
             );
@@ -300,6 +302,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
 
     public void setLocalVideoTrackName(String name) {
         this.videoTrackName = name != null ? name : "camera";
+        Log.i(TAG, "Updated local video track name to: " + this.videoTrackName);
     }
 
     private boolean createLocalVideo(boolean enableVideo, String cameraType) {
@@ -332,6 +335,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
             return false;
         }
 
+        Log.i(TAG, "Creating LocalVideoTrack with name: " + videoTrackName);
         localVideoTrack = LocalVideoTrack.create(getContext(), enableVideo, cameraCapturer, buildVideoFormat(), videoTrackName);
 
         if (thumbnailVideoView != null && localVideoTrack != null) {
@@ -354,6 +358,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
              * If the local video track was released when the app was put in the background, recreate.
              */
             if (cameraCapturer != null && localVideoTrack == null) {
+                Log.i(TAG, "OnHostResume, Creating LocalVideoTrack with name: " + videoTrackName);
                 localVideoTrack = LocalVideoTrack.create(getContext(), isVideoEnabled, cameraCapturer, buildVideoFormat(), videoTrackName);
             }
 
@@ -468,13 +473,13 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         this.enableH264Codec = enableH264Codec;
 
         // Share your microphone
+        Log.i(TAG, "Creating LocalAudioTrack");
         localAudioTrack = LocalAudioTrack.create(getContext(), enableAudio);
 
         if (cameraCapturer == null && enableVideo) {
-            Log.d("RNTwilioVideo", String.format("Creating local video track with name: %s", videoTrackName));
             boolean createVideoStatus = createLocalVideo(enableVideo, cameraType);
             if (!createVideoStatus) {
-                Log.d("RNTwilioVideo", "Failed to create local video");
+                Log.d(TAG, "Failed to create local video");
                 // No need to connect to room if video creation failed
                 return;
             }
@@ -493,6 +498,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         ConnectOptions.Builder connectOptionsBuilder = new ConnectOptions.Builder(this.accessToken);
 
         if (this.roomName != null) {
+            Log.i(TAG, "Connecting to room: " + this.roomName);
             connectOptionsBuilder.roomName(this.roomName);
         }
 
@@ -531,7 +537,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
 
         boolean isH264Supported = h264EncoderSupported && h264DecoderSupported;
 
-        Log.d("RNTwilioVideo", "H264 supported by hardware: " + isH264Supported);
+        Log.i(TAG, "H264 supported by hardware: " + isH264Supported);
 
         WritableArray supportedCodecs = new WritableNativeArray();
 
@@ -651,13 +657,14 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
 
     @Override
     public void onAudioFocusChange(int focusChange) {
-        Log.e(TAG, "onAudioFocusChange: focuschange: " + focusChange);
+        Log.i(TAG, "onAudioFocusChange: focuschange: " + focusChange);
     }
 
     // ====== DISCONNECTING ========================================================================
 
     public void disconnect() {
         if (room != null) {
+            Log.i(TAG, "Disconnecting from room: " + this.roomName);
             room.disconnect();
         }
         if (localAudioTrack != null) {
@@ -708,17 +715,19 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
                 cameraCapturer.switchCamera(backFacingDevice);
                 cameraType = CustomTwilioVideoView.BACK_CAMERA_TYPE;
             }
+            Log.i(TAG, "Switched camera to: " + cameraType);
         }
     }
 
     public void toggleVideo(boolean enabled, String cameraType) {
         this.cameraType = cameraType;
+        Log.i(TAG, "ToggleVideo, enabled: " + enabled + ", cameraType: " + cameraType);
 
         if (cameraCapturer == null && enabled) {
             String fallbackCameraType = cameraType == null ? CustomTwilioVideoView.FRONT_CAMERA_TYPE : cameraType;
             boolean createVideoStatus = createLocalVideo(true, fallbackCameraType);
             if (!createVideoStatus) {
-                Log.d("RNTwilioVideo", "Failed to create local video");
+                Log.d(TAG, "Failed to create local video");
                 return;
             }
         }
@@ -776,6 +785,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     }
 
     public void publishLocalVideo(boolean enabled) {
+        Log.i(TAG, "publishLocalVideo(" + enabled + ")");
         if (localParticipant != null && localVideoTrack != null) {
             if (enabled) {
                 localParticipant.publishTrack(localVideoTrack);
@@ -786,6 +796,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     }
 
     public void publishLocalAudio(boolean enabled) {
+        Log.i(TAG, "publishLocalAudio(" + enabled + ")");
         if (localParticipant != null && localAudioTrack != null) {
             if (enabled) {
                 localParticipant.publishTrack(localAudioTrack);
@@ -795,6 +806,19 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         }
     }
 
+    public void prepareToRebuildLocalVideoTrack(String localVideoTrackName) {
+        Log.i(TAG, "prepareToRebuildLocalVideoTrack(" + localVideoTrackName + ")");
+        this.setLocalVideoTrackName(localVideoTrackName);
+
+        if (localVideoTrack != null) {
+            localVideoTrack.release();
+            localVideoTrack = null;
+        }
+        if (cameraCapturer != null) {
+            cameraCapturer.stopCapture();
+            cameraCapturer = null;
+        }
+    }
 
     private void convertBaseTrackStats(BaseTrackStats bs, WritableMap result) {
         result.putString("codec", bs.codec);

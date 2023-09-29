@@ -177,6 +177,17 @@ declare module "react-native-twilio-video-webrtc" {
     publishLocalVideo: () => void;
     unpublishLocalVideo: () => void;
     sendString: (message: string) => void;
+
+    /**
+     * Prepares the local video track so that it can receive a new name.  The local
+     * video should be unpublished and disabled before calling this method, and you
+     * will need to enable and publish the video track for it to take effect.
+     *
+     * @param {string} localVideoTrackName - The new name for the local video track,
+     * which should match the prop of the same name.  This is needed here to deal with
+     * platform oddities around when the prop gets sent to the native side... :-/
+     */
+    prepareToRebuildLocalVideoTrack: (localVideoTrackName: string) => void;
   }
 
   class TwilioVideoLocalView extends React.Component<

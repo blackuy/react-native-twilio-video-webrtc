@@ -207,7 +207,15 @@ export default class TwilioVideo extends Component {
    * Enable or disable local video
    */
   setLocalVideoEnabled(enabled, cameraType) {
-    return TWVideoModule.setLocalVideoEnabled(enabled, cameraType);
+    if (!enabled) {
+      // We need to explicitly wait for the local video to stop before resolving the returned promise.
+      // The call to setLocalVideoEnabled() _does_ stop the camera, but it does so asynchronously.
+      return Promise.resolve()
+          .then(() => this._stopLocalVideo())
+          .then(() => TWVideoModule.setLocalVideoEnabled(enabled, cameraType));
+    } else {
+      return TWVideoModule.setLocalVideoEnabled(enabled, cameraType);
+    }
   }
 
   /**
@@ -222,6 +230,11 @@ export default class TwilioVideo extends Component {
    */
   flipCamera() {
     TWVideoModule.flipCamera();
+  }
+
+  prepareToRebuildLocalVideoTrack(localVideoTrackName) {
+    this._setLocalVideoTrackName(localVideoTrackName);
+    TWVideoModule.prepareToRebuildLocalVideoTrack();
   }
 
   /**
@@ -253,24 +266,24 @@ export default class TwilioVideo extends Component {
    * @param  {Boolean} enableNetworkQualityReporting Report network quality of participants
    */
   connect({
-    roomName,
-    accessToken,
-    cameraType = "front",
-    enableAudio = true,
-    enableVideo = true,
-    encodingParameters = null,
-    enableNetworkQualityReporting = false,
-    dominantSpeakerEnabled = false,
-  }) {
+            roomName,
+            accessToken,
+            cameraType = "front",
+            enableAudio = true,
+            enableVideo = true,
+            encodingParameters = null,
+            enableNetworkQualityReporting = false,
+            dominantSpeakerEnabled = false,
+          }) {
     TWVideoModule.connect(
-      accessToken,
-      roomName,
-      enableAudio,
-      enableVideo,
-      encodingParameters,
-      enableNetworkQualityReporting,
-      dominantSpeakerEnabled,
-      cameraType
+        accessToken,
+        roomName,
+        enableAudio,
+        enableVideo,
+        encodingParameters,
+        enableNetworkQualityReporting,
+        dominantSpeakerEnabled,
+        cameraType
     );
   }
 
@@ -322,11 +335,11 @@ export default class TwilioVideo extends Component {
   }
 
   _startLocalVideo() {
-    TWVideoModule.startLocalVideo();
+    return TWVideoModule.startLocalVideo();
   }
 
   _stopLocalVideo() {
-    TWVideoModule.stopLocalVideo();
+    return TWVideoModule.stopLocalVideo();
   }
 
   _startLocalAudio() {
@@ -407,12 +420,12 @@ export default class TwilioVideo extends Component {
         }
       }),
       this._eventEmitter.addListener(
-        "participantDisabledVideoTrack",
-        (data) => {
-          if (this.props.onParticipantDisabledVideoTrack) {
-            this.props.onParticipantDisabledVideoTrack(data);
+          "participantDisabledVideoTrack",
+          (data) => {
+            if (this.props.onParticipantDisabledVideoTrack) {
+              this.props.onParticipantDisabledVideoTrack(data);
+            }
           }
-        }
       ),
       this._eventEmitter.addListener("participantEnabledAudioTrack", (data) => {
         if (this.props.onParticipantEnabledAudioTrack) {
@@ -420,12 +433,12 @@ export default class TwilioVideo extends Component {
         }
       }),
       this._eventEmitter.addListener(
-        "participantDisabledAudioTrack",
-        (data) => {
-          if (this.props.onParticipantDisabledAudioTrack) {
-            this.props.onParticipantDisabledAudioTrack(data);
+          "participantDisabledAudioTrack",
+          (data) => {
+            if (this.props.onParticipantDisabledAudioTrack) {
+              this.props.onParticipantDisabledAudioTrack(data);
+            }
           }
-        }
       ),
       this._eventEmitter.addListener("dataTrackMessageReceived", (data) => {
         if (this.props.onDataTrackMessageReceived) {

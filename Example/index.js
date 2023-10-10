@@ -82,24 +82,22 @@ const Example = (props) => {
   const _onParticipantAddedVideoTrack = ({ participant, track }) => {
     console.log("onParticipantAddedVideoTrack: ", participant, track);
 
-    setVideoTracks(
-      new Map([
-        ...videoTracks,
-        [
-          track.trackSid,
-          { participantSid: participant.sid, videoTrackSid: track.trackSid },
-        ],
-      ])
-    );
+    setVideoTracks((originalVideoTracks) => {
+      originalVideoTracks.set(track.trackSid, {
+        participantSid: participant.sid,
+        videoTrackSid: track.trackSid,
+      });
+      return new Map(originalVideoTracks);
+    });
   };
 
   const _onParticipantRemovedVideoTrack = ({ participant, track }) => {
     console.log("onParticipantRemovedVideoTrack: ", participant, track);
 
-    const newVideoTracks = new Map(videoTracks);
-    newVideoTracks.delete(track.trackSid);
-
-    setVideoTracks(newVideoTracks);
+    setVideoTracks((originalVideoTracks) => {
+      originalVideoTracks.delete(track.trackSid);
+      return new Map(originalVideoTracks);
+    });
   };
 
   const _onNetworkLevelChanged = ({ participant, isLocalUser, quality }) => {

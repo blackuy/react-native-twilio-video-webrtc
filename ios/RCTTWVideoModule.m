@@ -28,6 +28,7 @@ static NSString* participantDisabledVideoTrack     = @"participantDisabledVideoT
 static NSString* participantEnabledAudioTrack      = @"participantEnabledAudioTrack";
 static NSString* participantDisabledAudioTrack     = @"participantDisabledAudioTrack";
 static NSString* dataTrackMessageReceived     = @"dataTrackMessageReceived";
+static NSString* dataTrackBinaryMessageReceived     = @"dataTrackBinaryMessageReceived";
 
 static NSString* cameraDidStart               = @"cameraDidStart";
 static NSString* cameraWasInterrupted         = @"cameraWasInterrupted";
@@ -107,6 +108,7 @@ RCT_EXPORT_MODULE();
     participantEnabledAudioTrack,
     participantDisabledAudioTrack,
     dataTrackMessageReceived,
+    dataTrackBinaryMessageReceived,
     cameraDidStopRunning,
     cameraDidStart,
     cameraWasInterrupted,
@@ -711,8 +713,8 @@ RCT_EXPORT_METHOD(disconnect) {
 }
 
 - (void)remoteDataTrack:(nonnull TVIRemoteDataTrack *)remoteDataTrack didReceiveData:(nonnull NSData *)message {
-    // TODO: Handle didReceiveData
-    NSLog(@"DataTrack didReceiveData");
+    NSString *base64String = [message base64EncodedStringWithOptions:0];
+    [self sendEventCheckingListenerWithName:dataTrackBinaryMessageReceived body:@{ @"message": base64String, @"trackSid": remoteDataTrack.sid }];
 }
 
 # pragma mark - TVILocalParticipantDelegate

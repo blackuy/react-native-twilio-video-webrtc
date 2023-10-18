@@ -21,11 +21,11 @@ import android.media.AudioDeviceInfo;
 import android.media.AudioFocusRequest;
 import android.media.AudioManager;
 import android.os.Build;
-import androidx.annotation.Nullable;
 import androidx.annotation.NonNull;
 import androidx.annotation.StringDef;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 
@@ -65,7 +65,6 @@ import com.twilio.video.RemoteVideoTrack;
 import com.twilio.video.RemoteVideoTrackPublication;
 import com.twilio.video.RemoteVideoTrackStats;
 import com.twilio.video.Room;
-import com.twilio.video.Room.State;
 import com.twilio.video.StatsListener;
 import com.twilio.video.StatsReport;
 import com.twilio.video.TrackPublication;
@@ -95,6 +94,7 @@ import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_CONNECTED;
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_CONNECT_FAILURE;
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_DISCONNECTED;
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_DATATRACK_MESSAGE_RECEIVED;
+import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_DATATRACK_BINARY_MESSAGE_RECEIVED;
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_NETWORK_QUALITY_LEVELS_CHANGED;
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_PARTICIPANT_ADDED_DATA_TRACK;
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_PARTICIPANT_ADDED_AUDIO_TRACK;
@@ -140,6 +140,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
             Events.ON_PARTICIPANT_DISCONNECTED,
             Events.ON_PARTICIPANT_ADDED_VIDEO_TRACK,
             Events.ON_DATATRACK_MESSAGE_RECEIVED,
+            Events.ON_DATATRACK_BINARY_MESSAGE_RECEIVED,
             Events.ON_PARTICIPANT_ADDED_DATA_TRACK,
             Events.ON_PARTICIPANT_REMOVED_DATA_TRACK,
             Events.ON_PARTICIPANT_REMOVED_VIDEO_TRACK,
@@ -164,6 +165,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         String ON_PARTICIPANT_CONNECTED = "onRoomParticipantDidConnect";
         String ON_PARTICIPANT_DISCONNECTED = "onRoomParticipantDidDisconnect";
         String ON_DATATRACK_MESSAGE_RECEIVED = "onDataTrackMessageReceived";
+        String ON_DATATRACK_BINARY_MESSAGE_RECEIVED = "onDataTrackBinaryMessageReceived";
         String ON_PARTICIPANT_ADDED_DATA_TRACK = "onParticipantAddedDataTrack";
         String ON_PARTICIPANT_REMOVED_DATA_TRACK = "onParticipantRemovedDataTrack";
         String ON_PARTICIPANT_ADDED_VIDEO_TRACK = "onParticipantAddedVideoTrack";
@@ -1362,9 +1364,19 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
 
             @Override
             public void onMessage(RemoteDataTrack remoteDataTrack, ByteBuffer byteBuffer) {
+                byte[] binaryMessage;
 
+                if (byteBuffer.hasArray()) {
+                    binaryMessage = byteBuffer.array();
+                } else {
+                    binaryMessage = new byte[byteBuffer.remaining()];
+                    byteBuffer.get(binaryMessage);
+                }
+
+                String encodedBinaryMessage = Base64.encodeToString(binaryMessage, Base64.NO_WRAP);
+                WritableMap event = buildDataTrackEvent(remoteDataTrack, encodedBinaryMessage);
+                pushEvent(CustomTwilioVideoView.this, ON_DATATRACK_BINARY_MESSAGE_RECEIVED, event);
             }
-
 
             @Override
             public void onMessage(RemoteDataTrack remoteDataTrack, String message) {

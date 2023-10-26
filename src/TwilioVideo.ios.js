@@ -9,6 +9,7 @@
 import { Component } from "react";
 import PropTypes from "prop-types";
 import { NativeModules, NativeEventEmitter, View } from "react-native";
+import { toByteArray } from "base64-js";
 
 const { TWVideoModule } = NativeModules;
 
@@ -105,11 +106,17 @@ export default class TwilioVideo extends Component {
      */
     onParticipantDisabledAudioTrack: PropTypes.func,
     /**
-     * Called when an dataTrack receives a message
+     * Called when a dataTrack receives a message
      *
      * @param {{message}}
      */
     onDataTrackMessageReceived: PropTypes.func,
+    /**
+     * Called when a dataTrack receives a binary message
+     *
+     * @param {{message}}
+     */
+    onDataTrackBinaryMessageReceived: PropTypes.func,
     /**
      * Called when the camera has started
      *
@@ -438,13 +445,25 @@ export default class TwilioVideo extends Component {
             if (this.props.onParticipantDisabledAudioTrack) {
               this.props.onParticipantDisabledAudioTrack(data);
             }
-          }
+        }
       ),
       this._eventEmitter.addListener("dataTrackMessageReceived", (data) => {
         if (this.props.onDataTrackMessageReceived) {
           this.props.onDataTrackMessageReceived(data);
         }
       }),
+      this._eventEmitter.addListener(
+        "dataTrackBinaryMessageReceived",
+        (data) => {
+          if (this.props.onDataTrackBinaryMessageReceived) {
+            const byteArray = toByteArray(data.message);
+            this.props.onDataTrackBinaryMessageReceived({
+              ...data,
+              message: byteArray,
+            });
+          }
+        }
+      ),
       this._eventEmitter.addListener("cameraDidStart", (data) => {
         if (this.props.onCameraDidStart) {
           this.props.onCameraDidStart(data);

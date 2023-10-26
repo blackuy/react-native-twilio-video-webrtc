@@ -17,6 +17,7 @@ import {
 import React, { Component } from "react";
 
 import PropTypes from "prop-types";
+import { toByteArray } from "base64-js";
 
 const propTypes = {
   ...View.propTypes,
@@ -70,6 +71,13 @@ const propTypes = {
    * @param {{message}}
    */
   onDataTrackMessageReceived: PropTypes.func,
+
+  /**
+   * Called when an dataTrack receives a binary message
+   *
+   * @param {{message}}
+   */
+  onDataTrackBinaryMessageReceived: PropTypes.func,
 
   /**
    * Called when a new video track has been added
@@ -293,6 +301,7 @@ class CustomTwilioVideoView extends Component {
       "onParticipantAddedDataTrack",
       "onParticipantRemovedDataTrack",
       "onDataTrackMessageReceived",
+      "onDataTrackBinaryMessageReceived",
       "onParticipantAddedVideoTrack",
       "onParticipantRemovedVideoTrack",
       "onParticipantAddedAudioTrack",
@@ -308,10 +317,19 @@ class CustomTwilioVideoView extends Component {
       "onDominantSpeakerDidChange",
       "onLocalParticipantSupportedCodecs",
     ].reduce((wrappedEvents, eventName) => {
+      let handler = (data) => this.props[eventName](data.nativeEvent);
+
       if (this.props[eventName]) {
+        if (eventName === "onDataTrackBinaryMessageReceived") {
+          handler = (data) =>
+            this.props[eventName]({
+              ...data.nativeEvent,
+              message: toByteArray(data.nativeEvent.message),
+            });
+        }
         return {
           ...wrappedEvents,
-          [eventName]: (data) => this.props[eventName](data.nativeEvent),
+          [eventName]: handler,
         };
       }
       return wrappedEvents;

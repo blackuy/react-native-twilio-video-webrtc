@@ -6,7 +6,6 @@
  */
 package com.twiliorn.library;
 
-import android.content.Context;
 import android.graphics.Point;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,7 +18,6 @@ import com.facebook.react.uimanager.events.RCTEventEmitter;
 import com.twilio.video.VideoScaleType;
 
 import tvi.webrtc.RendererCommon;
-import tvi.webrtc.VideoFrame;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -54,9 +52,10 @@ public class RNVideoViewGroup extends ViewGroup {
                 new RendererCommon.RendererEvents() {
                     @Override
                     public void onFirstFrameRendered() {
-
                     }
 
+                    // the w,h are not set before `onLayout` so it uses twilio defaults and video renders funky
+                    // we need to call `onLayout` again somehow after `onFrameResolutionChanged`
                     @Override
                     public void onFrameResolutionChanged(int vw, int vh, int rotation) {
                         synchronized (layoutSync) {

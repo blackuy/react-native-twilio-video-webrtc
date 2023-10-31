@@ -1,14 +1,14 @@
-declare module "react-native-twilio-video-webrtc" {
-  import { ViewProps } from "react-native";
-  import React from "react";
+declare module 'react-native-twilio-video-webrtc' {
+  import { ViewProps } from 'react-native';
+  import React from 'react';
 
   export interface TrackIdentifier {
     participantSid: string;
     videoTrackSid: string;
   }
 
-  type scaleType = "fit" | "fill";
-  type cameraType = "front" | "back";
+  type scaleType = 'fit' | 'fill';
+  type cameraType = 'front' | 'back';
 
   interface TwilioVideoParticipantViewProps extends ViewProps {
     trackIdentifier: TrackIdentifier;
@@ -93,7 +93,7 @@ declare module "react-native-twilio-video-webrtc" {
   export type ParticipantEventCb = (p: ParticipantEventArgs) => void;
 
   export type NetworkLevelChangeEventCb = (
-    p: NetworkLevelChangeEventArgs
+    p: NetworkLevelChangeEventArgs,
   ) => void;
 
   export type DominantSpeakerChangedEventArgs = RoomEventCommonArgs & {
@@ -101,7 +101,7 @@ declare module "react-native-twilio-video-webrtc" {
   };
 
   export type DominantSpeakerChangedCb = (
-    d: DominantSpeakerChangedEventArgs
+    d: DominantSpeakerChangedEventArgs,
   ) => void;
 
   export type LocalParticipantSupportedCodecsCbEventArgs = {
@@ -109,7 +109,7 @@ declare module "react-native-twilio-video-webrtc" {
   };
 
   export type LocalParticipantSupportedCodecsCb = (
-    d: LocalParticipantSupportedCodecsCbEventArgs
+    d: LocalParticipantSupportedCodecsCbEventArgs,
   ) => void;
 
   export type TwilioVideoProps = ViewProps & {
@@ -178,7 +178,7 @@ declare module "react-native-twilio-video-webrtc" {
   class TwilioVideo extends React.Component<TwilioVideoProps> {
     setLocalVideoEnabled: (
       enabled: boolean,
-      cameraType?: cameraType
+      cameraType?: cameraType,
     ) => Promise<boolean>;
     setLocalAudioEnabled: (enabled: boolean) => Promise<boolean>;
     setRemoteAudioEnabled: (enabled: boolean) => Promise<boolean>;
@@ -204,6 +204,18 @@ declare module "react-native-twilio-video-webrtc" {
      * platform oddities around when the prop gets sent to the native side... :-/
      */
     prepareToRebuildLocalVideoTrack: (localVideoTrackName: string) => void;
+    /**
+     * Send a capture frame request to the native `TwilioVideoLocalView`.
+     *
+     * The native view then captures the frame and saves it to the apps document directory as a `.jpeg` file.
+     *
+     * An event is emitted to JS when the captured frame is saved.
+     *
+     * Listen to JS event via `DeviceEventEmitter.addListener('onFrameCaptured', ({filename}) => { // code here })`.
+     *
+     * `import { DeviceEventEmitter } from 'react-native';`
+     */
+    captureFrame: () => void;
   }
 
   class TwilioVideoLocalView extends React.Component<TwilioVideoLocalViewProps> {}

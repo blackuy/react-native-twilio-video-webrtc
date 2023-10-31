@@ -179,6 +179,7 @@ const nativeEvents = {
   publishVideo: 13,
   publishAudio: 14,
   prepareToRebuildLocalVideoTrack: 15,
+  captureFrame: 16,
 };
 
 class CustomTwilioVideoView extends Component {
@@ -274,6 +275,10 @@ class CustomTwilioVideoView extends Component {
 
   toggleSoundSetup(speaker) {
     this.runCommand(nativeEvents.toggleSoundSetup, [speaker]);
+  }
+
+  captureFrame() {
+    this.runCommand(nativeEvents.captureFrame, []);
   }
 
   runCommand(event, args) {

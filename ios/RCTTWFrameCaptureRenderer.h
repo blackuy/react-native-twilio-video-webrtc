@@ -10,7 +10,8 @@
 @interface RCTTWFrameCaptureRenderer : NSObject<TVIVideoRenderer>
 
 @property (nonatomic) BOOL captureThisFrame;
+@property (nonatomic) NSString *filename;
 
-- (void) captureFrame;
+- (void) captureFrame:(NSString *)filename;
 
 @end

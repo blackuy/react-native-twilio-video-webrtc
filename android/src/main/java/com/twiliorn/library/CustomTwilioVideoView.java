@@ -824,9 +824,9 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         }
     }
 
-    public void captureFrame() {
+    public void captureFrame(String filename) {
         if (videoProcessor != null) {
-            videoProcessor.captureFrame();
+            videoProcessor.captureFrame(filename);
         } else {
             Log.e(TAG, "Failed to call captureFrame. Video processor is not initialized");
         }
@@ -1364,7 +1364,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     public static void registerThumbnailVideoView(PatchedVideoView v) {
         thumbnailVideoView = v;
         videoProcessor.setVideoView(v);
-        videoProcessor.setContext(v.getContext().getApplicationContext());
+        videoProcessor.setContext(v.getContext());
         if (localVideoTrack != null) {
             localVideoTrack.addSink(v);
             localVideoTrack.getVideoSource().setVideoProcessor(videoProcessor);

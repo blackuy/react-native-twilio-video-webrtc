@@ -277,8 +277,8 @@ class CustomTwilioVideoView extends Component {
     this.runCommand(nativeEvents.toggleSoundSetup, [speaker]);
   }
 
-  captureFrame() {
-    this.runCommand(nativeEvents.captureFrame, []);
+  captureFrame(filename) {
+    this.runCommand(nativeEvents.captureFrame, [filename]);
   }
 
   runCommand(event, args) {

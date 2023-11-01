@@ -58,11 +58,11 @@ public final class Utils {
     }
 
     // i420 -> nv21 -> yuv -> jpeg
-    public static void saveVideoFrame(VideoFrame frame, Context context) {
+    public static void saveVideoFrame(VideoFrame frame, Context context, String filename) {
         Log.d(TwilioPackage.TAG, "saving video frame");
         String fileId = UUID.randomUUID().toString();
-        String filename = "rntframe-" + fileId + ".jpeg";
-        Log.d(TwilioPackage.TAG, "saving frame for file " + filename);
+        String filePath = filename + ".jpeg";
+        Log.d(TwilioPackage.TAG, "saving frame for file " + filePath);
 
         VideoFrame.I420Buffer i420Buffer = frame.getBuffer().toI420();
         final int width = i420Buffer.getWidth();
@@ -77,13 +77,13 @@ public final class Utils {
         byte[] rawImageBytes = out.toByteArray();
         byte[] imageBytes = rotateJPEGByteArray(rawImageBytes, frame.getRotation());
 
-        try (FileOutputStream fos = context.openFileOutput(filename, Context.MODE_PRIVATE)) {
+        try (FileOutputStream fos = context.openFileOutput(filePath, Context.MODE_PRIVATE)) {
             // write image to disk
             fos.write(imageBytes);
-            Log.d(TwilioPackage.TAG, "saved frame to " + filename);
+            Log.d(TwilioPackage.TAG, "saved frame to " + filePath);
             // send event to JS w/ filename
             WritableMap params = Arguments.createMap();
-            params.putString("filename", filename);
+            params.putString("filename", filePath);
             sendEvent(context, "onFrameCaptured", params);
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);

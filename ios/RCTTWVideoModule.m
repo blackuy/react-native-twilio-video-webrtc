@@ -181,8 +181,8 @@ RCT_EXPORT_MODULE();
   }
 }
 
-RCT_EXPORT_METHOD(captureFrame) {
-    [self.captureRenderer captureFrame];
+RCT_EXPORT_METHOD(captureFrame:(NSString *)filename) {
+    [self.captureRenderer captureFrame:filename];
 }
 
 RCT_EXPORT_METHOD(changeListenerStatus:(BOOL)value) {

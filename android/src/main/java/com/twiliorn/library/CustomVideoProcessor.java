@@ -5,6 +5,8 @@ import android.util.Log;
 
 import androidx.annotation.Nullable;
 
+import com.facebook.react.bridge.ReactContext;
+
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -20,12 +22,12 @@ import tvi.webrtc.VideoSink;
 public class CustomVideoProcessor implements VideoProcessor {
     private final AtomicBoolean canCapture = new AtomicBoolean(false);
     private final AtomicBoolean captureThisFrame = new AtomicBoolean(false);
-    private PatchedVideoView videoView;
     // TODO: FIX THIS. ITS A POTENTIAL MEMORY LEAK.
-    private Context context;
+    private ReactContext context;
     // choosing to use single thread since limited i/o resources may be a bottleneck anyways
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
     private String filename = "";
+    private VideoSink videoSink;
 
     public CustomVideoProcessor() {}
 
@@ -40,11 +42,7 @@ public class CustomVideoProcessor implements VideoProcessor {
         }
     }
 
-    public void setVideoView(PatchedVideoView videoView) {
-        this.videoView = videoView;
-    }
-
-    public void setContext(Context context) {
+    public void setContext(ReactContext context) {
         this.context = context;
     }
 
@@ -67,10 +65,10 @@ public class CustomVideoProcessor implements VideoProcessor {
         // adapt frame and apply to video view component
         VideoFrame adaptedFrame = VideoProcessor.applyFrameAdaptationParameters(frame, parameters);
         if (adaptedFrame != null) {
-            videoView.onFrame(adaptedFrame);
+            videoSink.onFrame(adaptedFrame);
             adaptedFrame.release();
         } else {
-            videoView.onFrame(frame);
+            videoSink.onFrame(frame);
         }
     }
 
@@ -89,7 +87,7 @@ public class CustomVideoProcessor implements VideoProcessor {
 
     @Override
     public void setSink(@Nullable VideoSink videoSink) {
-        // noop
+        this.videoSink = videoSink;
     }
 
     @Override

@@ -19,7 +19,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.UUID;
 
 import tvi.webrtc.VideoFrame;
 
@@ -58,9 +57,8 @@ public final class Utils {
     }
 
     // i420 -> nv21 -> yuv -> jpeg
-    public static void saveVideoFrame(VideoFrame frame, Context context, String filename) {
+    public static void saveVideoFrame(VideoFrame frame, ReactContext context, String filename) {
         Log.d(TwilioPackage.TAG, "saving video frame");
-        String fileId = UUID.randomUUID().toString();
         String filePath = filename + ".jpeg";
         Log.d(TwilioPackage.TAG, "saving frame for file " + filePath);
 
@@ -123,8 +121,8 @@ public final class Utils {
         return Bitmap.createBitmap(sourceBitmap, 0, 0, sourceBitmap.getWidth(), sourceBitmap.getHeight(), matrix, true);
     }
 
-    private static void sendEvent(Context context, String event, WritableMap params) {
-        ((ReactContext) context).getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+    private static void sendEvent(ReactContext context, String event, WritableMap params) {
+        context.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
             .emit(event, params);
     }
 }

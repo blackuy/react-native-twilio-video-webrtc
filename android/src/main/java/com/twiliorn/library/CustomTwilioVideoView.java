@@ -30,6 +30,7 @@ import android.util.Log;
 import android.view.View;
 
 import com.facebook.react.bridge.LifecycleEventListener;
+import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeArray;
@@ -339,10 +340,10 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
 
         Log.i(TAG, "Creating LocalVideoTrack with name: " + videoTrackName);
         localVideoTrack = LocalVideoTrack.create(getContext(), enableVideo, cameraCapturer, buildVideoFormat(), videoTrackName);
-        localVideoTrack.getVideoSource().setVideoProcessor(videoProcessor);
 
         if (thumbnailVideoView != null && localVideoTrack != null) {
             localVideoTrack.addSink(thumbnailVideoView);
+            setVideoProcessor(thumbnailVideoView);
         }
         setThumbnailMirror();
         return true;
@@ -363,12 +364,12 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
             if (cameraCapturer != null && localVideoTrack == null) {
                 Log.i(TAG, "OnHostResume, Creating LocalVideoTrack with name: " + videoTrackName);
                 localVideoTrack = LocalVideoTrack.create(getContext(), isVideoEnabled, cameraCapturer, buildVideoFormat(), videoTrackName);
-                localVideoTrack.getVideoSource().setVideoProcessor(videoProcessor);
             }
 
             if (localVideoTrack != null) {
                 if (thumbnailVideoView != null) {
                     localVideoTrack.addSink(thumbnailVideoView);
+                    setVideoProcessor(thumbnailVideoView);
                 }
 
                 /*
@@ -1363,13 +1364,19 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
 
     public static void registerThumbnailVideoView(PatchedVideoView v) {
         thumbnailVideoView = v;
-        videoProcessor.setVideoView(v);
-        videoProcessor.setContext(v.getContext());
+        videoProcessor.setContext((ReactContext) v.getContext());
         if (localVideoTrack != null) {
             localVideoTrack.addSink(v);
-            localVideoTrack.getVideoSource().setVideoProcessor(videoProcessor);
+            setVideoProcessor(v);
         }
         setThumbnailMirror();
+    }
+
+    private static void setVideoProcessor(PatchedVideoView view) {
+        if (localVideoTrack != null) {
+            videoProcessor.setSink(view);
+            localVideoTrack.getVideoSource().setVideoProcessor(videoProcessor);
+        }
     }
 
     private RemoteDataTrack.Listener remoteDataTrackListener() {

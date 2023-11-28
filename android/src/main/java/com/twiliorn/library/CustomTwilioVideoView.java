@@ -129,7 +129,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     private String cameraType = "";
     private boolean enableH264Codec = false;
     private String videoTrackName = "camera";
-    private static CustomVideoProcessor videoProcessor = new CustomVideoProcessor();
+    private static final FrameCapturerVideoSink frameCapturerVideoSink = new FrameCapturerVideoSink();
 
     @Retention(RetentionPolicy.SOURCE)
     @StringDef({Events.ON_CAMERA_SWITCHED,
@@ -342,8 +342,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         localVideoTrack = LocalVideoTrack.create(getContext(), enableVideo, cameraCapturer, buildVideoFormat(), videoTrackName);
 
         if (thumbnailVideoView != null && localVideoTrack != null) {
-            localVideoTrack.addSink(thumbnailVideoView);
-            setVideoProcessor(thumbnailVideoView);
+            setupLocalVideoTrack(thumbnailVideoView);
         }
         setThumbnailMirror();
         return true;
@@ -368,8 +367,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
 
             if (localVideoTrack != null) {
                 if (thumbnailVideoView != null) {
-                    localVideoTrack.addSink(thumbnailVideoView);
-                    setVideoProcessor(thumbnailVideoView);
+                    setupLocalVideoTrack(thumbnailVideoView);
                 }
 
                 /*
@@ -826,11 +824,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     }
 
     public void captureFrame(String filename) {
-        if (videoProcessor != null) {
-            videoProcessor.captureFrame(filename);
-        } else {
-            Log.e(TAG, "Failed to call captureFrame. Video processor is not initialized");
-        }
+        frameCapturerVideoSink.captureFrame(filename);
     }
 
     private void convertBaseTrackStats(BaseTrackStats bs, WritableMap result) {
@@ -1364,18 +1358,16 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
 
     public static void registerThumbnailVideoView(PatchedVideoView v) {
         thumbnailVideoView = v;
-        videoProcessor.setContext((ReactContext) v.getContext());
-        if (localVideoTrack != null) {
-            localVideoTrack.addSink(v);
-            setVideoProcessor(v);
-        }
+        setupLocalVideoTrack(v);
         setThumbnailMirror();
     }
 
-    private static void setVideoProcessor(PatchedVideoView view) {
+    // called after LocalVideoTrack.create() and when registerThumbnailVideoView is called
+    private static void setupLocalVideoTrack(PatchedVideoView view) {
         if (localVideoTrack != null) {
-            videoProcessor.setSink(view);
-            localVideoTrack.getVideoSource().setVideoProcessor(videoProcessor);
+            localVideoTrack.addSink(view);
+            frameCapturerVideoSink.setContext((ReactContext) view.getContext());
+            localVideoTrack.addSink(frameCapturerVideoSink);
         }
     }
 

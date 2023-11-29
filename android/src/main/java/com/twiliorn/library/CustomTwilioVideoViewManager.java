@@ -43,6 +43,7 @@ import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_STATS_RECEIVE
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_NETWORK_QUALITY_LEVELS_CHANGED;
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_DOMINANT_SPEAKER_CHANGED;
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_LOCAL_PARTICIPANT_SUPPORTED_CODECS;
+import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_FLASHLIGHT_STATUS_CHANGED;
 
 import android.util.Log;
 
@@ -65,6 +66,7 @@ public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilio
     private static final int PUBLISH_AUDIO = 14;
     private static final int PREPARE_TO_REBUILD_LOCAL_VIDEO_TRACK = 15;
     private static final int CAPTURE_FRAME = 16;
+    private static final int SET_FLASHLIGHT_STATUS = 17;
 
 
     @Override
@@ -164,6 +166,9 @@ public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilio
                 Log.d(TwilioPackage.TAG, String.format("capture frame: %s", args.getString(0) == null ? "null" : args.getString(0)));
                 view.captureFrame(args.getString(0));
                 break;
+            case SET_FLASHLIGHT_STATUS:
+                view.setFlashlightStatus(args.getBoolean(0));
+                break;
         }
     }
 
@@ -192,6 +197,10 @@ public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilio
         map.putAll(MapBuilder.of(
                 ON_DATATRACK_MESSAGE_RECEIVED, MapBuilder.of("registrationName", ON_DATATRACK_MESSAGE_RECEIVED),
                 ON_DATATRACK_BINARY_MESSAGE_RECEIVED, MapBuilder.of("registrationName", ON_DATATRACK_BINARY_MESSAGE_RECEIVED)
+        ));
+
+        map.putAll(MapBuilder.of(
+                ON_FLASHLIGHT_STATUS_CHANGED, MapBuilder.of("registrationName", ON_FLASHLIGHT_STATUS_CHANGED)
         ));
 
         map.putAll(MapBuilder.of(
@@ -230,6 +239,7 @@ public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilio
                 .put("publishAudio", PUBLISH_AUDIO)
                 .put("prepareToRebuildLocalVideoTrack", PREPARE_TO_REBUILD_LOCAL_VIDEO_TRACK)
                 .put("captureFrame", CAPTURE_FRAME)
+                .put("setFlashlightStatus", SET_FLASHLIGHT_STATUS)
                 .build();
     }
 }

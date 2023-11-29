@@ -96,6 +96,8 @@ declare module 'react-native-twilio-video-webrtc' {
     p: NetworkLevelChangeEventArgs,
   ) => void;
 
+  export type FlashlightStatusChanged = (status: boolean, error?: string) => void;
+
   export type DominantSpeakerChangedEventArgs = RoomEventCommonArgs & {
     participant: Participant;
   };
@@ -128,6 +130,7 @@ declare module 'react-native-twilio-video-webrtc' {
     onParticipantAddedDataTrack?: TrackEventCb;
     onParticipantRemovedDataTrack?: TrackEventCb;
     onRoomDidConnect?: RoomEventCb;
+    onFlashlightStatusChanged?: (enabled: boolean) => FlashlightStatusChanged;
     onRoomDidDisconnect?: RoomErrorEventCb;
     onRoomDidFailToConnect?: RoomErrorEventCb;
     onRoomParticipantDidConnect?: ParticipantEventCb;
@@ -187,6 +190,7 @@ declare module 'react-native-twilio-video-webrtc' {
     disconnect: () => void;
     flipCamera: () => void;
     toggleSoundSetup: (speaker: boolean) => void;
+    setFlashlightStatus: (enabled: boolean) => void;
     getStats: () => void;
     publishLocalAudio: () => void;
     unpublishLocalAudio: () => void;

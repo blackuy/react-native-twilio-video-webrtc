@@ -21,6 +21,7 @@ import android.media.AudioDeviceInfo;
 import android.media.AudioFocusRequest;
 import android.media.AudioManager;
 import android.os.Build;
+import android.hardware.Camera;
 import androidx.annotation.NonNull;
 import androidx.annotation.StringDef;
 import android.os.Handler;
@@ -40,6 +41,7 @@ import com.facebook.react.uimanager.events.RCTEventEmitter;
 import com.twilio.video.AudioTrackPublication;
 import com.twilio.video.BaseTrackStats;
 import com.twilio.video.CameraCapturer;
+import com.twilio.video.CameraParameterUpdater;
 import com.twilio.video.ConnectOptions;
 import com.twilio.video.LocalAudioTrack;
 import com.twilio.video.LocalAudioTrackPublication;
@@ -113,6 +115,7 @@ import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_STATS_RECEIVE
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_VIDEO_CHANGED;
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_DOMINANT_SPEAKER_CHANGED;
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_LOCAL_PARTICIPANT_SUPPORTED_CODECS;
+import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_FLASHLIGHT_STATUS_CHANGED;
 
 public class CustomTwilioVideoView extends View implements LifecycleEventListener, AudioManager.OnAudioFocusChangeListener {
     private static final String TAG = "rntwilio";
@@ -156,6 +159,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
             Events.ON_NETWORK_QUALITY_LEVELS_CHANGED,
             Events.ON_DOMINANT_SPEAKER_CHANGED,
             Events.ON_LOCAL_PARTICIPANT_SUPPORTED_CODECS,
+            Events.ON_FLASHLIGHT_STATUS_CHANGED,
     })
     public @interface Events {
         String ON_CAMERA_SWITCHED = "onCameraSwitched";
@@ -182,6 +186,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         String ON_NETWORK_QUALITY_LEVELS_CHANGED = "onNetworkQualityLevelsChanged";
         String ON_DOMINANT_SPEAKER_CHANGED = "onDominantSpeakerDidChange";
         String ON_LOCAL_PARTICIPANT_SUPPORTED_CODECS = "onLocalParticipantSupportedCodecs";
+        String ON_FLASHLIGHT_STATUS_CHANGED = "onFlashlightStatusChanged";
     }
 
     private final ThemedReactContext themedReactContext;
@@ -721,6 +726,56 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
                 cameraType = CustomTwilioVideoView.BACK_CAMERA_TYPE;
             }
             Log.i(TAG, "Switched camera to: " + cameraType);
+        }
+    }
+
+    private final CameraParameterUpdater turnFlashlightOn = parameters -> {
+        if (parameters.getFlashMode() != null) {
+            if (parameters.getFlashMode().equals(Camera.Parameters.FLASH_MODE_TORCH)) {
+                Log.i(TAG, "Flashlight already on");
+            } else {
+                String flashMode = Camera.Parameters.FLASH_MODE_TORCH;
+                parameters.setFlashMode(flashMode);
+                WritableMap event = new WritableNativeMap();
+                event.putBoolean("isFlashOn", flashMode == Camera.Parameters.FLASH_MODE_TORCH);
+                pushEvent(CustomTwilioVideoView.this, ON_FLASHLIGHT_STATUS_CHANGED, event);
+            }
+        } else {
+            WritableMap event = new WritableNativeMap();
+            event.putString("error", "Flash is not supported in current camera mode");
+            pushEvent(CustomTwilioVideoView.this, ON_FLASHLIGHT_STATUS_CHANGED, event);
+        }
+    };
+
+    private final CameraParameterUpdater turnFlashlightOff = parameters -> {
+        if (parameters.getFlashMode() != null) {
+            if (parameters.getFlashMode().equals(Camera.Parameters.FLASH_MODE_OFF)) {
+                Log.i(TAG, "Flashlight already off");
+            } else {
+                String flashMode = Camera.Parameters.FLASH_MODE_OFF;
+                parameters.setFlashMode(flashMode);
+                WritableMap event = new WritableNativeMap();
+                event.putBoolean("isFlashOn", flashMode == Camera.Parameters.FLASH_MODE_TORCH);
+                pushEvent(CustomTwilioVideoView.this, ON_FLASHLIGHT_STATUS_CHANGED, event);
+            }
+        } else {
+            WritableMap event = new WritableNativeMap();
+            event.putString("error", "Flash is not supported in current camera mode");
+            pushEvent(CustomTwilioVideoView.this, ON_FLASHLIGHT_STATUS_CHANGED, event);
+        }
+    };
+
+    public void setFlashlightStatus(boolean enabled) {
+        if (cameraCapturer != null) {
+            if (enabled) {
+                cameraCapturer.updateCameraParameters(turnFlashlightOn);
+            } else {
+                cameraCapturer.updateCameraParameters(turnFlashlightOff);
+            }
+        } else {
+            WritableMap event = new WritableNativeMap();
+            event.putString("error", "There's no camera available");
+            pushEvent(CustomTwilioVideoView.this, ON_FLASHLIGHT_STATUS_CHANGED, event);
         }
     }
 

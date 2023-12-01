@@ -209,6 +209,10 @@ public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilio
         ));
 
         map.putAll(MapBuilder.of(
+                ON_FLASHLIGHT_STATUS_CHANGED, MapBuilder.of("registrationName", ON_FLASHLIGHT_STATUS_CHANGED)
+        ));
+
+        map.putAll(MapBuilder.of(
                 ON_PARTICIPANT_ENABLED_VIDEO_TRACK, MapBuilder.of("registrationName", ON_PARTICIPANT_ENABLED_VIDEO_TRACK),
                 ON_PARTICIPANT_DISABLED_VIDEO_TRACK, MapBuilder.of("registrationName", ON_PARTICIPANT_DISABLED_VIDEO_TRACK),
                 ON_PARTICIPANT_ENABLED_AUDIO_TRACK, MapBuilder.of("registrationName", ON_PARTICIPANT_ENABLED_AUDIO_TRACK),

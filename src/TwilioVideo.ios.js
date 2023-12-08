@@ -154,6 +154,11 @@ export default class TwilioVideo extends Component {
      */
     onDominantSpeakerDidChange: PropTypes.func,
     /**
+     * Called when the flashlight status changes
+     * @param {{ status, error }} 
+     */
+    onFlashlightStatusChanged: PropTypes.func,
+    /**
      * Whether or not video should be automatically initialized upon mounting
      * of this component. Defaults to true. If set to false, any use of the
      * camera will require calling `_startLocalVideo`.
@@ -208,6 +213,10 @@ export default class TwilioVideo extends Component {
 
   setBluetoothHeadsetConnected(enabled) {
     return Promise.resolve(enabled);
+  }
+
+  setFlashlightStatus(enabled) {
+    TWVideoModule.setFlashlightStatus(enabled);
   }
 
   /**
@@ -501,6 +510,11 @@ export default class TwilioVideo extends Component {
       this._eventEmitter.addListener("onDominantSpeakerDidChange", (data) => {
         if (this.props.onDominantSpeakerDidChange) {
           this.props.onDominantSpeakerDidChange(data);
+        }
+      }),
+      this._eventEmitter.addListener("onFlashlightStatusChanged", (data) => {
+        if (this.props.onFlashlightStatusChanged) {
+          this.props.onFlashlightStatusChanged(data);
         }
       }),
     ];

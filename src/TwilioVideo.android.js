@@ -161,6 +161,11 @@ const propTypes = {
    * The name of the local video track.  Defaults to "camera"
    */
   localVideoTrackName: PropTypes.string,
+  /**
+   * Called when torch is done attempting to change status
+   * @param {{ status, error }} 
+   */
+  onFlashlightStatusChanged: PropTypes.func,
 };
 
 const nativeEvents = {
@@ -180,6 +185,7 @@ const nativeEvents = {
   publishAudio: 14,
   prepareToRebuildLocalVideoTrack: 15,
   captureFrame: 16,
+  setFlashlightStatus: 17,
 };
 
 class CustomTwilioVideoView extends Component {
@@ -265,6 +271,10 @@ class CustomTwilioVideoView extends Component {
     return Promise.resolve(enabled);
   }
 
+  setFlashlightStatus(enabled) {
+    this.runCommand(nativeEvents.setFlashlightStatus, [enabled]);
+  }
+
   getStats() {
     this.runCommand(nativeEvents.getStats, []);
   }
@@ -321,6 +331,7 @@ class CustomTwilioVideoView extends Component {
       "onNetworkQualityLevelsChanged",
       "onDominantSpeakerDidChange",
       "onLocalParticipantSupportedCodecs",
+      "onFlashlightStatusChanged",
     ].reduce((wrappedEvents, eventName) => {
       let handler = (data) => this.props[eventName](data.nativeEvent);
 

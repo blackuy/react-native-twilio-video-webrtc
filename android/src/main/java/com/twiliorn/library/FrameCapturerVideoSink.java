@@ -29,9 +29,10 @@ public class FrameCapturerVideoSink implements VideoSink {
         if (captureThisFrame.compareAndSet(true, false)) {
             frame.retain(); // retain frame so we can save it on background thread, bg thread will handle releasing
             Log.d(TwilioPackage.TAG, "Capturing frame on background thread.");
+            String filename = this.filename;
             // save frame on background thread
             executorService.execute(() -> {
-                Utils.saveVideoFrame(frame, context, this.filename);
+                Utils.saveVideoFrame(frame, context, filename);
             });
         }
     }

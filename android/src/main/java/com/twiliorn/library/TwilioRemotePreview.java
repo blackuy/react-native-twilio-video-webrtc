@@ -19,6 +19,7 @@ public class TwilioRemotePreview extends RNVideoViewGroup {
 
     public TwilioRemotePreview(ThemedReactContext context, String trackSid) {
         super(context);
+        this.isRemote = true;
         Log.i("CustomTwilioVideoView", "Remote Prview Construct");
         Log.i("CustomTwilioVideoView", trackSid);
 

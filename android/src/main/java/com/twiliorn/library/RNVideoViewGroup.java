@@ -7,6 +7,7 @@
 package com.twiliorn.library;
 
 import android.graphics.Point;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import androidx.annotation.StringDef;
@@ -31,6 +32,7 @@ public class RNVideoViewGroup extends ViewGroup {
     private final Object layoutSync = new Object();
     private RendererCommon.ScalingType scalingType = RendererCommon.ScalingType.SCALE_ASPECT_FILL;
     private final RCTEventEmitter eventEmitter;
+    public boolean isRemote;
 
     @Retention(RetentionPolicy.SOURCE)
     @StringDef({ON_FRAME_DIMENSIONS_CHANGED})
@@ -107,9 +109,15 @@ public class RNVideoViewGroup extends ViewGroup {
                 videoWidth = 640;
             }
 
+            float aspectRatio = (float) videoWidth / (float) videoHeight;
+            if (isRemote) {
+                // NOTE: this is the aspect ratio the remote video is captured at
+                aspectRatio = 1.7777777778f;
+            }
+
             Point displaySize = RendererCommon.getDisplaySize(
                     this.scalingType,
-                    videoWidth / (float) videoHeight,
+                    aspectRatio,
                     width,
                     height
             );

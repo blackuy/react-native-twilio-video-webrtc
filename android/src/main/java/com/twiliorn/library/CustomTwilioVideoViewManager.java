@@ -62,7 +62,7 @@ public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilio
     private static final int PUBLISH_VIDEO = 13;
     private static final int PUBLISH_AUDIO = 14;
     private static final int TOGGLE_SCREEN_SHARE = 15;
-    private static final int SET_REMOTE_AUDIO_PLAYBACK = 15;
+    private static final int SET_REMOTE_AUDIO_PLAYBACK = 16;
 
     @Override
     public String getName() {

@@ -311,24 +311,22 @@ const Example = (props) => {
   const _onParticipantAddedVideoTrack = ({ participant, track }) => {
     console.log("onParticipantAddedVideoTrack: ", participant, track);
 
-    setVideoTracks(
-      new Map([
-        ...videoTracks,
-        [
-          track.trackSid,
-          { participantSid: participant.sid, videoTrackSid: track.trackSid },
-        ],
-      ])
-    );
+    setVideoTracks((originalVideoTracks) => {
+      originalVideoTracks.set(track.trackSid, {
+        participantSid: participant.sid,
+        videoTrackSid: track.trackSid,
+      });
+      return new Map(originalVideoTracks);
+    });
   };
 
   const _onParticipantRemovedVideoTrack = ({ participant, track }) => {
     console.log("onParticipantRemovedVideoTrack: ", participant, track);
 
-    const videoTracksLocal = videoTracks;
-    videoTracksLocal.delete(track.trackSid);
-
-    setVideoTracks(videoTracksLocal);
+    setVideoTracks((originalVideoTracks) => {
+      originalVideoTracks.delete(track.trackSid);
+      return new Map(originalVideoTracks);
+    });
   };
 
   return (

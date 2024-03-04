@@ -62,6 +62,7 @@ public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilio
     private static final int PUBLISH_VIDEO = 13;
     private static final int PUBLISH_AUDIO = 14;
     private static final int TOGGLE_SCREEN_SHARE = 15;
+    private static final int SET_REMOTE_AUDIO_PLAYBACK = 15;
 
     @Override
     public String getName() {
@@ -148,6 +149,11 @@ public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilio
                 break;
             case PUBLISH_AUDIO:
                 view.publishLocalAudio(args.getBoolean(0));
+                break;
+            case SET_REMOTE_AUDIO_PLAYBACK:
+                String participantSid = args.getString(0);
+                Boolean enabled = args.getBoolean(1);
+                view.setRemoteAudioPlayback(participantSid, enabled);
                 break;
         }
     }

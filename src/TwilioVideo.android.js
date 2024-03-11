@@ -31,8 +31,13 @@ const propTypes = {
   onVideoChanged: PropTypes.func,
 
   /**
-   * Callback that is called when a audio is toggled.
-   */
+     * Callback that is called when screen share permission received.
+     */
+  onScreenShareChanged: PropTypes.func,
+
+  /**
+     * Callback that is called when a audio is toggled.
+     */
   onAudioChanged: PropTypes.func,
 
   /**
@@ -167,7 +172,8 @@ const nativeEvents = {
   publishVideo: 13,
   publishAudio: 14,
   setRemoteAudioPlayback: 15,
-};
+  toggleScreenShare: 15
+}
 
 class CustomTwilioVideoView extends Component {
   connect({
@@ -233,9 +239,13 @@ class CustomTwilioVideoView extends Component {
     return Promise.resolve(enabled);
   }
 
-  setLocalAudioEnabled(enabled) {
-    this.runCommand(nativeEvents.toggleSound, [enabled]);
-    return Promise.resolve(enabled);
+  setScreenShareEnabled (enabled) {
+    this.runCommand(nativeEvents.toggleScreenShare, [enabled])
+  }
+
+  setLocalAudioEnabled (enabled) {
+    this.runCommand(nativeEvents.toggleSound, [enabled])
+    return Promise.resolve(enabled)
   }
 
   setRemoteAudioEnabled(enabled) {
@@ -283,29 +293,30 @@ class CustomTwilioVideoView extends Component {
 
   buildNativeEventWrappers() {
     return [
-      "onCameraSwitched",
-      "onVideoChanged",
-      "onAudioChanged",
-      "onRoomDidConnect",
-      "onRoomDidFailToConnect",
-      "onRoomDidDisconnect",
-      "onParticipantAddedDataTrack",
-      "onParticipantRemovedDataTrack",
-      "onDataTrackMessageReceived",
-      "onParticipantAddedVideoTrack",
-      "onParticipantRemovedVideoTrack",
-      "onParticipantAddedAudioTrack",
-      "onParticipantRemovedAudioTrack",
-      "onRoomParticipantDidConnect",
-      "onRoomParticipantDidDisconnect",
-      "onParticipantEnabledVideoTrack",
-      "onParticipantDisabledVideoTrack",
-      "onParticipantEnabledAudioTrack",
-      "onParticipantDisabledAudioTrack",
-      "onStatsReceived",
-      "onNetworkQualityLevelsChanged",
-      "onDominantSpeakerDidChange",
-      "onLocalParticipantSupportedCodecs",
+      'onCameraSwitched',
+      'onVideoChanged',
+      'onScreenShareChanged',
+      'onAudioChanged',
+      'onRoomDidConnect',
+      'onRoomDidFailToConnect',
+      'onRoomDidDisconnect',
+      'onParticipantAddedDataTrack',
+      'onParticipantRemovedDataTrack',
+      'onDataTrackMessageReceived',
+      'onParticipantAddedVideoTrack',
+      'onParticipantRemovedVideoTrack',
+      'onParticipantAddedAudioTrack',
+      'onParticipantRemovedAudioTrack',
+      'onRoomParticipantDidConnect',
+      'onRoomParticipantDidDisconnect',
+      'onParticipantEnabledVideoTrack',
+      'onParticipantDisabledVideoTrack',
+      'onParticipantEnabledAudioTrack',
+      'onParticipantDisabledAudioTrack',
+      'onStatsReceived',
+      'onNetworkQualityLevelsChanged',
+      'onDominantSpeakerDidChange',
+      'onLocalParticipantSupportedCodecs'
     ].reduce((wrappedEvents, eventName) => {
       if (this.props[eventName]) {
         return {

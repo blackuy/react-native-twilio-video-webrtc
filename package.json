@@ -2,9 +2,9 @@
   "name": "react-native-twilio-video-webrtc",
   "repository": {
     "type": "git",
-    "url": "https://github.com/blackuy/react-native-twilio-video-webrtc.git"
+    "url": "https://github.com/ttebify/react-native-twilio-video-webrtc.git"
   },
-  "homepage": "https://github.com/blackuy/react-native-twilio-video-webrtc",
+  "homepage": "https://github.com/ttebify/react-native-twilio-video-webrtc",
   "version": "3.2.0",
   "description": "Twilio Video WebRTC for React Native.",
   "main": "index.js",

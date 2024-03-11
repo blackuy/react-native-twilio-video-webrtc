@@ -245,8 +245,8 @@ import {
 
 Here you can see a complete example of a simple application that uses almost all the apis:
 
-```javascript
-import React, { Component, useRef } from "react";
+````javascript
+import React, { useState, useRef } from 'react';
 import {
   TwilioVideoLocalView,
   TwilioVideoParticipantView,
@@ -256,7 +256,8 @@ import {
 const Example = (props) => {
   const [isAudioEnabled, setIsAudioEnabled] = useState(true);
   const [isVideoEnabled, setIsVideoEnabled] = useState(true);
-  const [status, setStatus] = useState("disconnected");
+  const [isScreenShareEnabled, setIsScreenShareEnabled] = useState(false);
+  const [status, setStatus] = useState('disconnected');
   const [participants, setParticipants] = useState(new Map());
   const [videoTracks, setVideoTracks] = useState(new Map());
   const [token, setToken] = useState("");
@@ -264,8 +265,8 @@ const Example = (props) => {
 
   const _onConnectButtonPress = () => {
     twilioRef.current.connect({ accessToken: token });
-    setStatus("connecting");
-  };
+    setStatus('connecting');
+  }
 
   const _onEndButtonPress = () => {
     twilioRef.current.disconnect();
@@ -276,6 +277,14 @@ const Example = (props) => {
       .setLocalAudioEnabled(!isAudioEnabled)
       .then((isEnabled) => setIsAudioEnabled(isEnabled));
   };
+
+  const _onShareButtonPressed = () => {
+    twilioRef.current.setScreenShareEnabled(!isScreenShareEnabled);
+  };
+
+  const _onScreenShareChanged = ({screenShareEnabled = false}) => {
+    setIsScreenShareEnabled(screenShareEnabled);
+  }
 
   const _onFlipButtonPress = () => {
     twilioRef.current.flipCamera();
@@ -339,6 +348,7 @@ const Example = (props) => {
         </View>
       )}
 
+
       {(status === "connected" || status === "connecting") && (
         <View style={styles.callContainer}>
           {status === "connected" && (
@@ -375,18 +385,29 @@ const Example = (props) => {
             >
               <Text style={{ fontSize: 12 }}>Flip</Text>
             </TouchableOpacity>
-            <TwilioVideoLocalView enabled={true} style={styles.localVideo} />
+            <TouchableOpacity
+              style={styles.optionButton}
+              onPress={_onShareButtonPressed}>
+              <Text style={{ fontSize: 12 }}>
+                {isScreenShareEnabled ? "Stop Screen Sharing" : "Start Screen Sharing"}
+              </Text>
+            </TouchableOpacity>
+            <TwilioVideoLocalView
+              enabled={true}
+              style={styles.localVideo}
+              />
           </View>
         </View>
       )}
 
       <TwilioVideo
-        ref={twilioRef}
-        onRoomDidConnect={_onRoomDidConnect}
-        onRoomDidDisconnect={_onRoomDidDisconnect}
-        onRoomDidFailToConnect={_onRoomDidFailToConnect}
-        onParticipantAddedVideoTrack={_onParticipantAddedVideoTrack}
-        onParticipantRemovedVideoTrack={_onParticipantRemovedVideoTrack}
+        ref={ twilioRef }
+        onRoomDidConnect={ _onRoomDidConnect }
+        onRoomDidDisconnect={ _onRoomDidDisconnect }
+        onScreenShareChanged={ _onScreenShareChanged}
+        onRoomDidFailToConnect= { _onRoomDidFailToConnect }
+        onParticipantAddedVideoTrack={ _onParticipantAddedVideoTrack }
+        onParticipantRemovedVideoTrack= { _onParticipantRemovedVideoTrack }
       />
     </View>
   );

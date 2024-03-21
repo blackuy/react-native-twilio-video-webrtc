@@ -24,13 +24,16 @@ import android.os.Build;
 import android.hardware.Camera;
 import androidx.annotation.NonNull;
 import androidx.annotation.StringDef;
+import androidx.lifecycle.DefaultLifecycleObserver;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.ViewTreeLifecycleOwner;
+
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 
-import com.facebook.react.bridge.LifecycleEventListener;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
@@ -117,7 +120,7 @@ import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_DOMINANT_SPEA
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_LOCAL_PARTICIPANT_SUPPORTED_CODECS;
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_FLASHLIGHT_STATUS_CHANGED;
 
-public class CustomTwilioVideoView extends View implements LifecycleEventListener, AudioManager.OnAudioFocusChangeListener {
+public class CustomTwilioVideoView extends View implements DefaultLifecycleObserver, AudioManager.OnAudioFocusChangeListener {
     private static final String TAG = "rntwilio";
     private static final String DATA_TRACK_MESSAGE_THREAD_NAME = "DataTrackMessages";
     private static final String FRONT_CAMERA_TYPE = "front";
@@ -226,6 +229,8 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
 
     private LocalDataTrack localDataTrack;
 
+    private LifecycleOwner lifecycleOwner;
+
     // Map used to map remote data tracks to remote participants
     private final Map<RemoteDataTrack, RemoteParticipant> dataTrackRemoteParticipantMap =
             new HashMap<>();
@@ -234,9 +239,6 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         super(context);
         this.themedReactContext = context;
         this.eventEmitter = themedReactContext.getJSModule(RCTEventEmitter.class);
-
-        // add lifecycle for onResume and on onPause
-        themedReactContext.addLifecycleEventListener(this);
 
         /*
          * Needed for setting/abandoning audio focus during call
@@ -252,6 +254,23 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         // Start the thread where data messages are received
         dataTrackMessageThread.start();
         dataTrackMessageThreadHandler = new Handler(dataTrackMessageThread.getLooper());
+    }
+
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+
+        // Register for Android lifecycle events.  We can't use themedReactContext.addLifecycleEventListener(this) because
+        // the React LifecycleEventListener only supports onPause/onResume, but we are interested in onStop/onStart.
+        // Also, this must be done here rather than in the constructor because the view will not be attached to its
+        // LifeCycle owner (ie, the Activity) before this.
+        lifecycleOwner = ViewTreeLifecycleOwner.get(this);
+        if (lifecycleOwner != null) {
+            Log.i(TAG, "Registering for Android lifecycle events");
+            lifecycleOwner.getLifecycle().addObserver(this);
+        } else {
+            Log.w(TAG, "Unable to register for Android lifecycle events");
+        }
     }
 
     // ===== SETUP =================================================================================
@@ -357,7 +376,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
 
 
     @Override
-    public void onHostResume() {
+    public void onStart(@NonNull LifecycleOwner owner) {
         /*
          * In case it wasn't set.
          */
@@ -392,10 +411,16 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     }
 
     @Override
-    public void onHostPause() {
+    public void onStop(@NonNull LifecycleOwner owner) {
         /*
          * Release the local video track before going in the background. This ensures that the
          * camera can be used by other applications while this app is in the background.
+         *
+         * Note that we are doing this in onStop instead of onPause to make sure that the camera
+         * capture remains active if the app enters system PIP mode.  In that case, the activity
+         * will go through onPause, but not onStop.  In others cases where system PIP mode does not activate
+         * (older/unsupported devices; the user has manually disabled it; etc) we will hit onStop as the app
+         * goes into the background and the camera capture will be stopped here.
          */
         if (localVideoTrack != null && !maintainVideoTrackInBackground) {
             /*
@@ -413,7 +438,7 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     }
 
     @Override
-    public void onHostDestroy() {
+    public void onDestroy(@NonNull LifecycleOwner owner) {
         /*
          * Remove stream voice control
          */
@@ -450,7 +475,14 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
     }
 
     public void releaseResource() {
-        themedReactContext.removeLifecycleEventListener(this);
+        // Unregister for Android lifecycle events
+        if (lifecycleOwner != null) {
+            Log.i(TAG, "Unregistering for Android lifecycle events");
+            lifecycleOwner.getLifecycle().removeObserver(this);
+        } else {
+            Log.w(TAG, "Unable to unregister for Android lifecycle events");
+        }
+
         room = null;
         localVideoTrack = null;
         thumbnailVideoView = null;

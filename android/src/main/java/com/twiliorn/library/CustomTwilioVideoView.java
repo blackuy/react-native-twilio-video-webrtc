@@ -523,9 +523,10 @@ public class CustomTwilioVideoView extends View implements DefaultLifecycleObser
                 // No need to connect to room if video creation failed
                 return;
             }
-        } else {
-            isVideoEnabled = false;
         }
+
+        Log.i(TAG, "connectToRoomWrapper: setting isVideoEnabled=" + isVideoEnabled);
+        isVideoEnabled = enableVideo;
 
         setAudioFocus(enableAudio);
         connectToRoom();

@@ -49,6 +49,12 @@ public class RNVideoViewGroup extends ViewGroup {
         this.eventEmitter = themedReactContext.getJSModule(RCTEventEmitter.class);
         surfaceViewRenderer = new PatchedVideoView(themedReactContext);
         surfaceViewRenderer.setVideoScaleType(VideoScaleType.ASPECT_FILL);
+        
+        // adds rounding for android native view
+        GradientDrawable drawable = new GradientDrawable();
+        drawable.setCornerRadius(12f);
+        setBackground(drawable);
+
         addView(surfaceViewRenderer);
         surfaceViewRenderer.setListener(
                 new RendererCommon.RendererEvents() {

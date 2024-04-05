@@ -7,6 +7,7 @@
 package com.twiliorn.library;
 
 import android.graphics.Point;
+import android.graphics.drawable.GradientDrawable;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -49,7 +50,7 @@ public class RNVideoViewGroup extends ViewGroup {
         this.eventEmitter = themedReactContext.getJSModule(RCTEventEmitter.class);
         surfaceViewRenderer = new PatchedVideoView(themedReactContext);
         surfaceViewRenderer.setVideoScaleType(VideoScaleType.ASPECT_FILL);
-        
+
         // adds rounding for android native view
         GradientDrawable drawable = new GradientDrawable();
         drawable.setCornerRadius(12f);

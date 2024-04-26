@@ -78,6 +78,7 @@ TVIVideoFormat *RCTTWVideoModuleCameraSourceSelectVideoFormatBySize(AVCaptureDev
 @property (strong, nonatomic) NSString *videoTrackName;
 @property (nonatomic) BOOL listening;
 @property (strong, nonatomic) RCTTWFrameCaptureRenderer *captureRenderer;
+@property (atomic) BOOL isCameraCaptureActive;
 
 @end
 
@@ -230,9 +231,15 @@ RCT_EXPORT_METHOD(startLocalVideo) {
 
 - (void)startCameraCapture:(NSString *)cameraType {
   if (self.camera == nil) {
-    NSLog(@"[RNTwilioVideo] No camera...");
+    NSLog(@"[RNTwilioVideo] startCameraCapture: No camera...");
     return;
   }
+    
+  if (self.isCameraCaptureActive) {
+    NSLog(@"[RNTwilioVideo] startCameraCapture: capture already active, returning");
+    return;
+  }
+    
   AVCaptureDevice *captureDevice;
     if ([cameraType isEqualToString:@"back"]) {
     captureDevice = [TVICameraSource captureDeviceForPosition:AVCaptureDevicePositionBack];
@@ -255,6 +262,7 @@ RCT_EXPORT_METHOD(startLocalVideo) {
       if (!error) {
           NSLog(@"[RNTwilioVideo] Camera successfully started");
           NSLog(@"[RNTwilioVideo] selected format w x h at fps = %d x %d at %lu", startFormat.dimensions.width, startFormat.dimensions.height, (unsigned long)startFormat.frameRate);
+          self.isCameraCaptureActive = true;
           for (TVIVideoView *renderer in self.localVideoTrack.renderers) {
               // need to type check renderer class since multiple renderers are used.
               if ([renderer isKindOfClass:[TVIVideoView class]]) {
@@ -273,11 +281,18 @@ RCT_EXPORT_METHOD(startLocalAudio) {
 }
 
 RCT_EXPORT_METHOD(stopLocalVideo:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+    if (! self.isCameraCaptureActive) {
+        NSLog(@"[RNTwilioVideo] stopLocalVideo: camera capture not currently active, returning");
+        resolve(@(true));
+        return;
+    }
+    
     if (self.camera) {
         NSLog(@"[RNTwilioVideo] Stopping camera via stopLocalVideo");
         [self.camera stopCaptureWithCompletion:^(NSError *error) {
             if (!error) {
                 NSLog(@"[RNTwilioVideo] Camera stopped via stopLocalVideo");
+                self.isCameraCaptureActive = false;
                 resolve(@(true));
             } else {
                 NSLog(@"[RNTwilioVideo] Error stopping camera via stopLocalVideo: %@", error);
@@ -296,7 +311,11 @@ RCT_EXPORT_METHOD(stopLocalAudio) {
 RCT_EXPORT_METHOD(publishLocalVideo) {
   if(self.localVideoTrack != nil){
     TVILocalParticipant *localParticipant = self.room.localParticipant;
-    [localParticipant publishVideoTrack:self.localVideoTrack];
+    NSLog(@"[RNTwilioVideo] publishLocalVideo calling publishVideoTrack");
+    BOOL result = [localParticipant publishVideoTrack:self.localVideoTrack];
+    NSLog(@"[RNTwilioVideo] publishLocalVideo result: %d", result);
+  } else {
+    NSLog(@"[RNTwilioVideo] publishLocalVideo: localVideoTrack not defined");
   }
 }
 
@@ -306,9 +325,12 @@ RCT_EXPORT_METHOD(publishLocalAudio) {
 }
 
 RCT_EXPORT_METHOD(unpublishLocalVideo) {
+  NSLog(@"[RNTwilioVideo] unpublishLocalVideo starting");
   if(self.localVideoTrack != nil){
     TVILocalParticipant *localParticipant = self.room.localParticipant;
-    [localParticipant unpublishVideoTrack:self.localVideoTrack];
+    NSLog(@"[RNTwilioVideo] unpublishLocalVideo calling unpublishVideoTrack");
+    bool result = [localParticipant unpublishVideoTrack:self.localVideoTrack];
+    NSLog(@"[RNTwilioVideo] unpublishLocalVideo result: %d", result);
   }
 }
 
@@ -337,9 +359,12 @@ RCT_REMAP_METHOD(setLocalAudioEnabled, enabled:(BOOL)enabled setLocalAudioEnable
       [self.localVideoTrack setEnabled:enabled];
       if (self.camera != nil) {
           if (enabled) {
+              NSLog(@"[RNTwilioVideo] setLocalVideoEnabled: calling startCameraCapture");
             [self startCameraCapture:cameraType];
           } else {
+              NSLog(@"[RNTwilioVideo] setLocalVideoEnabled: calling clearCameraInstance");
             [self clearCameraInstance];
+              NSLog(@"[RNTwilioVideo] setLocalVideoEnabled: finished clearCameraInstance");
           }
           return enabled;
       } else {
@@ -561,7 +586,8 @@ RCT_EXPORT_METHOD(getStats) {
 }
 
 RCT_EXPORT_METHOD(connect:(NSString *)accessToken roomName:(NSString *)roomName enableAudio:(BOOL *)enableAudio enableVideo:(BOOL *)enableVideo encodingParameters:(NSDictionary *)encodingParameters enableNetworkQualityReporting:(BOOL *)enableNetworkQualityReporting dominantSpeakerEnabled:(BOOL *)dominantSpeakerEnabled cameraType:(NSString *)cameraType) {
-  [self _setLocalVideoEnabled:enableVideo cameraType:cameraType];
+    NSLog(@"[RNTwilioVideo] connect: calling setLocalVideoEnabled %s", enableVideo ? "enabled" : "disabled");
+    [self _setLocalVideoEnabled:enableVideo cameraType:cameraType];
   if (self.localAudioTrack) {
     [self.localAudioTrack setEnabled:enableAudio];
   }
@@ -602,6 +628,7 @@ RCT_EXPORT_METHOD(connect:(NSString *)accessToken roomName:(NSString *)roomName 
 
   }];
 
+  NSLog(@"[RNTwilioVideo] connect: calling connectWithOptions");
   self.room = [TwilioVideoSDK connectWithOptions:connectOptions delegate:self];
 }
 
@@ -612,20 +639,32 @@ RCT_EXPORT_METHOD(sendString:(nonnull NSString *)message) {
 }
 
 RCT_EXPORT_METHOD(disconnect) {
+  NSLog(@"[RNTwilioVideo] disconnect: calling clearCameraInstance");
   [self clearCameraInstance];
+  NSLog(@"[RNTwilioVideo] disconnect: finished clearCameraInstance");
   [self.room disconnect];
 }
 
 - (void)clearCameraInstance {
     // We are done with camera
+
+    if (! self.isCameraCaptureActive) {
+        NSLog(@"[RNTwilioVideo] clearCameraInstance: camera capture not currently active, returning");
+        return;
+    }
+
     if (self.camera) {
+        NSLog(@"[RNTwilioVideo] clearCameraInstance: calling stopCaptureWithCompletion");
         [self.camera stopCaptureWithCompletion:^(NSError *error) {
             if (!error) {
-                NSLog(@"[RNTwilioVideo] Camera stopped");
+                NSLog(@"[RNTwilioVideo] clearCameraInstance: Camera stopped");
+                self.isCameraCaptureActive = false;
             } else {
-                NSLog(@"[RNTwilioVideo] Error stopping camera: %@", error);
+                NSLog(@"[RNTwilioVideo] clearCameraInstance: Error stopping camera: %@", error);
             }
         }];
+    } else {
+        NSLog(@"[RNTwilioVideo] clearCameraInstance: camera is not defined");
     }
 }
 
@@ -681,6 +720,7 @@ RCT_EXPORT_METHOD(disconnect) {
 }
 
 - (void)didConnectToRoom:(TVIRoom *)room {
+  NSLog(@"[RNTwilioVideo] didConnectToRoom");
   NSMutableArray *participants = [NSMutableArray array];
 
   for (TVIRemoteParticipant *p in room.remoteParticipants) {

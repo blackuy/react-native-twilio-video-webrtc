@@ -761,38 +761,66 @@ public class CustomTwilioVideoView extends View implements DefaultLifecycleObser
     }
 
     private final CameraParameterUpdater turnFlashlightOn = parameters -> {
-        if (parameters.getFlashMode() != null) {
-            if (parameters.getFlashMode().equals(Camera.Parameters.FLASH_MODE_TORCH)) {
-                Log.i(TAG, "Flashlight already on");
+        WritableMap event = new WritableNativeMap();
+        List<String> supportedFlashModes = parameters.getSupportedFlashModes();
+        if (supportedFlashModes == null || supportedFlashModes.isEmpty()) {
+            event.putString("status", "Error: There are no supported flash modes in current camera");
+            pushEvent(CustomTwilioVideoView.this, ON_FLASHLIGHT_STATUS_CHANGED, event);
+        } else {
+            if (supportedFlashModes.contains(Camera.Parameters.FLASH_MODE_TORCH)) {
+                if (parameters.getFlashMode().equals(Camera.Parameters.FLASH_MODE_TORCH)) {
+                    event.putString("status", "flashlight already on");
+                } else {
+                    String flashMode = Camera.Parameters.FLASH_MODE_TORCH;
+                    parameters.setFlashMode(flashMode);
+                    event.putString("status", "flashlight turned on");
+                    pushEvent(CustomTwilioVideoView.this, ON_FLASHLIGHT_STATUS_CHANGED, event);
+                }
+            } else if (supportedFlashModes.contains(Camera.Parameters.FLASH_MODE_ON)) {
+                if (parameters.getFlashMode().equals(Camera.Parameters.FLASH_MODE_ON)) {
+                    event.putString("status", "flashlight already on");
+                } else {
+                    String flashMode = Camera.Parameters.FLASH_MODE_ON;
+                    parameters.setFlashMode(flashMode);
+                    event.putString("status", "flashlight turned on");
+                    pushEvent(CustomTwilioVideoView.this, ON_FLASHLIGHT_STATUS_CHANGED, event);
+                }
             } else {
-                String flashMode = Camera.Parameters.FLASH_MODE_TORCH;
-                parameters.setFlashMode(flashMode);
-                WritableMap event = new WritableNativeMap();
-                event.putBoolean("isFlashOn", flashMode == Camera.Parameters.FLASH_MODE_TORCH);
+                event.putString("status", "Error: Flash mode is not recognized: " + supportedFlashModes);
                 pushEvent(CustomTwilioVideoView.this, ON_FLASHLIGHT_STATUS_CHANGED, event);
             }
-        } else {
-            WritableMap event = new WritableNativeMap();
-            event.putString("error", "Flash is not supported in current camera mode");
-            pushEvent(CustomTwilioVideoView.this, ON_FLASHLIGHT_STATUS_CHANGED, event);
         }
     };
 
     private final CameraParameterUpdater turnFlashlightOff = parameters -> {
-        if (parameters.getFlashMode() != null) {
-            if (parameters.getFlashMode().equals(Camera.Parameters.FLASH_MODE_OFF)) {
-                Log.i(TAG, "Flashlight already off");
+        WritableMap event = new WritableNativeMap();
+        List<String> supportedFlashModes = parameters.getSupportedFlashModes();
+        if (supportedFlashModes == null || supportedFlashModes.isEmpty()) {
+            event.putString("status", "Error: There are no supported flash modes in current camera");
+            pushEvent(CustomTwilioVideoView.this, ON_FLASHLIGHT_STATUS_CHANGED, event);
+        } else {
+            if (supportedFlashModes.contains(Camera.Parameters.FLASH_MODE_TORCH)) {
+                if (parameters.getFlashMode().equals(Camera.Parameters.FLASH_MODE_OFF)) {
+                    event.putString("status", "flashlight already off");
+                } else {
+                    String flashMode = Camera.Parameters.FLASH_MODE_OFF;
+                    parameters.setFlashMode(flashMode);
+                    event.putString("status", "flashlight turned off");
+                    pushEvent(CustomTwilioVideoView.this, ON_FLASHLIGHT_STATUS_CHANGED, event);
+                }
+            } else if (supportedFlashModes.contains(Camera.Parameters.FLASH_MODE_ON)) {
+                if (parameters.getFlashMode().equals(Camera.Parameters.FLASH_MODE_OFF)) {
+                    event.putString("status", "flashlight already off");
+                } else {
+                    String flashMode = Camera.Parameters.FLASH_MODE_OFF;
+                    parameters.setFlashMode(flashMode);
+                    event.putString("status", "flashlight turned off");
+                    pushEvent(CustomTwilioVideoView.this, ON_FLASHLIGHT_STATUS_CHANGED, event);
+                }
             } else {
-                String flashMode = Camera.Parameters.FLASH_MODE_OFF;
-                parameters.setFlashMode(flashMode);
-                WritableMap event = new WritableNativeMap();
-                event.putBoolean("isFlashOn", flashMode == Camera.Parameters.FLASH_MODE_TORCH);
+                event.putString("status", "Error: Flash mode is not recognized: " + supportedFlashModes);
                 pushEvent(CustomTwilioVideoView.this, ON_FLASHLIGHT_STATUS_CHANGED, event);
             }
-        } else {
-            WritableMap event = new WritableNativeMap();
-            event.putString("error", "Flash is not supported in current camera mode");
-            pushEvent(CustomTwilioVideoView.this, ON_FLASHLIGHT_STATUS_CHANGED, event);
         }
     };
 
@@ -805,7 +833,7 @@ public class CustomTwilioVideoView extends View implements DefaultLifecycleObser
             }
         } else {
             WritableMap event = new WritableNativeMap();
-            event.putString("error", "There's no camera available");
+            event.putString("status", "Error: There's no camera available");
             pushEvent(CustomTwilioVideoView.this, ON_FLASHLIGHT_STATUS_CHANGED, event);
         }
     }

@@ -439,13 +439,14 @@ RCT_EXPORT_METHOD(setFlashlightStatus:(BOOL)isEnabled) {
               }
               BOOL isFlashOn = device.torchActive;
               [device unlockForConfiguration];
-              [body addEntriesFromDictionary:@{ @"isFlashOn" : [NSNumber numberWithBool:!isFlashOn] }];
+              // For some reason, isFlashOn is the reverse of the actual status
+              [body addEntriesFromDictionary:@{ @"status" : !isFlashOn ? @"flashlight is on" : @"flashlight is off" }];
             }
         } else {
-           [body addEntriesFromDictionary:@{ @"error" : @"Flash is not supported in current camera mode" }];
+           [body addEntriesFromDictionary:@{ @"status" : @"Error: Flash is not supported in current camera mode" }];
         }
   } else {
-    [body addEntriesFromDictionary:@{ @"error" : @"There's no camera available" }];
+    [body addEntriesFromDictionary:@{ @"status" : @"Error There's no camera available" }];
   }
   [self sendEventCheckingListenerWithName:onFlashlightStatusChanged body:body];
 }

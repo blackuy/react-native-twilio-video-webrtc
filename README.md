@@ -1,4 +1,11 @@
-![GitHub Logo](/logo.png)
+![Logo](/logo.png)
+
+![GitHub Repo stars](https://img.shields.io/github/stars/blackuy/react-native-twilio-video-webrtc)
+![GitHub License](https://img.shields.io/github/license/blackuy/react-native-twilio-video-webrtc)
+![Weekly Views](https://shieldsdev.tech/badge/react-native-twilio-video-webrtc/totals)
+![NPM version](https://img.shields.io/npm/v/react-native-twilio-video-webrtc)
+![NPM Downloads](https://img.shields.io/npm/dy/react-native-twilio-video-webrtc)
+
 
 # Twilio Video (WebRTC) for React Native
 
@@ -421,5 +428,5 @@ To run the example application:
 
 ## Contact
 
-- Martín Fernández <fmartin91@gmail.com>
-- Gaston Morixe <gaston@gastonmorixe.com>
+- Martín Fernández ([@bilby91](https://github.com/bilby91)) <fmartin91@gmail.com> 
+- Gaston Morixe ([@gastonmorixe](https://github.com/gastonmorixe)) <gaston@gastonmorixe.com>

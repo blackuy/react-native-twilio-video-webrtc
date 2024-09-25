@@ -1,13 +1,12 @@
-![Logo](/logo.png)
-
-![GitHub Repo stars](https://img.shields.io/github/stars/blackuy/react-native-twilio-video-webrtc)
-![GitHub License](https://img.shields.io/github/license/blackuy/react-native-twilio-video-webrtc)
-![Weekly Views](https://shieldsdev.tech/badge/react-native-twilio-video-webrtc/totals)
-![NPM version](https://img.shields.io/npm/v/react-native-twilio-video-webrtc)
-![NPM Downloads](https://img.shields.io/npm/dy/react-native-twilio-video-webrtc)
-
-
 # Twilio Video (WebRTC) for React Native
+
+[![Logo](/logo.png)](https://github.com/blackuy/react-native-twilio-video-webrtc)
+
+[![GitHub Repo stars](https://img.shields.io/github/stars/blackuy/react-native-twilio-video-webrtc)](https://github.com/blackuy/react-native-twilio-video-webrtc/stargazers)
+[![Weekly Views](https://shieldsdev.tech/badge/react-native-twilio-video-webrtc/totals)](https://npm-stat.com/charts.html?package=react-native-twilio-video-webrtc&from=2016-01-01)
+[![GitHub License](https://img.shields.io/github/license/blackuy/react-native-twilio-video-webrtc)](https://github.com/blackuy/react-native-twilio-video-webrtc/blob/master/LICENSE)
+[![NPM version](https://img.shields.io/npm/v/react-native-twilio-video-webrtc)](https://www.npmjs.com/package/react-native-twilio-video-webrtc)
+[![NPM Downloads](https://img.shields.io/npm/dy/react-native-twilio-video-webrtc)](https://npm-stat.com/charts.html?package=react-native-twilio-video-webrtc&from=2016-01-01)
 
 Platforms:
 
@@ -22,6 +21,8 @@ People using a version < 1.0.1 please move to 1.0.1 since the project changed a 
 - react-native < 0.40.0: install react-native-twilio-video-webrtc@1.0.0
 
 ### Install Node Package
+
+[![NPM version](https://img.shields.io/npm/v/react-native-twilio-video-webrtc)](https://www.npmjs.com/package/react-native-twilio-video-webrtc)
 
 #### Option A: yarn
 
@@ -428,5 +429,21 @@ To run the example application:
 
 ## Contact
 
-- Martín Fernández ([@bilby91](https://github.com/bilby91)) <fmartin91@gmail.com> 
-- Gaston Morixe ([@gastonmorixe](https://github.com/gastonmorixe)) <gaston@gastonmorixe.com>
+- Original Author: **Gaston Morixe** ([@gastonmorixe](https://github.com/gastonmorixe)) <gaston@gastonmorixe.com>
+- Core Contributor: **Martín Fernández** ([@bilby91](https://github.com/bilby91)) <fmartin91@gmail.com>
+
+## License
+
+The MIT License (MIT)
+
+Copyright (c) 2016-2024 Gaston Morixe <gaston@gastonmorixe.com>
+
+**Full License text** you must include and attribute in your project: [LICENSE](/LICENSE).
+
+**Compliance Requirement:** All users must include the full text of the MIT License, including the copyright notice and permission notice, in any copies or substantial portions of the Software.
+
+**Commercial Use:** Commercial entities using this software are especially ensure compliance with the license terms.
+
+**Consequences of Violation:** Failure to comply with the MIT License constitutes copyright infringement and may result in legal action, including injunctions and monetary damages. Please ensure to respect the open source project.
+
+For any questions regarding licensing or to request additional permissions, please contact the author.

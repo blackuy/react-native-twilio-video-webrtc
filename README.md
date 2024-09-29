@@ -1,6 +1,6 @@
 # Twilio Video (WebRTC) for React Native
 
-[![Logo](/logo.png)](https://github.com/blackuy/react-native-twilio-video-webrtc)
+[![react-native-twilio-video-webrtc](./docs/react-native-banner.svg)](https://github.com/blackuy/react-native-twilio-video-webrtc)
 
 [![GitHub Repo stars](https://img.shields.io/github/stars/blackuy/react-native-twilio-video-webrtc)](https://github.com/blackuy/react-native-twilio-video-webrtc/stargazers)
 [![Weekly Views](https://shieldsdev.tech/badge/react-native-twilio-video-webrtc/totals)](https://npm-stat.com/charts.html?package=react-native-twilio-video-webrtc&from=2016-01-01)
@@ -442,7 +442,7 @@ Copyright (c) 2016-2024 Gaston Morixe <gaston@gastonmorixe.com>
 
 **Compliance Requirement:** All users must include the full text of the MIT License, including the copyright notice and permission notice, in any copies or substantial portions of the Software.
 
-**Commercial Use:** Commercial entities using this software please ensure compliance with the license terms.
+**Commercial Use:** Commercial entities using this software please ensure compliance with the license terms and proper attribution.
 
 **Consequences of Violation:** Failure to comply with the MIT License constitutes copyright infringement and may result in legal action, including injunctions and monetary damages. Please ensure to respect the open source project.
 

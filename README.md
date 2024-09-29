@@ -442,8 +442,18 @@ Copyright (c) 2016-2024 Gaston Morixe <gaston@gastonmorixe.com>
 
 **Compliance Requirement:** All users must include the full text of the MIT License, including the copyright notice and permission notice, in any copies or substantial portions of the Software.
 
-**Commercial Use:** Commercial entities using this software are especially ensure compliance with the license terms.
+**Commercial Use:** Commercial entities using this software please ensure compliance with the license terms.
 
 **Consequences of Violation:** Failure to comply with the MIT License constitutes copyright infringement and may result in legal action, including injunctions and monetary damages. Please ensure to respect the open source project.
 
 For any questions regarding licensing or to request additional permissions, please contact the author.
+
+## Star History
+
+<a href="https://star-history.com/#blackuy/react-native-twilio-video-webrtc&Date">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=blackuy/react-native-twilio-video-webrtc&type=Date&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=blackuy/react-native-twilio-video-webrtc&type=Date" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=blackuy/react-native-twilio-video-webrtc&type=Date" />
+ </picture>
+</a>

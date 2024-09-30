@@ -315,13 +315,15 @@ RCT_EXPORT_METHOD(toggleSoundSetup:(BOOL)speaker) {
   NSError *error = nil;
   kTVIDefaultAVAudioSessionConfigurationBlock();
   AVAudioSession *session = [AVAudioSession sharedInstance];
-  AVAudioSessionMode mode = speaker ? AVAudioSessionModeVideoChat : AVAudioSessionModeVoiceChat ;
+  AVAudioSessionMode mode = speaker ? AVAudioSessionModeVideoChat : AVAudioSessionModeVoiceChat;
   // Overwrite the audio route
   if (![session setMode:mode error:&error]) {
     NSLog(@"AVAudiosession setMode %@",error);
   }
 
-  if (![session overrideOutputAudioPort:AVAudioSessionPortOverrideNone error:&error]) {
+  AVAudioSessionPortOverride portOverride = speaker: AVAudioSessionPortOverrideSpeaker : AVAudioSessionPortOverrideNone;
+
+  if (![session overrideOutputAudioPort:portOverride error:&error]) {
     NSLog(@"AVAudiosession overrideOutputAudioPort %@",error);
   }
 }
@@ -441,7 +443,7 @@ RCT_EXPORT_METHOD(connect:(NSString *)accessToken roomName:(NSString *)roomName 
     if (self.localDataTrack) {
       builder.dataTracks = @[self.localDataTrack];
     }
-      
+
     builder.dominantSpeakerEnabled = dominantSpeakerEnabled ? YES : NO;
 
     builder.roomName = roomName;

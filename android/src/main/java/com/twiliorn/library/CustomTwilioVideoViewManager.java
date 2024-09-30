@@ -42,6 +42,7 @@ import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_STATS_RECEIVE
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_NETWORK_QUALITY_LEVELS_CHANGED;
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_DOMINANT_SPEAKER_CHANGED;
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_LOCAL_PARTICIPANT_SUPPORTED_CODECS;
+import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_SCREEN_SHARE_CHANGED;
 
 public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilioVideoView> {
     public static final String REACT_CLASS = "RNCustomTwilioVideoView";
@@ -60,7 +61,8 @@ public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilio
     private static final int SEND_STRING = 12;
     private static final int PUBLISH_VIDEO = 13;
     private static final int PUBLISH_AUDIO = 14;
-    private static final int SET_REMOTE_AUDIO_PLAYBACK = 15;
+    private static final int TOGGLE_SCREEN_SHARE = 15;
+    private static final int SET_REMOTE_AUDIO_PLAYBACK = 16;
 
     @Override
     public String getName() {
@@ -109,6 +111,10 @@ public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilio
             case TOGGLE_VIDEO:
                 Boolean videoEnabled = args.getBoolean(0);
                 view.toggleVideo(videoEnabled);
+                break;
+            case TOGGLE_SCREEN_SHARE:
+                Boolean screenShareEnabled = args.getBoolean(0);
+                view.toggleScreenShare(screenShareEnabled);
                 break;
             case TOGGLE_SOUND:
                 Boolean audioEnabled = args.getBoolean(0);
@@ -177,7 +183,8 @@ public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilio
 
         map.putAll(MapBuilder.of(
                 ON_PARTICIPANT_REMOVED_DATA_TRACK, MapBuilder.of("registrationName", ON_PARTICIPANT_REMOVED_DATA_TRACK),
-                ON_LOCAL_PARTICIPANT_SUPPORTED_CODECS, MapBuilder.of("registrationName", ON_LOCAL_PARTICIPANT_SUPPORTED_CODECS)
+                ON_LOCAL_PARTICIPANT_SUPPORTED_CODECS, MapBuilder.of("registrationName", ON_LOCAL_PARTICIPANT_SUPPORTED_CODECS),
+                ON_SCREEN_SHARE_CHANGED, MapBuilder.of("registrationName", ON_SCREEN_SHARE_CHANGED)
         ));
 
         map.putAll(MapBuilder.of(
@@ -201,6 +208,7 @@ public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilio
                 .put("disconnect", DISCONNECT)
                 .put("switchCamera", SWITCH_CAMERA)
                 .put("toggleVideo", TOGGLE_VIDEO)
+                .put("toggleScreenShare", TOGGLE_SCREEN_SHARE)
                 .put("toggleSound", TOGGLE_SOUND)
                 .put("getStats", GET_STATS)
                 .put("disableOpenSLES", DISABLE_OPENSL_ES)

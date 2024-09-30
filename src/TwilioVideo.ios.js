@@ -15,6 +15,10 @@ const { TWVideoModule } = NativeModules;
 export default class TwilioVideo extends Component {
   static propTypes = {
     /**
+     * Callback that is called when screen share permission received.
+     */
+    onScreenShareChanged: PropTypes.func,
+    /**
      * Called when the room has connected
      *
      * @param {{roomName, participants}}
@@ -215,6 +219,11 @@ export default class TwilioVideo extends Component {
   /**
    * Toggle screen sharing
    */
+
+  setScreenShareEnabled (enabled) {
+    TWVideoModule.toggleScreenShare(enabled)
+  }
+
   toggleScreenSharing(status) {
     TWVideoModule.toggleScreenSharing(status);
   }
@@ -330,7 +339,12 @@ export default class TwilioVideo extends Component {
   _registerEvents() {
     TWVideoModule.changeListenerStatus(true);
     this._subscriptions = [
-      this._eventEmitter.addListener("roomDidConnect", (data) => {
+      this._eventEmitter.addListener('screenShareChanged', (data) => {
+        if (this.props.onScreenShareChanged) {
+          this.props.onScreenShareChanged(data)
+        }
+      }),
+      this._eventEmitter.addListener('roomDidConnect', (data) => {
         if (this.props.onRoomDidConnect) {
           this.props.onRoomDidConnect(data);
         }

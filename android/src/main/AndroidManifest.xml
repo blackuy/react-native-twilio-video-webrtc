@@ -16,4 +16,13 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
     <uses-permission android:name="android.permission.BLUETOOTH"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+
+    <application>
+        <service
+            android:enabled="true"
+            android:name=".ScreenCapturerService"
+            android:foregroundServiceType="mediaProjection">
+        </service>
+    </application>
 </manifest>

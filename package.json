@@ -40,7 +40,10 @@
     "gulp-react-docs": "^1.0.1",
     "gulp-tap": "^1.0.1",
     "prettier": "^2.8.8",
-    "react-docgen": "^2.15.0"
+    "react-docgen": "^2.15.0",
+    "semver": "5.7.2",
+    "tough-cookie": "4.1.4",
+    "word-wrap": "^1.2.5"
   },
   "peerDependencies": {
     "expo": ">=47.0.0",

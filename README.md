@@ -27,13 +27,13 @@ People using a version < 1.0.1 please move to 1.0.1 since the project changed a 
 #### Option A: yarn
 
 ```shell
-yarn add https://github.com/blackuy/react-native-twilio-video-webrtc
+yarn add react-native-twilio-video-webrtc
 ```
 
 #### Option B: npm
 
 ```shell
-npm install https://github.com/blackuy/react-native-twilio-video-webrtc --save
+npm install react-native-twilio-video-webrtc --save
 ```
 
 ### Usage with Expo

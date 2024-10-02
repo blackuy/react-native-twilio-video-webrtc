@@ -16,7 +16,8 @@
     "jest": "24.8.0",
     "metro-react-native-babel-preset": "^0.51.1",
     "react-native-twilio-video-webrtc": "file:../",
-    "react-test-renderer": "16.8.3"
+    "react-test-renderer": "16.8.3",
+    "semver": "5.7.2"
   },
   "jest": {
     "preset": "react-native"

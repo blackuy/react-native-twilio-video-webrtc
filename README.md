@@ -1,5 +1,11 @@
 # Twilio Video (WebRTC) for React Native
 
+> [!NOTE]  
+> **October 21 2024:** _Good news!_ Twilio just announced **Twilio Video service is here to stay**, they are reversing the deprecation decision. [Here's their official announcement.](https://www.twilio.com/en-us/blog/twilio-video-update-2024). 
+> 
+> If you or your company need React Native support, contact me [gaston@gastonmorixe.com](mailto:gaston@gastonmorixe.com). We have premium react native features  like PiP support, Live Activities, Typescript, and many more. - Gaston
+
+
 [![react-native-twilio-video-webrtc](./docs/react-native-banner.svg)](https://github.com/blackuy/react-native-twilio-video-webrtc)
 
 [![GitHub Repo stars](https://img.shields.io/github/stars/blackuy/react-native-twilio-video-webrtc)](https://github.com/blackuy/react-native-twilio-video-webrtc/stargazers)

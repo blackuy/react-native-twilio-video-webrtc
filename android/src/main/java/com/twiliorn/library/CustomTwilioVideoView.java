@@ -461,7 +461,9 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
         this.enableH264Codec = enableH264Codec;
 
         // Share your microphone
+        if(enableAudio){
         localAudioTrack = LocalAudioTrack.create(getContext(), enableAudio);
+        }
 
         if (cameraCapturer == null && enableVideo) {
             boolean createVideoStatus = createLocalVideo(enableVideo, cameraType);

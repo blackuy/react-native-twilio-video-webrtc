@@ -722,6 +722,11 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
             WritableMap event = new WritableNativeMap();
             event.putBoolean("videoEnabled", enabled);
             pushEvent(CustomTwilioVideoView.this, ON_VIDEO_CHANGED, event);
+            if (!enabled) {
+                localVideoTrack.release();
+                localVideoTrack = null;
+                cameraCapturer = null;
+            }
         }
     }
 
@@ -1160,11 +1165,15 @@ public class CustomTwilioVideoView extends View implements LifecycleEventListene
 
             @Override
             public void onVideoTrackPublished(RemoteParticipant participant, RemoteVideoTrackPublication publication) {
+                WritableMap event = buildParticipantVideoEvent(participant, publication);
+                pushEvent(CustomTwilioVideoView.this, ON_PARTICIPANT_ENABLED_VIDEO_TRACK, event);
 
             }
 
             @Override
             public void onVideoTrackUnpublished(RemoteParticipant participant, RemoteVideoTrackPublication publication) {
+                WritableMap event = buildParticipantVideoEvent(participant, publication);
+                pushEvent(CustomTwilioVideoView.this, ON_PARTICIPANT_DISABLED_VIDEO_TRACK, event);
 
             }
 

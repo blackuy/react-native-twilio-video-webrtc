@@ -246,7 +246,7 @@ export default class TwilioVideo extends Component {
     cameraType = "front",
     enableAudio = true,
     enableVideo = true,
-    encodingParameters = null,
+    encodingParameters = {},
     enableNetworkQualityReporting = false,
     dominantSpeakerEnabled = false,
   }) {

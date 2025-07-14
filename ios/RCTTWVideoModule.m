@@ -63,14 +63,19 @@ TVIVideoFormat *RCTTWVideoModuleCameraSourceSelectVideoFormatBySize(AVCaptureDev
 
 @interface RCTTWVideoModule () <TVIRemoteDataTrackDelegate, TVIRemoteParticipantDelegate, TVIRoomDelegate, TVICameraSourceDelegate, TVILocalParticipantDelegate, TVIAppScreenSourceDelegate>
 
-@property (strong, nonatomic) TVICameraSource *camera;
-@property (strong, nonatomic) TVILocalVideoTrack* localVideoTrack;
-@property (strong, nonatomic) TVILocalAudioTrack* localAudioTrack;
+// Multiple track support - replace single track properties
+@property (strong, nonatomic) NSMutableDictionary<NSString*, TVILocalVideoTrack*> *localVideoTracks;
+@property (strong, nonatomic) NSMutableDictionary<NSString*, TVILocalAudioTrack*> *localAudioTracks;
+@property (strong, nonatomic) NSMutableDictionary<NSString*, TVICameraSource*> *cameraSources;
+
 @property (strong, nonatomic) TVILocalDataTrack* localDataTrack;
 @property (strong, nonatomic) TVIAppScreenSource *screen;
 @property (strong, nonatomic) TVILocalParticipant* localParticipant;
 @property (strong, nonatomic) TVIRoom *room;
 @property (nonatomic) BOOL listening;
+
+// Map used to map remote data tracks to remote participants
+@property (strong, nonatomic) NSMutableDictionary<TVIRemoteDataTrack*, TVIRemoteParticipant*> *dataTrackRemoteParticipantMap;
 
 @end
 
@@ -80,8 +85,27 @@ TVIVideoFormat *RCTTWVideoModuleCameraSourceSelectVideoFormatBySize(AVCaptureDev
 
 RCT_EXPORT_MODULE();
 
+- (instancetype)init {
+    if (self = [super init]) {
+        // Initialize multiple track collections
+        self.localVideoTracks = [[NSMutableDictionary alloc] init];
+        self.localAudioTracks = [[NSMutableDictionary alloc] init];
+        self.cameraSources = [[NSMutableDictionary alloc] init];
+        self.dataTrackRemoteParticipantMap = [[NSMutableDictionary alloc] init];
+    }
+    return self;
+}
+
 - (void)dealloc {
-  [self clearCameraInstance];
+  [self clearAllCameraInstances];
+}
+
+- (void)clearAllCameraInstances {
+  // Stop all camera sources
+  for (TVICameraSource *cameraSource in self.cameraSources.allValues) {
+    [cameraSource stopCapture];
+  }
+  [self.cameraSources removeAllObjects];
 }
 
 - (dispatch_queue_t)methodQueue {
@@ -116,22 +140,282 @@ RCT_EXPORT_MODULE();
   ];
 }
 
-- (void)addLocalView:(TVIVideoView *)view {
-  if (self.localVideoTrack != nil) {
-    [self.localVideoTrack addRenderer:view];
-  }
-  [self updateLocalViewMirroring:view];
+// New methods for multiple track support
+RCT_EXPORT_METHOD(createLocalAudioTrack:(NSDictionary *)config
+                 resolver:(RCTPromiseResolveBlock)resolve
+                 rejecter:(RCTPromiseRejectBlock)reject) {
+    NSString *trackName = config[@"trackName"];
+    BOOL enabled = config[@"enabled"] ? [config[@"enabled"] boolValue] : YES;
+    
+    if (!trackName) {
+        reject(@"INVALID_PARAMS", @"trackName is required", nil);
+        return;
+    }
+    
+    if (self.localAudioTracks[trackName]) {
+        reject(@"TRACK_EXISTS", @"Audio track with this name already exists", nil);
+        return;
+    }
+    
+    TVILocalAudioTrack *audioTrack = [TVILocalAudioTrack trackWithOptions:nil enabled:enabled name:trackName];
+    if (audioTrack) {
+        self.localAudioTracks[trackName] = audioTrack;
+        resolve(trackName);
+    } else {
+        reject(@"CREATION_FAILED", @"Failed to create audio track", nil);
+    }
 }
 
-- (void)updateLocalViewMirroring:(TVIVideoView *)view {
-  if (self.camera && self.camera.device.position == AVCaptureDevicePositionFront) {
-    view.mirror = true;
-  }
+RCT_EXPORT_METHOD(createLocalVideoTrack:(NSDictionary *)config
+                 resolver:(RCTPromiseResolveBlock)resolve
+                 rejecter:(RCTPromiseRejectBlock)reject) {
+    NSString *trackName = config[@"trackName"];
+    BOOL enabled = config[@"enabled"] ? [config[@"enabled"] boolValue] : YES;
+    NSString *cameraType = config[@"cameraType"] ? config[@"cameraType"] : @"front";
+    
+    if (!trackName) {
+        reject(@"INVALID_PARAMS", @"trackName is required", nil);
+        return;
+    }
+    
+    if (self.localVideoTracks[trackName]) {
+        reject(@"TRACK_EXISTS", @"Video track with this name already exists", nil);
+        return;
+    }
+    
+    TVICameraSourceOptions *options = [TVICameraSourceOptions optionsWithBlock:^(TVICameraSourceOptionsBuilder * _Nonnull builder) {
+        
+    }];
+    TVICameraSource *cameraSource = [[TVICameraSource alloc] initWithOptions:options delegate:self];
+    
+    if (cameraSource == nil) {
+        reject(@"CAMERA_UNAVAILABLE", @"Camera source unavailable", nil);
+        return;
+    }
+    
+    TVILocalVideoTrack *videoTrack = [TVILocalVideoTrack trackWithSource:cameraSource enabled:enabled name:trackName];
+    if (videoTrack) {
+        self.localVideoTracks[trackName] = videoTrack;
+        self.cameraSources[trackName] = cameraSource;
+        
+        // Start camera capture
+        [self startCameraCaptureForTrack:trackName cameraType:cameraType];
+        resolve(trackName);
+    } else {
+        reject(@"CREATION_FAILED", @"Failed to create video track", nil);
+    }
+}
+
+RCT_EXPORT_METHOD(publishLocalAudioTrack:(NSString *)trackName
+                 resolver:(RCTPromiseResolveBlock)resolve
+                 rejecter:(RCTPromiseRejectBlock)reject) {
+    TVILocalAudioTrack *audioTrack = self.localAudioTracks[trackName];
+    if (!audioTrack) {
+        reject(@"TRACK_NOT_FOUND", @"Audio track not found", nil);
+        return;
+    }
+    
+    if (self.localParticipant) {
+        [self.localParticipant publishAudioTrack:audioTrack];
+        resolve(@(YES));
+    } else {
+        reject(@"NOT_CONNECTED", @"Not connected to room", nil);
+    }
+}
+
+RCT_EXPORT_METHOD(publishLocalVideoTrack:(NSString *)trackName
+                 resolver:(RCTPromiseResolveBlock)resolve
+                 rejecter:(RCTPromiseRejectBlock)reject) {
+    TVILocalVideoTrack *videoTrack = self.localVideoTracks[trackName];
+    if (!videoTrack) {
+        reject(@"TRACK_NOT_FOUND", @"Video track not found", nil);
+        return;
+    }
+    
+    if (self.localParticipant) {
+        [self.localParticipant publishVideoTrack:videoTrack];
+        resolve(@(YES));
+    } else {
+        reject(@"NOT_CONNECTED", @"Not connected to room", nil);
+    }
+}
+
+RCT_EXPORT_METHOD(unpublishLocalAudioTrack:(NSString *)trackName
+                 resolver:(RCTPromiseResolveBlock)resolve
+                 rejecter:(RCTPromiseRejectBlock)reject) {
+    TVILocalAudioTrack *audioTrack = self.localAudioTracks[trackName];
+    if (!audioTrack) {
+        reject(@"TRACK_NOT_FOUND", @"Audio track not found", nil);
+        return;
+    }
+    
+    if (self.localParticipant) {
+        [self.localParticipant unpublishAudioTrack:audioTrack];
+        resolve(@(YES));
+    } else {
+        reject(@"NOT_CONNECTED", @"Not connected to room", nil);
+    }
+}
+
+RCT_EXPORT_METHOD(unpublishLocalVideoTrack:(NSString *)trackName
+                 resolver:(RCTPromiseResolveBlock)resolve
+                 rejecter:(RCTPromiseRejectBlock)reject) {
+    TVILocalVideoTrack *videoTrack = self.localVideoTracks[trackName];
+    if (!videoTrack) {
+        reject(@"TRACK_NOT_FOUND", @"Video track not found", nil);
+        return;
+    }
+    
+    if (self.localParticipant) {
+        [self.localParticipant unpublishVideoTrack:videoTrack];
+        resolve(@(YES));
+    } else {
+        reject(@"NOT_CONNECTED", @"Not connected to room", nil);
+    }
+}
+
+RCT_EXPORT_METHOD(destroyLocalTrack:(NSString *)trackName
+                 resolver:(RCTPromiseResolveBlock)resolve
+                 rejecter:(RCTPromiseRejectBlock)reject) {
+    TVILocalVideoTrack *videoTrack = self.localVideoTracks[trackName];
+    TVILocalAudioTrack *audioTrack = self.localAudioTracks[trackName];
+    TVICameraSource *cameraSource = self.cameraSources[trackName];
+    
+    if (videoTrack) {
+        // Unpublish if published
+        if (self.localParticipant) {
+            [self.localParticipant unpublishVideoTrack:videoTrack];
+        }
+        
+        // Stop camera capture
+        if (cameraSource) {
+            [cameraSource stopCapture];
+            [self.cameraSources removeObjectForKey:trackName];
+        }
+        
+        [self.localVideoTracks removeObjectForKey:trackName];
+        resolve(@(YES));
+    } else if (audioTrack) {
+        // Unpublish if published
+        if (self.localParticipant) {
+            [self.localParticipant unpublishAudioTrack:audioTrack];
+        }
+        
+        [self.localAudioTracks removeObjectForKey:trackName];
+        resolve(@(YES));
+    } else {
+        reject(@"TRACK_NOT_FOUND", @"Track not found", nil);
+    }
+}
+
+RCT_EXPORT_METHOD(enableLocalTrack:(NSString *)trackName
+                 enabled:(BOOL)enabled
+                 resolver:(RCTPromiseResolveBlock)resolve
+                 rejecter:(RCTPromiseRejectBlock)reject) {
+    TVILocalVideoTrack *videoTrack = self.localVideoTracks[trackName];
+    TVILocalAudioTrack *audioTrack = self.localAudioTracks[trackName];
+    
+    if (videoTrack) {
+        [videoTrack setEnabled:enabled];
+        resolve(@(YES));
+    } else if (audioTrack) {
+        [audioTrack setEnabled:enabled];
+        resolve(@(YES));
+    } else {
+        reject(@"TRACK_NOT_FOUND", @"Track not found", nil);
+    }
+}
+
+RCT_EXPORT_METHOD(getLocalTracks:(RCTPromiseResolveBlock)resolve
+                 rejecter:(RCTPromiseRejectBlock)reject) {
+    NSMutableArray *tracks = [[NSMutableArray alloc] init];
+    
+    // Add video tracks
+    for (NSString *trackName in self.localVideoTracks) {
+        TVILocalVideoTrack *track = self.localVideoTracks[trackName];
+        [tracks addObject:@{
+            @"trackName": track.name,
+            @"enabled": @(track.enabled),
+            @"type": @"video"
+        }];
+    }
+    
+    // Add audio tracks
+    for (NSString *trackName in self.localAudioTracks) {
+        TVILocalAudioTrack *track = self.localAudioTracks[trackName];
+        [tracks addObject:@{
+            @"trackName": track.name,
+            @"enabled": @(track.enabled),
+            @"type": @"audio"
+        }];
+    }
+    
+    resolve(tracks);
+}
+
+// Helper method for camera capture
+- (void)startCameraCaptureForTrack:(NSString *)trackName cameraType:(NSString *)cameraType {
+    TVICameraSource *cameraSource = self.cameraSources[trackName];
+    TVILocalVideoTrack *videoTrack = self.localVideoTracks[trackName];
+    
+    if (!cameraSource || !videoTrack) {
+        return;
+    }
+    
+    AVCaptureDevice *camera;
+    if ([cameraType isEqualToString:@"back"]) {
+        camera = [TVICameraSource captureDeviceForPosition:AVCaptureDevicePositionBack];
+    } else {
+        camera = [TVICameraSource captureDeviceForPosition:AVCaptureDevicePositionFront];
+    }
+    
+    [cameraSource startCaptureWithDevice:camera completion:^(AVCaptureDevice *device,
+            TVIVideoFormat *startFormat,
+            NSError *error) {
+        if (!error) {
+            for (TVIVideoView *renderer in videoTrack.renderers) {
+                [self updateLocalViewMirroring:renderer forTrack:trackName];
+            }
+            [self sendEventCheckingListenerWithName:cameraDidStart body:nil];
+        }
+    }];
+}
+
+- (void)updateLocalViewMirroring:(TVIVideoView *)view forTrack:(NSString *)trackName {
+    TVICameraSource *cameraSource = self.cameraSources[trackName];
+    if (cameraSource && cameraSource.device.position == AVCaptureDevicePositionFront) {
+        view.mirror = true;
+    }
+}
+
+// Updated methods to support track names
+- (void)addLocalView:(TVIVideoView *)view {
+    [self addLocalView:view trackName:nil];
+}
+
+- (void)addLocalView:(TVIVideoView *)view trackName:(NSString *)trackName {
+    // If trackName is specified, use that track; otherwise use first available track
+    if (trackName) {
+        TVILocalVideoTrack *videoTrack = self.localVideoTracks[trackName];
+        if (videoTrack) {
+            [videoTrack addRenderer:view];
+            [self updateLocalViewMirroring:view forTrack:trackName];
+        }
+    } else {
+        // Use first available video track
+        TVILocalVideoTrack *firstTrack = [self.localVideoTracks.allValues firstObject];
+        if (firstTrack) {
+            [firstTrack addRenderer:view];
+            NSString *firstTrackName = [[self.localVideoTracks allKeysForObject:firstTrack] firstObject];
+            [self updateLocalViewMirroring:view forTrack:firstTrackName];
+        }
+    }
 }
 
 - (void)removeLocalView:(TVIVideoView *)view {
-  if (self.localVideoTrack != nil) {
-    [self.localVideoTrack removeRenderer:view];
+  // Remove view from all local video tracks
+  for (TVILocalVideoTrack *videoTrack in self.localVideoTracks.allValues) {
+    [videoTrack removeRenderer:view];
   }
 }
 
@@ -165,127 +449,31 @@ RCT_EXPORT_METHOD(setRemoteAudioPlayback:(NSString *)participantSid enabled:(BOO
     }
 }
 
-RCT_EXPORT_METHOD(startLocalVideo) {
-  TVICameraSourceOptions *options = [TVICameraSourceOptions optionsWithBlock:^(TVICameraSourceOptionsBuilder * _Nonnull builder) {
-
-  }];
-  self.camera = [[TVICameraSource alloc] initWithOptions:options delegate:self];
-  if (self.camera == nil) {
-      return;
-  }
-  self.localVideoTrack = [TVILocalVideoTrack trackWithSource:self.camera enabled:NO name:@"camera"];
-}
-
-- (void)startCameraCapture:(NSString *)cameraType {
-  if (self.camera == nil) {
-    return;
-  }
-  AVCaptureDevice *camera;
-    if ([cameraType isEqualToString:@"back"]) {
-    camera = [TVICameraSource captureDeviceForPosition:AVCaptureDevicePositionBack];
-  } else {
-    camera = [TVICameraSource captureDeviceForPosition:AVCaptureDevicePositionFront];
-  }
-
-  [self.camera startCaptureWithDevice:camera completion:^(AVCaptureDevice *device,
-          TVIVideoFormat *startFormat,
-          NSError *error) {
-      if (!error) {
-          for (TVIVideoView *renderer in self.localVideoTrack.renderers) {
-            [self updateLocalViewMirroring:renderer];
-          }
-          [self sendEventCheckingListenerWithName:cameraDidStart body:nil];
-      }
-  }];
-}
-
-RCT_EXPORT_METHOD(startLocalAudio) {
-    self.localAudioTrack = [TVILocalAudioTrack trackWithOptions:nil enabled:YES name:@"microphone"];
-}
-
-RCT_EXPORT_METHOD(stopLocalVideo) {
-    [self clearCameraInstance];
-}
-
-RCT_EXPORT_METHOD(stopLocalAudio) {
-  self.localAudioTrack = nil;
-}
-
-RCT_EXPORT_METHOD(publishLocalVideo) {
-  if(self.localVideoTrack != nil){
-    TVILocalParticipant *localParticipant = self.room.localParticipant;
-    [localParticipant publishVideoTrack:self.localVideoTrack];
-  }
-}
-
-RCT_EXPORT_METHOD(publishLocalAudio) {
-  TVILocalParticipant *localParticipant = self.room.localParticipant;
-  [localParticipant publishAudioTrack:self.localAudioTrack];
-}
-
-RCT_EXPORT_METHOD(unpublishLocalVideo) {
-  if(self.localVideoTrack != nil){
-    TVILocalParticipant *localParticipant = self.room.localParticipant;
-    [localParticipant unpublishVideoTrack:self.localVideoTrack];
-  }
-}
-
-RCT_EXPORT_METHOD(unpublishLocalAudio) {
-  TVILocalParticipant *localParticipant = self.room.localParticipant;
-  [localParticipant unpublishAudioTrack:self.localAudioTrack];
-}
-
-RCT_REMAP_METHOD(setLocalAudioEnabled, enabled:(BOOL)enabled setLocalAudioEnabledWithResolver:(RCTPromiseResolveBlock)resolve
-    rejecter:(RCTPromiseRejectBlock)reject) {
-  [self.localAudioTrack setEnabled:enabled];
-
-  resolve(@(enabled));
-}
-
-
-// set a default for setting local video enabled
-- (bool)_setLocalVideoEnabled:(bool)enabled {
-    return [self _setLocalVideoEnabled:enabled cameraType:@"front"];
-}
-
-- (bool)_setLocalVideoEnabled:(bool)enabled cameraType:(NSString *)cameraType {
-  if (self.localVideoTrack != nil) {
-      [self.localVideoTrack setEnabled:enabled];
-      if (self.camera) {
-          if (enabled) {
-            [self startCameraCapture:cameraType];
-          } else {
-            [self clearCameraInstance];
-          }
-          return enabled;
-      }
-  }
-  return false;
-}
-
-RCT_REMAP_METHOD(setLocalVideoEnabled, enabled:(BOOL)enabled setLocalVideoEnabledWithResolver:(RCTPromiseResolveBlock)resolve
-                 rejecter:(RCTPromiseRejectBlock)reject) {
-  bool result = [self _setLocalVideoEnabled:enabled];
-  resolve(@(result));
-}
-
 RCT_EXPORT_METHOD(flipCamera) {
-    if (self.camera) {
-        AVCaptureDevicePosition position = self.camera.device.position;
+    // Flip camera for all camera sources
+    for (TVICameraSource *cameraSource in self.cameraSources.allValues) {
+        AVCaptureDevicePosition position = cameraSource.device.position;
         AVCaptureDevicePosition nextPosition = position == AVCaptureDevicePositionFront ? AVCaptureDevicePositionBack : AVCaptureDevicePositionFront;
         BOOL mirror = nextPosition == AVCaptureDevicePositionFront;
 
         AVCaptureDevice *captureDevice = [TVICameraSource captureDeviceForPosition:nextPosition];
-        [self.camera selectCaptureDevice:captureDevice completion:^(AVCaptureDevice *device,
+        [cameraSource selectCaptureDevice:captureDevice completion:^(AVCaptureDevice *device,
                 TVIVideoFormat *startFormat,
                 NSError *error) {
             if (!error) {
-                for (TVIVideoView *renderer in self.localVideoTrack.renderers) {
-                    renderer.mirror = mirror;
+                // Update mirroring for all renderers of video tracks using this camera source
+                for (NSString *trackName in self.localVideoTracks) {
+                    TVILocalVideoTrack *videoTrack = self.localVideoTracks[trackName];
+                    TVICameraSource *trackCameraSource = self.cameraSources[trackName];
+                    if (trackCameraSource == cameraSource) {
+                        for (TVIVideoView *renderer in videoTrack.renderers) {
+                            renderer.mirror = mirror;
+                        }
+                    }
                 }
             }
         }];
-  }
+    }
 }
 
 RCT_EXPORT_METHOD(toggleScreenSharing: (BOOL) value) {
@@ -297,17 +485,24 @@ RCT_EXPORT_METHOD(toggleScreenSharing: (BOOL) value) {
        if (self.screen == nil) {
            return;
        }
-       self.localVideoTrack = [TVILocalVideoTrack trackWithSource:self.screen enabled:YES name:@"screen"];
-       if(self.localVideoTrack != nil){
-         TVILocalParticipant *localParticipant = self.room.localParticipant;
-         [localParticipant publishVideoTrack:self.localVideoTrack];
+       
+       // Create a screen share video track
+       TVILocalVideoTrack *screenTrack = [TVILocalVideoTrack trackWithSource:self.screen enabled:YES name:@"screen"];
+       if (screenTrack) {
+           self.localVideoTracks[@"screen"] = screenTrack;
+           if (self.localParticipant) {
+               [self.localParticipant publishVideoTrack:screenTrack];
+           }
        }
        [self.screen startCapture];    
-  } else {
-        [self unpublishLocalVideo];
+    } else {
+        TVILocalVideoTrack *screenTrack = self.localVideoTracks[@"screen"];
+        if (screenTrack && self.localParticipant) {
+            [self.localParticipant unpublishVideoTrack:screenTrack];
+        }
+        [self.localVideoTracks removeObjectForKey:@"screen"];
         [self.screen stopCapture];
-        self.localVideoTrack = nil;
-       }
+    }
 }
 
 
@@ -421,19 +616,21 @@ RCT_EXPORT_METHOD(getStats) {
   }
 }
 
-RCT_EXPORT_METHOD(connect:(NSString *)accessToken roomName:(NSString *)roomName enableAudio:(BOOL *)enableAudio enableVideo:(BOOL *)enableVideo encodingParameters:(NSDictionary *)encodingParameters enableNetworkQualityReporting:(BOOL *)enableNetworkQualityReporting dominantSpeakerEnabled:(BOOL *)dominantSpeakerEnabled cameraType:(NSString *)cameraType) {
-  [self _setLocalVideoEnabled:enableVideo cameraType:cameraType];
-  if (self.localAudioTrack) {
-    [self.localAudioTrack setEnabled:enableAudio];
-  }
-
+RCT_EXPORT_METHOD(connect:(NSString *)accessToken roomName:(NSString *)roomName enableAudio:(BOOL)enableAudio enableVideo:(BOOL)enableVideo encodingParameters:(NSDictionary *)encodingParameters enableNetworkQualityReporting:(BOOL)enableNetworkQualityReporting dominantSpeakerEnabled:(BOOL)dominantSpeakerEnabled cameraType:(NSString *)cameraType) {
+  
+  // No automatic track creation - users must create tracks explicitly
+  
   TVIConnectOptions *connectOptions = [TVIConnectOptions optionsWithToken:accessToken block:^(TVIConnectOptionsBuilder * _Nonnull builder) {
-    if (self.localVideoTrack) {
-      builder.videoTracks = @[self.localVideoTrack];
+    // Add all video tracks
+    NSArray<TVILocalVideoTrack *> *videoTracks = [self.localVideoTracks allValues];
+    if (videoTracks.count > 0) {
+      builder.videoTracks = videoTracks;
     }
 
-    if (self.localAudioTrack) {
-      builder.audioTracks = @[self.localAudioTrack];
+    // Add all audio tracks
+    NSArray<TVILocalAudioTrack *> *audioTracks = [self.localAudioTracks allValues];
+    if (audioTracks.count > 0) {
+      builder.audioTracks = audioTracks;
     }
 
     self.localDataTrack = [TVILocalDataTrack track];
@@ -442,7 +639,7 @@ RCT_EXPORT_METHOD(connect:(NSString *)accessToken roomName:(NSString *)roomName 
       builder.dataTracks = @[self.localDataTrack];
     }
       
-    builder.dominantSpeakerEnabled = dominantSpeakerEnabled ? YES : NO;
+    builder.dominantSpeakerEnabled = dominantSpeakerEnabled;
 
     builder.roomName = roomName;
 
@@ -473,15 +670,8 @@ RCT_EXPORT_METHOD(sendString:(nonnull NSString *)message) {
 }
 
 RCT_EXPORT_METHOD(disconnect) {
-  [self clearCameraInstance];
+  [self clearAllCameraInstances];
   [self.room disconnect];
-}
-
-- (void)clearCameraInstance {
-    // We are done with camera
-    if (self.camera) {
-        [self.camera stopCapture];
-    }
 }
 
 # pragma mark - Common

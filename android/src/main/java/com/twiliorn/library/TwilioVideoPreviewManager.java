@@ -44,6 +44,16 @@ public class TwilioVideoPreviewManager extends SimpleViewManager<TwilioVideoPrev
       view.applyZOrder(applyZOrder);
     }
 
+    @ReactProp(name = "enabled", defaultBoolean = true)
+    public void setEnabled(TwilioVideoPreview view, boolean enabled) {
+      view.setEnabled(enabled);
+    }
+
+    @ReactProp(name = "trackName")
+    public void setTrackName(TwilioVideoPreview view, @Nullable String trackName) {
+      view.setTrackName(trackName);
+    }
+
     @Override
     @Nullable
     public Map getExportedCustomDirectEventTypeConstants() {

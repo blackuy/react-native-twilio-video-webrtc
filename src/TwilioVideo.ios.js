@@ -164,16 +164,12 @@ export default class TwilioVideo extends Component {
 
   componentDidMount() {
     this._registerEvents();
-    if (this.props.autoInitializeCamera !== false) {
-      this._startLocalVideo();
-    }
-    this._startLocalAudio();
+    // Removed automatic track creation - users must create tracks explicitly
   }
 
   componentWillUnmount() {
     this._unregisterEvents();
-    this._stopLocalVideo();
-    this._stopLocalAudio();
+    // Clean up is handled by destroyLocalTrack calls from user code
   }
 
   /**
@@ -189,20 +185,6 @@ export default class TwilioVideo extends Component {
 
   setBluetoothHeadsetConnected(enabled) {
     return Promise.resolve(enabled);
-  }
-
-  /**
-   * Enable or disable local video
-   */
-  setLocalVideoEnabled(enabled) {
-    return TWVideoModule.setLocalVideoEnabled(enabled);
-  }
-
-  /**
-   * Enable or disable local audio
-   */
-  setLocalAudioEnabled(enabled) {
-    return TWVideoModule.setLocalAudioEnabled(enabled);
   }
 
   /**
@@ -270,31 +252,84 @@ export default class TwilioVideo extends Component {
   }
 
   /**
-   * Publish a local audio track
+   * Create a local audio track
+   * @param {LocalAudioTrackConfig} config - Configuration for the audio track
+   * @returns {Promise<string>} - Promise that resolves to the track name
    */
-  publishLocalAudio() {
-    TWVideoModule.publishLocalAudio();
+  createLocalAudioTrack(config) {
+    return TWVideoModule.createLocalAudioTrack(config);
+  }
+
+  /**
+   * Create a local video track
+   * @param {LocalVideoTrackConfig} config - Configuration for the video track
+   * @returns {Promise<string>} - Promise that resolves to the track name
+   */
+  createLocalVideoTrack(config) {
+    return TWVideoModule.createLocalVideoTrack(config);
+  }
+
+  /**
+   * Publish a local audio track
+   * @param {string} trackName - Name of the track to publish
+   * @returns {Promise<boolean>} - Promise that resolves to true if successful
+   */
+  publishLocalAudioTrack(trackName) {
+    return TWVideoModule.publishLocalAudioTrack(trackName);
   }
 
   /**
    * Publish a local video track
+   * @param {string} trackName - Name of the track to publish
+   * @returns {Promise<boolean>} - Promise that resolves to true if successful
    */
-  publishLocalVideo() {
-    TWVideoModule.publishLocalVideo();
+  publishLocalVideoTrack(trackName) {
+    return TWVideoModule.publishLocalVideoTrack(trackName);
   }
 
   /**
    * Unpublish a local audio track
+   * @param {string} trackName - Name of the track to unpublish
+   * @returns {Promise<boolean>} - Promise that resolves to true if successful
    */
-  unpublishLocalAudio() {
-    TWVideoModule.unpublishLocalAudio();
+  unpublishLocalAudioTrack(trackName) {
+    return TWVideoModule.unpublishLocalAudioTrack(trackName);
   }
 
   /**
    * Unpublish a local video track
+   * @param {string} trackName - Name of the track to unpublish
+   * @returns {Promise<boolean>} - Promise that resolves to true if successful
    */
-  unpublishLocalVideo() {
-    TWVideoModule.unpublishLocalVideo();
+  unpublishLocalVideoTrack(trackName) {
+    return TWVideoModule.unpublishLocalVideoTrack(trackName);
+  }
+
+  /**
+   * Destroy a local track
+   * @param {string} trackName - Name of the track to destroy
+   * @returns {Promise<boolean>} - Promise that resolves to true if successful
+   */
+  destroyLocalTrack(trackName) {
+    return TWVideoModule.destroyLocalTrack(trackName);
+  }
+
+  /**
+   * Enable or disable a local track
+   * @param {string} trackName - Name of the track to enable/disable
+   * @param {boolean} enabled - Whether to enable or disable the track
+   * @returns {Promise<boolean>} - Promise that resolves to true if successful
+   */
+  enableLocalTrack(trackName, enabled) {
+    return TWVideoModule.enableLocalTrack(trackName, enabled);
+  }
+
+  /**
+   * Get all local tracks
+   * @returns {Promise<TrackPublication[]>} - Promise that resolves to an array of track publications
+   */
+  getLocalTracks() {
+    return TWVideoModule.getLocalTracks();
   }
 
   /**
@@ -303,22 +338,6 @@ export default class TwilioVideo extends Component {
    */
   sendString(message) {
     TWVideoModule.sendString(message);
-  }
-
-  _startLocalVideo() {
-    TWVideoModule.startLocalVideo();
-  }
-
-  _stopLocalVideo() {
-    TWVideoModule.stopLocalVideo();
-  }
-
-  _startLocalAudio() {
-    TWVideoModule.startLocalAudio();
-  }
-
-  _stopLocalAudio() {
-    TWVideoModule.stopLocalAudio();
   }
 
   _unregisterEvents() {

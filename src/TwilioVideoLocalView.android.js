@@ -15,6 +15,14 @@ const propTypes = {
   // this view to appear above other Twilio Video views.
   applyZOrder: PropTypes.bool,
   /**
+   * Indicate if video feed is enabled.
+   */
+  enabled: PropTypes.bool.isRequired,
+  /**
+   * Optional track name for multiple track support.
+   */
+  trackName: PropTypes.string,
+  /**
    * How the video stream should be scaled to fit its
    * container.
    */

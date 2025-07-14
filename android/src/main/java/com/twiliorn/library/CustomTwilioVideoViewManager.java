@@ -43,6 +43,10 @@ import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_NETWORK_QUALI
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_DOMINANT_SPEAKER_CHANGED;
 import static com.twiliorn.library.CustomTwilioVideoView.Events.ON_LOCAL_PARTICIPANT_SUPPORTED_CODECS;
 
+import com.facebook.react.bridge.WritableArray;
+import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.bridge.WritableNativeMap;
+
 public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilioVideoView> {
     public static final String REACT_CLASS = "RNCustomTwilioVideoView";
 
@@ -58,9 +62,18 @@ public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilio
     private static final int RELEASE_RESOURCE = 10;
     private static final int TOGGLE_BLUETOOTH_HEADSET = 11;
     private static final int SEND_STRING = 12;
-    private static final int PUBLISH_VIDEO = 13;
-    private static final int PUBLISH_AUDIO = 14;
-    private static final int SET_REMOTE_AUDIO_PLAYBACK = 15;
+    private static final int SET_REMOTE_AUDIO_PLAYBACK = 13;
+    
+    // Multiple track support commands
+    private static final int CREATE_LOCAL_AUDIO_TRACK = 14;
+    private static final int CREATE_LOCAL_VIDEO_TRACK = 15;
+    private static final int PUBLISH_LOCAL_AUDIO_TRACK = 16;
+    private static final int PUBLISH_LOCAL_VIDEO_TRACK = 17;
+    private static final int UNPUBLISH_LOCAL_AUDIO_TRACK = 18;
+    private static final int UNPUBLISH_LOCAL_VIDEO_TRACK = 19;
+    private static final int DESTROY_LOCAL_TRACK = 20;
+    private static final int ENABLE_LOCAL_TRACK = 21;
+    private static final int GET_LOCAL_TRACKS = 22;
 
     @Override
     public String getName() {
@@ -138,16 +151,54 @@ public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilio
             case SEND_STRING:
                 view.sendString(args.getString(0));
                 break;
-            case PUBLISH_VIDEO:
-                view.publishLocalVideo(args.getBoolean(0));
-                break;
-            case PUBLISH_AUDIO:
-                view.publishLocalAudio(args.getBoolean(0));
-                break;
             case SET_REMOTE_AUDIO_PLAYBACK:
                 String participantSid = args.getString(0);
                 Boolean enabled = args.getBoolean(1);
                 view.setRemoteAudioPlayback(participantSid, enabled);
+                break;
+            // Multiple track support commands
+            case CREATE_LOCAL_AUDIO_TRACK:
+                String audioTrackName = args.getString(0);
+                boolean audioTrackEnabled = args.getBoolean(1);
+                view.createLocalAudioTrack(audioTrackName, audioTrackEnabled);
+                break;
+            case CREATE_LOCAL_VIDEO_TRACK:
+                String videoTrackName = args.getString(0);
+                boolean videoTrackEnabled = args.getBoolean(1);
+                String videoCameraType = args.getString(2);
+                view.createLocalVideoTrack(videoTrackName, videoTrackEnabled, videoCameraType);
+                break;
+            case PUBLISH_LOCAL_AUDIO_TRACK:
+                String publishAudioTrackName = args.getString(0);
+                view.publishLocalAudioTrack(publishAudioTrackName);
+                break;
+            case PUBLISH_LOCAL_VIDEO_TRACK:
+                String publishVideoTrackName = args.getString(0);
+                view.publishLocalVideoTrack(publishVideoTrackName);
+                break;
+            case UNPUBLISH_LOCAL_AUDIO_TRACK:
+                String unpublishAudioTrackName = args.getString(0);
+                view.unpublishLocalAudioTrack(unpublishAudioTrackName);
+                break;
+            case UNPUBLISH_LOCAL_VIDEO_TRACK:
+                String unpublishVideoTrackName = args.getString(0);
+                view.unpublishLocalVideoTrack(unpublishVideoTrackName);
+                break;
+            case DESTROY_LOCAL_TRACK:
+                String destroyTrackName = args.getString(0);
+                view.destroyLocalTrack(destroyTrackName);
+                break;
+            case ENABLE_LOCAL_TRACK:
+                String enableTrackName = args.getString(0);
+                boolean enableTrack = args.getBoolean(1);
+                view.enableLocalTrack(enableTrackName, enableTrack);
+                break;
+            case GET_LOCAL_TRACKS:
+                WritableArray tracks = view.getLocalTracks();
+                WritableMap event = new WritableNativeMap();
+                event.putArray("tracks", tracks);
+                // Push event with tracks data
+                view.pushEvent(view, "onLocalTracksReceived", event);
                 break;
         }
     }
@@ -207,6 +258,17 @@ public class CustomTwilioVideoViewManager extends SimpleViewManager<CustomTwilio
                 .put("toggleRemoteSound", TOGGLE_REMOTE_SOUND)
                 .put("toggleBluetoothHeadset", TOGGLE_BLUETOOTH_HEADSET)
                 .put("sendString", SEND_STRING)
+                .put("setRemoteAudioPlayback", SET_REMOTE_AUDIO_PLAYBACK)
+                // Multiple track support commands
+                .put("createLocalAudioTrack", CREATE_LOCAL_AUDIO_TRACK)
+                .put("createLocalVideoTrack", CREATE_LOCAL_VIDEO_TRACK)
+                .put("publishLocalAudioTrack", PUBLISH_LOCAL_AUDIO_TRACK)
+                .put("publishLocalVideoTrack", PUBLISH_LOCAL_VIDEO_TRACK)
+                .put("unpublishLocalAudioTrack", UNPUBLISH_LOCAL_AUDIO_TRACK)
+                .put("unpublishLocalVideoTrack", UNPUBLISH_LOCAL_VIDEO_TRACK)
+                .put("destroyLocalTrack", DESTROY_LOCAL_TRACK)
+                .put("enableLocalTrack", ENABLE_LOCAL_TRACK)
+                .put("getLocalTracks", GET_LOCAL_TRACKS)
                 .build();
     }
 }

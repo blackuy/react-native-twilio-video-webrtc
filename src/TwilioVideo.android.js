@@ -149,6 +149,13 @@ const propTypes = {
    * Callback that is called after determining what codecs are supported
    */
   onLocalParticipantSupportedCodecs: PropTypes.func,
+  // New events for multiple track support
+  onAudioTrackCreated: PropTypes.func,
+  onVideoTrackCreated: PropTypes.func,
+  onTrackCreationError: PropTypes.func,
+  onTrackPublishError: PropTypes.func,
+  onTrackUnpublishError: PropTypes.func,
+  onLocalTracksReceived: PropTypes.func,
 };
 
 const nativeEvents = {
@@ -164,9 +171,17 @@ const nativeEvents = {
   releaseResource: 10,
   toggleBluetoothHeadset: 11,
   sendString: 12,
-  publishVideo: 13,
-  publishAudio: 14,
-  setRemoteAudioPlayback: 15,
+  setRemoteAudioPlayback: 13,
+  // Multiple track support commands
+  createLocalAudioTrack: 14,
+  createLocalVideoTrack: 15,
+  publishLocalAudioTrack: 16,
+  publishLocalVideoTrack: 17,
+  unpublishLocalAudioTrack: 18,
+  unpublishLocalVideoTrack: 19,
+  destroyLocalTrack: 20,
+  enableLocalTrack: 21,
+  getLocalTracks: 22,
 };
 
 class CustomTwilioVideoView extends Component {
@@ -200,22 +215,6 @@ class CustomTwilioVideoView extends Component {
     this.runCommand(nativeEvents.sendString, [message]);
   }
 
-  publishLocalAudio() {
-    this.runCommand(nativeEvents.publishAudio, [true]);
-  }
-
-  publishLocalVideo() {
-    this.runCommand(nativeEvents.publishVideo, [true]);
-  }
-
-  unpublishLocalAudio() {
-    this.runCommand(nativeEvents.publishAudio, [false]);
-  }
-
-  unpublishLocalVideo() {
-    this.runCommand(nativeEvents.publishVideo, [false]);
-  }
-
   disconnect() {
     this.runCommand(nativeEvents.disconnect, []);
   }
@@ -226,16 +225,6 @@ class CustomTwilioVideoView extends Component {
 
   flipCamera() {
     this.runCommand(nativeEvents.switchCamera, []);
-  }
-
-  setLocalVideoEnabled(enabled) {
-    this.runCommand(nativeEvents.toggleVideo, [enabled]);
-    return Promise.resolve(enabled);
-  }
-
-  setLocalAudioEnabled(enabled) {
-    this.runCommand(nativeEvents.toggleSound, [enabled]);
-    return Promise.resolve(enabled);
   }
 
   setRemoteAudioEnabled(enabled) {
@@ -281,6 +270,86 @@ class CustomTwilioVideoView extends Component {
     }
   }
 
+  // Multiple track support methods
+  createLocalAudioTrack(config) {
+    return new Promise((resolve, reject) => {
+      this.runCommand(nativeEvents.createLocalAudioTrack, [
+        config.trackName,
+        config.enabled !== undefined ? config.enabled : true
+      ]);
+      // TODO: Add proper promise handling with event listeners
+      resolve(config.trackName);
+    });
+  }
+
+  createLocalVideoTrack(config) {
+    return new Promise((resolve, reject) => {
+      this.runCommand(nativeEvents.createLocalVideoTrack, [
+        config.trackName,
+        config.enabled !== undefined ? config.enabled : true,
+        config.cameraType || "front"
+      ]);
+      // TODO: Add proper promise handling with event listeners
+      resolve(config.trackName);
+    });
+  }
+
+  publishLocalAudioTrack(trackName) {
+    return new Promise((resolve, reject) => {
+      this.runCommand(nativeEvents.publishLocalAudioTrack, [trackName]);
+      // TODO: Add proper promise handling with event listeners
+      resolve(true);
+    });
+  }
+
+  publishLocalVideoTrack(trackName) {
+    return new Promise((resolve, reject) => {
+      this.runCommand(nativeEvents.publishLocalVideoTrack, [trackName]);
+      // TODO: Add proper promise handling with event listeners
+      resolve(true);
+    });
+  }
+
+  unpublishLocalAudioTrack(trackName) {
+    return new Promise((resolve, reject) => {
+      this.runCommand(nativeEvents.unpublishLocalAudioTrack, [trackName]);
+      // TODO: Add proper promise handling with event listeners
+      resolve(true);
+    });
+  }
+
+  unpublishLocalVideoTrack(trackName) {
+    return new Promise((resolve, reject) => {
+      this.runCommand(nativeEvents.unpublishLocalVideoTrack, [trackName]);
+      // TODO: Add proper promise handling with event listeners
+      resolve(true);
+    });
+  }
+
+  destroyLocalTrack(trackName) {
+    return new Promise((resolve, reject) => {
+      this.runCommand(nativeEvents.destroyLocalTrack, [trackName]);
+      // TODO: Add proper promise handling with event listeners
+      resolve(true);
+    });
+  }
+
+  enableLocalTrack(trackName, enabled) {
+    return new Promise((resolve, reject) => {
+      this.runCommand(nativeEvents.enableLocalTrack, [trackName, enabled]);
+      // TODO: Add proper promise handling with event listeners
+      resolve(true);
+    });
+  }
+
+  getLocalTracks() {
+    return new Promise((resolve, reject) => {
+      this.runCommand(nativeEvents.getLocalTracks, []);
+      // TODO: Add proper promise handling with event listeners - should resolve with tracks array
+      resolve([]);
+    });
+  }
+
   buildNativeEventWrappers() {
     return [
       "onCameraSwitched",
@@ -306,6 +375,13 @@ class CustomTwilioVideoView extends Component {
       "onNetworkQualityLevelsChanged",
       "onDominantSpeakerDidChange",
       "onLocalParticipantSupportedCodecs",
+      // New events for multiple track support
+      "onAudioTrackCreated",
+      "onVideoTrackCreated",
+      "onTrackCreationError",
+      "onTrackPublishError",
+      "onTrackUnpublishError",
+      "onLocalTracksReceived",
     ].reduce((wrappedEvents, eventName) => {
       if (this.props[eventName]) {
         return {

@@ -42,4 +42,15 @@ RCT_CUSTOM_VIEW_PROPERTY(enabled, BOOL, TVIVideoView) {
   }
 }
 
+RCT_CUSTOM_VIEW_PROPERTY(trackName, NSString, TVIVideoView) {
+  if (json) {
+    RCTTWVideoModule *videoModule = [self.bridge moduleForName:@"TWVideoModule"];
+    NSString *trackName = [RCTConvert NSString:json];
+    
+    // Remove from all tracks first, then add to specific track
+    [videoModule removeLocalView:view.subviews[0]];
+    [videoModule addLocalView:view.subviews[0] trackName:trackName];
+  }
+}
+
 @end

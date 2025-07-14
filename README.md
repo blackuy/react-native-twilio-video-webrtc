@@ -276,7 +276,29 @@ const Example = (props) => {
   const [token, setToken] = useState("");
   const twilioRef = useRef(null);
 
-  const _onConnectButtonPress = () => {
+  const _createTracks = async () => {
+    try {
+      // Create audio track
+      await twilioRef.current.createLocalAudioTrack({
+        trackName: 'microphone',
+        enabled: isAudioEnabled
+      });
+      
+      // Create video track
+      await twilioRef.current.createLocalVideoTrack({
+        trackName: 'camera',
+        enabled: isVideoEnabled,
+        cameraType: 'front'
+      });
+    } catch (error) {
+      console.error('Error creating tracks:', error);
+    }
+  };
+
+  const _onConnectButtonPress = async () => {
+    // Create tracks before connecting
+    await _createTracks();
+    
     twilioRef.current.connect({ accessToken: token });
     setStatus("connecting");
   };
@@ -287,16 +309,20 @@ const Example = (props) => {
 
   const _onMuteButtonPress = () => {
     twilioRef.current
-      .setLocalAudioEnabled(!isAudioEnabled)
-      .then((isEnabled) => setIsAudioEnabled(isEnabled));
+      .enableLocalTrack('microphone', !isAudioEnabled)
+      .then(() => setIsAudioEnabled(!isAudioEnabled));
   };
 
   const _onFlipButtonPress = () => {
     twilioRef.current.flipCamera();
   };
 
-  const _onRoomDidConnect = ({ roomName, error }) => {
+  const _onRoomDidConnect = async ({ roomName, error }) => {
     console.log("onRoomDidConnect: ", roomName);
+
+    // Publish tracks after connecting
+    await twilioRef.current.publishLocalAudioTrack('microphone');
+    await twilioRef.current.publishLocalVideoTrack('camera');
 
     setStatus("connected");
   };
@@ -389,7 +415,7 @@ const Example = (props) => {
             >
               <Text style={{ fontSize: 12 }}>Flip</Text>
             </TouchableOpacity>
-            <TwilioVideoLocalView enabled={true} style={styles.localVideo} />
+            <TwilioVideoLocalView enabled={true} trackName="camera" style={styles.localVideo} />
           </View>
         </View>
       )}
@@ -463,3 +489,250 @@ For any questions regarding licensing or to request additional permissions, plea
    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=blackuy/react-native-twilio-video-webrtc&type=Date" />
  </picture>
 </a>
+
+## Multiple Track Support
+
+This library supports multiple audio and video tracks, similar to the Twilio Video JS SDK. This allows you to publish multiple audio/video tracks simultaneously, which is useful for scenarios like:
+
+- Screen sharing alongside camera video
+- Multiple camera feeds (front/back camera)
+- Multiple audio sources (microphone, system audio, etc.)
+- More complex video conferencing scenarios
+
+### API Methods
+
+#### Track Creation
+```javascript
+// Create a local audio track
+const audioTrackName = await twilioVideo.createLocalAudioTrack({
+  trackName: 'microphone',
+  enabled: true
+});
+
+// Create a local video track
+const videoTrackName = await twilioVideo.createLocalVideoTrack({
+  trackName: 'camera',
+  enabled: true,
+  cameraType: 'front' // or 'back'
+});
+```
+
+#### Track Publishing
+```javascript
+// Publish a specific track
+await twilioVideo.publishLocalAudioTrack('microphone');
+await twilioVideo.publishLocalVideoTrack('camera');
+
+// Unpublish a specific track
+await twilioVideo.unpublishLocalAudioTrack('microphone');
+await twilioVideo.unpublishLocalVideoTrack('camera');
+```
+
+#### Track Management
+```javascript
+// Enable/disable a specific track
+await twilioVideo.enableLocalTrack('microphone', false); // mute audio
+await twilioVideo.enableLocalTrack('camera', true); // enable video
+
+// Get all local tracks
+const tracks = await twilioVideo.getLocalTracks();
+// Returns: [{ trackName: 'microphone', enabled: true, type: 'audio' }, { trackName: 'camera', enabled: true, type: 'video' }]
+
+// Destroy a track
+await twilioVideo.destroyLocalTrack('microphone');
+```
+
+### New Events
+
+The library emits additional events for track lifecycle management:
+
+```javascript
+<TwilioVideo
+  onAudioTrackCreated={({ trackName, trackSid, enabled }) => {
+    console.log('Audio track created:', trackName);
+  }}
+  onVideoTrackCreated={({ trackName, trackSid, enabled }) => {
+    console.log('Video track created:', trackName);
+  }}
+  onTrackCreationError={({ error }) => {
+    console.error('Track creation failed:', error);
+  }}
+  onTrackPublishError={({ error }) => {
+    console.error('Track publish failed:', error);
+  }}
+  onTrackUnpublishError={({ error }) => {
+    console.error('Track unpublish failed:', error);
+  }}
+  onLocalTracksReceived={({ tracks }) => {
+    console.log('Local tracks:', tracks);
+  }}
+  // ... other props
+/>
+```
+
+### Local Video View with Track Names
+
+The `TwilioVideoLocalView` supports an optional `trackName` prop to display a specific track:
+
+```javascript
+{/* Display specific track */}
+<TwilioVideoLocalView 
+  enabled={true} 
+  trackName="camera" 
+/>
+
+{/* Display another track */}
+<TwilioVideoLocalView 
+  enabled={true} 
+  trackName="frontCamera" 
+/>
+```
+
+### Example Usage
+
+Here's a complete example showing how to use multiple tracks:
+
+```javascript
+import React, { useState, useEffect } from 'react';
+import { View, Button } from 'react-native';
+import { TwilioVideo, TwilioVideoLocalView, TwilioVideoParticipantView } from 'react-native-twilio-video-webrtc';
+
+const MultiTrackExample = () => {
+  const [twilioRef, setTwilioRef] = useState(null);
+  const [tracks, setTracks] = useState([]);
+
+  const createTracks = async () => {
+    try {
+      // Create audio track
+      await twilioRef.createLocalAudioTrack({
+        trackName: 'microphone',
+        enabled: true
+      });
+      
+      // Create video track
+      await twilioRef.createLocalVideoTrack({
+        trackName: 'camera',
+        enabled: true,
+        cameraType: 'front'
+      });
+      
+      // Get all tracks
+      const allTracks = await twilioRef.getLocalTracks();
+      setTracks(allTracks);
+    } catch (error) {
+      console.error('Error creating tracks:', error);
+    }
+  };
+
+  const connectToRoom = async () => {
+    try {
+      // Create tracks before connecting
+      await createTracks();
+      
+      // Connect to room
+      twilioRef.connect({
+        roomName: 'my-room',
+        accessToken: 'your-access-token',
+        enableAudio: true,
+        enableVideo: true
+      });
+    } catch (error) {
+      console.error('Error connecting:', error);
+    }
+  };
+
+  const publishTracks = async () => {
+    try {
+      await twilioRef.publishLocalAudioTrack('microphone');
+      await twilioRef.publishLocalVideoTrack('camera');
+    } catch (error) {
+      console.error('Error publishing tracks:', error);
+    }
+  };
+
+  const toggleAudio = async () => {
+    try {
+      const currentTrack = tracks.find(t => t.trackName === 'microphone');
+      if (currentTrack) {
+        await twilioRef.enableLocalTrack('microphone', !currentTrack.enabled);
+      }
+    } catch (error) {
+      console.error('Error toggling audio:', error);
+    }
+  };
+
+  return (
+    <View style={{ flex: 1 }}>
+      <TwilioVideo
+        ref={ref => setTwilioRef(ref)}
+        onRoomDidConnect={() => {
+          console.log('Connected to room');
+          publishTracks();
+        }}
+        onAudioTrackCreated={({ trackName }) => {
+          console.log('Audio track created:', trackName);
+        }}
+        onVideoTrackCreated={({ trackName }) => {
+          console.log('Video track created:', trackName);
+        }}
+        // ... other props
+      />
+      
+      {/* Display video track */}
+      <TwilioVideoLocalView 
+        enabled={true} 
+        trackName="camera"
+        style={{ width: 200, height: 300 }}
+      />
+      
+      <Button title="Connect" onPress={connectToRoom} />
+      <Button title="Toggle Audio" onPress={toggleAudio} />
+    </View>
+  );
+};
+
+export default MultiTrackExample;
+```
+
+### Important Notes
+
+- **No automatic track creation**: You must explicitly create all tracks using `createLocalAudioTrack()` and `createLocalVideoTrack()` before connecting to a room
+- **Track management**: Use `enableLocalTrack(trackName, enabled)` to enable/disable specific tracks
+- **Explicit track names**: All track operations require specifying the exact track name you want to work with
+- **Lifecycle management**: Remember to call `destroyLocalTrack()` for tracks you no longer need
+
+### TypeScript Support
+
+The library includes full TypeScript definitions for the multiple track APIs:
+
+```typescript
+interface LocalTrackConfig {
+  trackName: string;
+  enabled?: boolean;
+}
+
+interface LocalVideoTrackConfig extends LocalTrackConfig {
+  cameraType?: 'front' | 'back';
+}
+
+interface LocalAudioTrackConfig extends LocalTrackConfig {
+  // Audio-specific configs can be added here
+}
+
+interface TrackPublication {
+  trackSid: string;
+  trackName: string;
+  enabled: boolean;
+}
+```
+
+### Platform Support
+
+- ✅ Android: Fully implemented
+- ⚠️ iOS: Implementation in progress (some features may not be fully functional yet)
+
+For more complex scenarios, you can now:
+- Create multiple tracks of the same type
+- Publish/unpublish tracks independently
+- Enable/disable tracks without affecting others
+- Get detailed information about all active tracks

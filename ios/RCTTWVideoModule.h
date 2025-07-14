@@ -14,6 +14,7 @@
 @interface RCTTWVideoModule : RCTEventEmitter <RCTBridgeModule>
 
 - (void)addLocalView:(TVIVideoView *)view;
+- (void)addLocalView:(TVIVideoView *)view trackName:(NSString *)trackName;
 - (void)removeLocalView:(TVIVideoView *)view;
 - (void)addParticipantView:(TVIVideoView *)view sid:(NSString *)sid trackSid:(NSString *)trackSid;
 

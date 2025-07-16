@@ -168,7 +168,7 @@ dependencies {
     .....
     .....
     .....
-    implementation project(':react-native-twilio-video-webrtc')
+    implementation(project(':react-native-twilio-video-webrtc'))
 }
 ```
 
@@ -177,8 +177,8 @@ You will also need to update this file so that you compile with java 8 features:
 ```
 android {
     compileOptions {
-        sourceCompatibility 1.8
-        targetCompatibility 1.8
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 }
 ```
@@ -198,6 +198,25 @@ Then update the `getPackages()` method:
             new TwilioPackage()
         );
     }
+```
+
+If your React Native project uses Kotlin for the `MainApplication`, follow these steps to manually add the `TwilioPackage`.
+
+
+At the top of your `MainApplication.kt` file, add:
+
+```kotlin
+import com.twiliorn.library.TwilioPackage
+```
+Now update the `getPackages()` method by adding:
+```kotlin
+override val reactNativeHost: ReactNativeHost =
+      object : DefaultReactNativeHost(this) {
+        override fun getPackages(): List<ReactPackage> =
+            PackageList(this).packages.apply {
+              ...
+              add(TwilioPackage())
+            }
 ```
 
 ### Permissions

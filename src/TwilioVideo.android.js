@@ -10,7 +10,6 @@
 import {
   Platform,
   UIManager,
-  View,
   findNodeHandle,
   requireNativeComponent,
 } from "react-native";
@@ -19,7 +18,6 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 
 const propTypes = {
-  ...View.propTypes,
   /**
    * Callback that is called when camera source changes
    */

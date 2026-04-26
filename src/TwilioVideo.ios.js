@@ -152,7 +152,6 @@ export default class TwilioVideo extends Component {
      * camera will require calling `_startLocalVideo`.
      */
     autoInitializeCamera: PropTypes.bool,
-    ...View.propTypes,
   };
 
   constructor(props) {
